@@ -1,0 +1,1 @@
+[10-Nov-2018 15:16:17 UTC] PHP Fatal error:  Trait 'Illuminate\Support\Traits\Macroable' not found in /home/ttupor5/public_html/srms/vendor/laravel/framework/src/Illuminate/Routing/Router.php on line 23
