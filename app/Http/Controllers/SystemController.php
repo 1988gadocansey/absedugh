@@ -3346,4 +3346,12 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
             return "None";
         }
     }
+
+    public function generatePassword(){
+        $str = 'abcdefhkmnprtuvwxy34678abcdefhkmnprtuvwxy34678';
+        $shuffled = str_shuffle($str);
+        $vcode = substr($shuffled, 0, 8);
+        $real = strtoupper($vcode);
+        return $real;
+    }
 }

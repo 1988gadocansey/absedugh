@@ -8,7 +8,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class PortalPasswordModel extends Model
 {
-     use LogsActivity;
+     //use LogsActivity;
     //
     /**
      * The database table used by the model.

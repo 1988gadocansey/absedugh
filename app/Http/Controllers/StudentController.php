@@ -986,9 +986,10 @@ class StudentController extends Controller
                 $fname= $value->fname;
                 $lname= $value->surname;
                 $phone= $value->telephone;
-                $password= $value->pass;
+                $password=$sys->generatePassword();
                 $name = $value->name;
                 $program = $value->program;
+                $email = $value->email;
                 $level= $value->level;
                 $address= $value->address;
                 $group = $sys->graduatingGroup($indexno);
@@ -1010,6 +1011,7 @@ class StudentController extends Controller
                         $student->SEX = $gender;
                         $student->NAME = $name;
                         $student->FIRSTNAME= $fname;
+                        $student->EMAIL= $email;
                         $student->SURNAME= $lname;
                         $student->TELEPHONENO= $phone;
                         $student->BILL_OWING = $balance;

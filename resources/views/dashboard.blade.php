@@ -240,16 +240,16 @@
                     <a  href='{{url("/download_results")}}'>  
                     <div class="md-card md-card-hover md-card-overlay">
                         <div class="md-card-content">
-                            <img src="{{url('public/assets/img/dashboard/nabptex.png')}}"/>
+
                         </div>
                         <div class="md-card-overlay-content uk-badge-success">
                             <div class="uk-clearfix md-card-overlay-header">
                                 <i class="md-icon material-icons md-card-overlay-toggler">&#xE5D4;</i>
                                 <h3 class="uk-text-center uk-text-upper uk-text-red">
-                                  NABPTEX BROADSHEET
+                                 BROADSHEET
                                 </h3>
                             </div>
-                           <p>NABPTEX broadsheet</p>
+                           <p>DOWNLOAD BROADSHEET</p>
                         </div>
                     </div>
                     </a>
