@@ -497,7 +497,7 @@ class ProgrammeController extends Controller
 
 
 
-    public function update(Request $request, $id){
+    public function update(Request $request, $id,SystemController $sys){
 
         if ($sys->getUserLevel((@\Auth::user()->department),"courses_upload") == '1' || $sys->getUserLevel((@\Auth::user()->role),"courses_upload") == '1') {
 
@@ -527,11 +527,11 @@ class ProgrammeController extends Controller
 
 
 
-            return redirect("/programmes")->withErrors("Following banks N<u>o</u> :<span style='font-weight:bold;font-size:13px;'> $name could not be updated!</span>");
+            return redirect("/programmes")->withErrors("Following programmes N<u>o</u> :<span style='font-weight:bold;font-size:13px;'> $name could not be updated!</span>");
 
         } else {
 
-            return redirect("/programmes")->with("success", "Following banks:<span style='font-weight:bold;font-size:13px;'> $name successfully updated!</span> ");
+            return redirect("/programmes")->with("success", "Following programmes:<span style='font-weight:bold;font-size:13px;'> $name successfully updated!</span> ");
 
         }
 

@@ -27,7 +27,7 @@
 
                         <label for="wizard_phone">Programme Categories<span class="req uk-text-danger">*</span></label>
                         <p></p>
-                                             {!!  Form::select('type', array('HND'=>'HND','BTECH'=>'BTECH','DBS' => 'DBS','NON-T'=>'NON-TERTIARY' ), null, ['placeholder' => 'Select category','id'=>'parent','class'=>'md-input','required'=>'required','v-model'=>'type','v-form-ctrl'=>'','v-select'=>'','style'=>'width:200px'],old("type","")); !!}
+                                             {!!  Form::select('type', array('DIPLOMA'=>'DIPLOMA','DEGREE'=>'DEGREE','MASTERS' => 'MASTERS','PHD'=>'PHD','OTHERS'=>'OTHERS' ), null, ['placeholder' => 'Select category','id'=>'parent','class'=>'md-input','required'=>'required','v-model'=>'type','v-form-ctrl'=>'','v-select'=>'','style'=>'width:200px'],old("type","")); !!}
                             
                     </div>
                 </div>

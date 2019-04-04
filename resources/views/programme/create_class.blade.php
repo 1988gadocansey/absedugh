@@ -33,7 +33,7 @@
 
           <td valign="top">Class &nbsp;
              
-                                 {!!  Form::select('class[]', array('1st Class'=>'First Class','2nd Class(Upper Division)'=>'Second Class Upper(Upper Division)','2nd Class(Lower Division)'=>'Second Class Upper(Lower Division)', '3rd Class'=>'Third Class','Pass'=>'Pass','Failed'=>'Failed'), null, ['placeholder' => 'select class','required'=>'required','class'=>'md-input parent'],old("class","")); !!}
+                                 {!!  Form::select('class[]', array('1st Class'=>'First Class','2nd Class(Upper Division)'=>'Second Class Upper(Upper Division)','2nd Class(Lower Division)'=>'Second Class Upper(Lower Division)', '3rd Class'=>'Third Class','Pass'=>'Pass','Fail'=>'Fail'), null, ['placeholder' => 'select class','required'=>'required','class'=>'md-input parent'],old("class","")); !!}
           </td>
 
           
