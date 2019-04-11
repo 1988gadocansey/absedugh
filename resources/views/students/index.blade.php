@@ -358,11 +358,11 @@
                                 <td> {{ strtoupper(@$row->NAME) }}</td>
                                 <td>
 
-                                    @if(substr($row->LEVEL, 0, 3 ) === "100" || substr($row->LEVEL, 0, 3 ) === "500"  )
+
                                         <img style="width:90px;height:auto;margin-left:-5px" <?php
-                                        $pic = $row->STNO;
-                                        echo $sys->picture("{!! url(\"public/albums/applicants/$pic.jpg\") !!}", 50)
-                                        ?>  src="http://www.ttuportal.com/admissions/public/albums/thumbnails/{{$pic}}.jpg"
+                                        $pic = $row->INDEXNO;
+                                        echo $sys->picture("{!! url(\"public/albums/students/$pic.jpg\") !!}", 50)
+                                        ?>  src="http://23.92.25.212/portal/public/albums/students/{{$pic}}.jpg"
                                              alt="photo"/>
 
 
@@ -370,25 +370,6 @@
 
 
 
-                        @else
-                                        
-                    
-
-
-                         <?php
-                          $pic = $row->INDEXNO;
-                          $filename = url("public/albums/students/$pic.JPG");
-
-
-                            ?>
-
-                             <a onclick="return MM_openBrWindow('{{url("/student_show/$row->ID/id")}}', 'mark', 'width=800,height=500')"><img  style="width:90px;height: auto;" src='{{url("public/albums/students/$pic.JPG")}}' onerror="this.onerror=function my(){return this.src='{{url("public/albums/students/USER.JPG")}}';};this.src='{{url("public/albums/students/$pic.jpg")}}';" /></a>
-
-                                   
-                                   
-
-                        @endif
-                </div>
 
 
 
