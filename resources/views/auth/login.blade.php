@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="srms ABS">
     <meta name="author" content="Gad Ocansey | gadocansey@gmail.com +233243348522">
-   <title>University Resource Planning System - Accra Business School</title>
+   <title>MIS- Accra Business School</title>
 
     <meta name="msapplication-TileColor" content="#9f00a7">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
@@ -120,8 +120,9 @@ body{
         
     </div>
       <div class="row">
-            <center><small style="font-size: 11px">&copy <?php echo  date('Y'); ?> | Accra Business School - Powered by TPconnect<br/>Help lines 0243348522/0246091283</small></center>
-        </div>
+          <center><small style="font-size: 11px">&copy <?php echo  date('Y'); ?> | Accra Business School - Help Line 0271586811/0263888666 </small></center>
+
+      </div>
   </div>
 
 

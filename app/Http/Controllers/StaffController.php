@@ -39,7 +39,7 @@ class StaffController extends Controller
     public function anyData(Request $request)
     {
          
-        $staff = WorkerModel::select([  'id','fullName', 'designation','staffID','department']);
+        $staff = Models\WorkerModel::select([  'id','fullName', 'designation','staffID','department']);
 
 
         return Datatables::of($staff)
@@ -82,7 +82,7 @@ class StaffController extends Controller
        public function showFileUpload(Request $request) {
            return view("staff.upload");
        }
-       public function uploadStaff(Request $request) {
+       public function uploadStaff(Request $request,SystemController $sys) {
         if ($sys->getUserLevel((@\Auth::user()->department),"create_staff") == '1' || $sys->getUserLevel((@\Auth::user()->role),"create_staff") == '1') {
        if($request->hasFile('file')){
             $file=$request->file('file');

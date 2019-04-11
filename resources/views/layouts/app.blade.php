@@ -340,7 +340,7 @@
                             <ul class="uk-nav uk-nav-dropdown">
 
                                 <li><a href='{!! url("staff") !!}'>View Staff</a></li>
-                                <li><a href='{!! url("/directory") !!}'>Staff Directory</a></li>
+
 
                             </ul>
                         </div>
@@ -476,7 +476,7 @@
                                     <li><a href='{!! url("/groups/view") !!}'>View Class Groups</a></li>
                                     <li><a href='{!! url("/courses") !!}'>View Courses</a></li>
                                     <li><a href='{!! url("/mounted_view") !!}'>View Mounted Courses</a></li>
-                                    <li><a href='{!! url("/directory") !!}'>Staff Directory</a></li>
+
                                     <li><a href='{!! url("/download_regList") !!}'>Registered</a></li>
 
                                 </ul>
@@ -786,10 +786,10 @@
                             <div class="uk-dropdown uk-dropdown-scrollable">
                                 <ul class="uk-nav uk-nav-dropdown">
                                     <li><a href='{!! url("/add_staff") !!}'>Add Staff</a></li>
-                                    <li><a href='{!! url("/power_users") !!}'>Add Staff 2</a></li>
+
                                     <li><a href='{!! url("/search_password") !!}'>Search student passwords</a></li>
                                     <li><a href='{!! url("staff") !!}'>View Staff</a></li>
-                                    <li><a href='{!! url("/directory") !!}'>Staff Directory</a></li>
+
                                     <li><a href='{!! url("/power_users") !!}'>View Users</a></li>
                                     <li><a href='{!! url("/updatePassword") !!}'>Reset Staff Password</a></li>
 
@@ -838,7 +838,6 @@
                                     <li><a href='{!! url("/courses") !!}'>View Courses</a></li>
                                     <li><a href='{!! url("/mounted_view") !!}'>View Mounted Courses</a></li>
                                     <li><a href='{!! url("/power_users") !!}'>View Users</a></li>
-                                    <li><a href='{!! url("/directory") !!}'>Staff Directory</a></li>
 
 
                                 </ul>
@@ -909,7 +908,7 @@
                                     <li><a href='{!! url("staff") !!}'>View Staff</a></li>
                                     <li><a href='{!! url("/grade_system") !!}'>View Grading Systems</a></li>
                                     <li><a href='{!! url("/mounted_view") !!}'>View Mounted Courses</a></li>
-                                    <li><a href='{!! url("/directory") !!}'>Staff Directory</a></li>
+
                                 </ul>
                             </div>
                         </li>

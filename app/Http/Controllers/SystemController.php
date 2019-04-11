@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
 use App\Models\MessagesModel;
@@ -17,7 +18,7 @@ class SystemController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param  TaskRepository  $tasks
+     * @param  TaskRepository $tasks
      * @return void
      */
     public function __construct()
@@ -26,7 +27,9 @@ class SystemController extends Controller
 
 
     }
-    public function getCourseGradeCounter($course,$sem,$level,$year,$program,$grade) {
+
+    public function getCourseGradeCounter($course, $sem, $level, $year, $program, $grade)
+    {
 
         /* $data= @\DB::table('tpoly_academic_record')
              ->where("year",$year)
@@ -35,12 +38,11 @@ class SystemController extends Controller
              ->where("code",$course)
              ->select("grade")
              ->get();*/
-        $row=array();
-        $data= Models\AcademicRecordsModel::where("level",$level)->where("grade","!=","E")->where("sem",$sem)
-
-            ->where("year",$year)->where("grade",$grade)->where("code",$course)->whereHas('student', function($q)use ($program) {
-                $q->whereHas('programme', function($q)use ($program) {
-                    $q->whereIn('PROGRAMMECODE',  array($program));
+        $row = array();
+        $data = Models\AcademicRecordsModel::where("level", $level)->where("grade", "!=", "E")->where("sem", $sem)
+            ->where("year", $year)->where("grade", $grade)->where("code", $course)->whereHas('student', function ($q) use ($program) {
+                $q->whereHas('programme', function ($q) use ($program) {
+                    $q->whereIn('PROGRAMMECODE', array($program));
                 });
             })
             ->count();
@@ -61,51 +63,48 @@ class SystemController extends Controller
         return @$data;
     }
 
-    public function getFCounter($course,$indexno) {
+    public function getFCounter($course, $indexno)
+    {
 
-        
-       
-        $data= Models\AcademicRecordsModel::where("grade","F")->where("code",$course)->where("indexno",$indexno)
+
+        $data = Models\AcademicRecordsModel::where("grade", "F")->where("code", $course)->where("indexno", $indexno)
             ->count();
 
-             if ((empty($data)) || $data < 1) {
-                 $data = 1;
-             }
-            else{
-                @$data = @$data + 1;
-            }
-            
-       
+        if ((empty($data)) || $data < 1) {
+            $data = 1;
+        } else {
+            @$data = @$data + 1;
+        }
+
 
         return @$data;
     }
 
-    public function getUserLevel($role,$item) {
+    public function getUserLevel($role, $item)
+    {
 
-        
-       
-        $data= Models\UserLevelModel::where("name",$role)
 
+        $data = Models\UserLevelModel::where("name", $role)
             ///->where($item,'1')
             //->select($item)
             ->get();
 //dd($item);
-            //  if ((empty($data)) || $data < 1) {
-            //      $data = 1;
-            //  }
-            // else{
-            //     @$data = @$data + 1;
-            // }
-            
-       
+        //  if ((empty($data)) || $data < 1) {
+        //      $data = 1;
+        //  }
+        // else{
+        //     @$data = @$data + 1;
+        // }
+
 
         return @$data[0]->$item;
     }
 
-    public function getCourseGradeCounterTotal($course,$sem,$level,$year,$program,$grade) {
+    public function getCourseGradeCounterTotal($course, $sem, $level, $year, $program, $grade)
+    {
 
-        $total=0;
-        foreach($grade as $grades) {
+        $total = 0;
+        foreach ($grade as $grades) {
 
             $data = Models\AcademicRecordsModel::where("level", $level)->where("grade", "!=", "E")->where("sem", $sem)
                 ->where("year", $year)->where("grade", $grades)->where("code", $course)->whereHas('student', function ($q) use ($program) {
@@ -114,208 +113,237 @@ class SystemController extends Controller
                     });
                 })
                 ->count();
-            $total+= $data;
+            $total += $data;
         }
         return $total;
     }
 
 
+    public function getCourseGradeArray($course, $sem, $level, $year, $program)
+    {
 
-
-
-
-
-
-    public function getCourseGradeArray($course,$sem,$level,$year,$program) {
-
-        $rows=array();
-        $data= Models\AcademicRecordsModel::where("level",$level)->where("grade","!=","E")->where("sem",$sem)
-
-            ->where("year",$year)->where("code",$course)->whereHas('student', function($q)use ($program) {
-                $q->whereHas('programme', function($q)use ($program) {
-                    $q->whereIn('PROGRAMMECODE',  array($program));
+        $rows = array();
+        $data = Models\AcademicRecordsModel::where("level", $level)->where("grade", "!=", "E")->where("sem", $sem)
+            ->where("year", $year)->where("code", $course)->whereHas('student', function ($q) use ($program) {
+                $q->whereHas('programme', function ($q) use ($program) {
+                    $q->whereIn('PROGRAMMECODE', array($program));
                 });
             })
             ->select("grade")->get();
-        foreach ($data as $row){
-            array_push($rows,$row->grade);
+        foreach ($data as $row) {
+            array_push($rows, $row->grade);
         }
 
         return $rows;
 
 
     }
-    public function getLecturerAverage($grades) {
 
-        $total=0.0;
-        for($i=0;$i<count($grades);$i++) {
+    public function getLecturerAverage($grades)
+    {
+
+        $total = 0.0;
+        for ($i = 0; $i < count($grades); $i++) {
             $data = Models\GradeSystemModel::
             where("grade", $grades[$i])->select("value")->first();
 
 
-            $total+= $data->value;
+            $total += $data->value;
 
         }
 
-        return round($total/count($grades),2);
+        return round($total / count($grades), 2);
     }
-    function array_push_assoc($array, $key, $value){
+
+    function array_push_assoc($array, $key, $value)
+    {
         $array[$key] = $value;
         return $array;
     }
-    public function arrayFrequencyCounter( $array,$needle){
 
-        return count(array_keys($array,$needle));
+    public function arrayFrequencyCounter($array, $needle)
+    {
+
+        return count(array_keys($array, $needle));
 
 
     }
-    public function sync_to_online($url,$data){
+
+    public function sync_to_online($url, $data)
+    {
         $ch = \curl_init();
-        \curl_setopt($ch, CURLOPT_URL,$url);
-        \curl_setopt($ch, CURLOPT_POST,1);
+        \curl_setopt($ch, CURLOPT_URL, $url);
+        \curl_setopt($ch, CURLOPT_POST, 1);
         \curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
         \curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $result=\curl_exec($ch);
+        $result = \curl_exec($ch);
 
-        \curl_close ($ch);
+        \curl_close($ch);
         return $result;
 
     }
-    public function getCourseGrade($courseId,$year,$term,$student,$level) {
 
-        $data= @\DB::table('tpoly_academic_record')->where("indexno",$student)
-            ->where("year",$year)
-            ->where("sem",$term)
-            ->where("level",$level)
-            ->where("code",$courseId)
-            ->where("grade","!=","E")
+    public function getCourseGrade($courseId, $year, $term, $student, $level)
+    {
+
+        $data = @\DB::table('tpoly_academic_record')->where("indexno", $student)
+            ->where("year", $year)
+            ->where("sem", $term)
+            ->where("level", $level)
+            ->where("code", $courseId)
+            ->where("grade", "!=", "E")
             ->select("total")
             ->first();
 
         return @$data->total;
 
     }
-    public function getCourseGradeNoticeBoard($courseId,$year,$term,$student,$level) {
 
-        $data= @\DB::table('tpoly_academic_record')->where("indexno",$student)
-            ->where("year",$year)
-            ->where("sem",$term)
-            ->where("level",$level)
-            ->where("code",$courseId)
-            ->where("grade","!=","E")
-            ->select("total","grade")
+    public function getCourseGradeNoticeBoard($courseId, $year, $term, $student, $level)
+    {
+
+        $data = @\DB::table('tpoly_academic_record')->where("indexno", $student)
+            ->where("year", $year)
+            ->where("sem", $term)
+            ->where("level", $level)
+            ->where("code", $courseId)
+            ->where("grade", "!=", "E")
+            ->select("total", "grade")
             ->first();
 
         return @$data;
 
     }
-    public function getProgramDuration($code) {
+
+    public function getProgramDuration($code)
+    {
 
         $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE', $code)->get();
 
         return @$programme[0]->DURATION;
     }
 
-    public function getProgramResult($code) {
+    public function getProgramResult($code)
+    {
 
         $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE', $code)->get();
 
         return @$programme[0]->RESULT;
     }
-    public function getCreditBySem($indexno,$sem,$level) {
+
+    public function getCreditBySem($indexno, $sem, $level)
+    {
 
         $total = \DB::table('tpoly_academic_record')->where('indexno', $indexno)
-            ->where("level",$level)
-            ->where("sem",$sem)->where("grade","!=","E")
+            ->where("level", $level)
+            ->where("sem", $sem)->where("grade", "!=", "E")
             ->sum('credits');
 
         return $total;
     }
-    public function getGPBySem($indexno,$sem,$level) {
+
+    public function getGPBySem($indexno, $sem, $level)
+    {
 
         $total = \DB::table('tpoly_academic_record')->where('indexno', $indexno)
-            ->where("level",$level)
-            ->where("sem",$sem)->where("grade","!=","E")
+            ->where("level", $level)
+            ->where("sem", $sem)->where("grade", "!=", "E")
             ->sum('gpoint');
 
         return $total;
     }
-    public function getGPABySem($indexno,$sem,$level) {
 
-        $totalCR=@$this->getCreditBySem($indexno,$sem,$level);
-        $totalGP=@$this->getGPBySem($indexno,$sem,$level);
+    public function getGPABySem($indexno, $sem, $level)
+    {
 
-        if($totalCR<=0 ||  $totalGP<=0){
+        $totalCR = @$this->getCreditBySem($indexno, $sem, $level);
+        $totalGP = @$this->getGPBySem($indexno, $sem, $level);
+
+        if ($totalCR <= 0 || $totalGP <= 0) {
             return 0;
         }
-        return round( $totalGP/$totalCR,3);
+        return round($totalGP / $totalCR, 3);
     }
-    public function getCGPAPerSem($indexno,$sem,$levels) {
 
-        $totalCR=Models\AcademicRecordsModel::where("indexno",$indexno)->where("level",$levels)
-            ->where("sem",$sem)->where("grade","!=","E")->sum("credits");
-        $totalGP=Models\AcademicRecordsModel::where("indexno",$indexno)->where("level",$levels)
-            ->where("sem",$sem)->where("grade","!=","E")->sum("gpoint");
+    public function getCGPAPerSem($indexno, $sem, $levels)
+    {
+
+        $totalCR = Models\AcademicRecordsModel::where("indexno", $indexno)->where("level", $levels)
+            ->where("sem", $sem)->where("grade", "!=", "E")->sum("credits");
+        $totalGP = Models\AcademicRecordsModel::where("indexno", $indexno)->where("level", $levels)
+            ->where("sem", $sem)->where("grade", "!=", "E")->sum("gpoint");
 
 
-        if($totalCR<=0 ||  $totalGP<=0){
+        if ($totalCR <= 0 || $totalGP <= 0) {
             return 0;
         }
-        return round( $totalGP/$totalCR,3);
+        return round($totalGP / $totalCR, 3);
     }
-    public function getCGPA($indexno) {
 
-        $totalCR=Models\AcademicRecordsModel::where("indexno",$indexno)->where("grade","!=","E")->sum("credits");
-        $totalGP=Models\AcademicRecordsModel::where("indexno",$indexno)->where("grade","!=","E")->sum("gpoint");
+    public function getCGPA($indexno)
+    {
+
+        $totalCR = Models\AcademicRecordsModel::where("indexno", $indexno)->where("grade", "!=", "E")->sum("credits");
+        $totalGP = Models\AcademicRecordsModel::where("indexno", $indexno)->where("grade", "!=", "E")->sum("gpoint");
 
 
-        if($totalCR<=0 ||  $totalGP<=0){
+        if ($totalCR <= 0 || $totalGP <= 0) {
             return 0;
         }
-        return round( $totalGP/$totalCR,3);
+        return round($totalGP / $totalCR, 3);
     }
+
     public function age($birthdate, $pattern = 'eu')
     {
         $patterns = array(
-            'eu'    => 'd/m/Y',
+            'eu' => 'd/m/Y',
             'mysql' => 'Y-m-d',
-            'us'    => 'm/d/Y',
-            'gh'    => 'd-m-Y',
+            'us' => 'm/d/Y',
+            'gh' => 'd-m-Y',
         );
 
-        $now      = new \DateTime();
-        $in       = \DateTime::createFromFormat($patterns[$pattern], $birthdate);
+        $now = new \DateTime();
+        $in = \DateTime::createFromFormat($patterns[$pattern], $birthdate);
         $interval = $now->diff($in);
         return $interval->y;
     }
-    public function getReligion() {
+
+    public function getReligion()
+    {
         $religion = \DB::table('tbl_religion')
             ->lists('religion', 'religion');
         return $religion;
     }
-    public function getCountry() {
+
+    public function getCountry()
+    {
         $country = \DB::table('tbl_country')->orderBy("Name")->orderBy('Name')
             ->lists('Name', 'Name');
         return $country;
     }
-    public function getHalls() {
+
+    public function getHalls()
+    {
         $hall = \DB::table('tpoly_hall')->orderBy("HALL_NAME")
             ->lists('HALL_NAME', 'HALL_NAME');
         return $hall;
     }
-    public function getRegions() {
+
+    public function getRegions()
+    {
         $region = \DB::table('tbl_regions')
             ->lists('Name', 'Name');
         return $region;
     }
-    public function getProgramByIDList() {
-        if( @\Auth::user()->department=='top' || @\Auth::user()->department=='Tptop' || @\Auth::user()->role=='FO'){
+
+    public function getProgramByIDList()
+    {
+        if (@\Auth::user()->department == 'top' || @\Auth::user()->department == 'Tptop' || @\Auth::user()->role == 'FO') {
 
             $program = \DB::table('tpoly_programme')->orderBy("PROGRAMME")
                 ->lists('PROGRAMME', 'ID');
             return $program;
-        }
-        else{
+        } else {
             // $user_department= @\Auth::user()->department;
             $program = \DB::table('tpoly_programme')->orderBy("PROGRAMME")
                 ->lists('PROGRAMME', 'ID');
@@ -323,52 +351,52 @@ class SystemController extends Controller
         }
 
     }
-    public function getDepartmentByIDList() {
 
-        if( @\Auth::user()->role=='FSupport' ){
-            $user_department= @\Auth::user()->department;
-            $department = \DB::table('tpoly_department')->where('FACCODE',$user_department)->orderBy("DEPARTMENT")
+    public function getDepartmentByIDList()
+    {
+
+        if (@\Auth::user()->role == 'FSupport') {
+            $user_department = @\Auth::user()->department;
+            $department = \DB::table('tpoly_department')->where('FACCODE', $user_department)->orderBy("DEPARTMENT")
                 ->lists('DEPARTMENT', 'ID');
             return $department;
-        }
-        elseif( @\Auth::user()->role=='Support' ){
-            $user_department= @\Auth::user()->department;
-            $department = \DB::table('tpoly_department')->where('DEPTCODE',$user_department)
+        } elseif (@\Auth::user()->role == 'Support') {
+            $user_department = @\Auth::user()->department;
+            $department = \DB::table('tpoly_department')->where('DEPTCODE', $user_department)
                 ->lists('DEPARTMENT', 'ID');
             return $department;
-        }
-
-        else{
+        } else {
             $department = \DB::table('tpoly_department')->orderBy("DEPARTMENT")
                 ->lists('DEPARTMENT', 'ID');
             return $department;
         }
-        
+
 
     }
-    public function getDepartmentList() {
-        if(@\Auth::user()->role=='FSupport'){
-            $department = \DB::table('tpoly_department')->where('FACCODE',@\Auth::user()->department)->orderBy("DEPARTMENT")
+
+    public function getDepartmentList()
+    {
+        if (@\Auth::user()->role == 'FSupport') {
+            $department = \DB::table('tpoly_department')->where('FACCODE', @\Auth::user()->department)->orderBy("DEPARTMENT")
                 ->lists('DEPARTMENT', 'DEPTCODE');
             return $department;
-        }
-        elseif(@\Auth::user()->role=='Support' ||@\Auth::user()->role=='HOD' ||@\Auth::user()->role=='Lecturer' ){
-            $department = \DB::table('tpoly_department')->where('DEPTCODE',@\Auth::user()->department)->orderBy("DEPARTMENT")
+        } elseif (@\Auth::user()->role == 'Support' || @\Auth::user()->role == 'HOD' || @\Auth::user()->role == 'Lecturer') {
+            $department = \DB::table('tpoly_department')->where('DEPTCODE', @\Auth::user()->department)->orderBy("DEPARTMENT")
                 ->lists('DEPARTMENT', 'DEPTCODE');
             return $department;
-        }
-        elseif(@\Auth::user()->department=='LA'){
+        } elseif (@\Auth::user()->department == 'LA') {
             $department = \DB::table('tpoly_department')->orderBy("DEPARTMENT")
                 ->lists('DEPARTMENT', 'DEPTCODE');
             return $department;
-        }
-        else{
+        } else {
             $department = \DB::table('tpoly_department')->orderBy("DEPARTMENT")
                 ->lists('DEPARTMENT', 'DEPTCODE');
             return $department;
         }
     }
-    public function getGradeSystemIDList() {
+
+    public function getGradeSystemIDList()
+    {
 
 
         $grade = \DB::table('tpoly_grade_system')
@@ -377,7 +405,9 @@ class SystemController extends Controller
 
 
     }
-    public function getLevelList() {
+
+    public function getLevelList()
+    {
 
 
         $level = \DB::table('tpoly_levels')
@@ -387,7 +417,8 @@ class SystemController extends Controller
 
     }
 
-    public function getLevelName($name) {
+    public function getLevelName($name)
+    {
 
 
         $level = \DB::table('tpoly_levels')
@@ -396,7 +427,9 @@ class SystemController extends Controller
 
 
     }
-    public function getSchoolList() {
+
+    public function getSchoolList()
+    {
 
 
         $school = \DB::table('tpoly_faculty')->orderBy("FACULTY")
@@ -405,17 +438,20 @@ class SystemController extends Controller
 
 
     }
-    public function getProgrammeType($program){
-        $sql=Models\ProgrammeModel::where("PROGRAMMECODE",$program)->first();
-        if(!empty($sql)) {
+
+    public function getProgrammeType($program)
+    {
+        $sql = Models\ProgrammeModel::where("PROGRAMMECODE", $program)->first();
+        if (!empty($sql)) {
             return $sql->TYPE;
         }
     }
 
-    public function assignIndex($programme){
-        $type=$this->getProgrammeType($programme);
-        $quote=Models\IndexNumberModel::where("programme",$programme)->where("year",date("Y"))->first();
-        if(!empty($quote)) {
+    public function assignIndex($programme)
+    {
+        $type = $this->getProgrammeType($programme);
+        $quote = Models\IndexNumberModel::where("programme", $programme)->where("year", date("Y"))->first();
+        if (!empty($quote)) {
             if ($type == "NON TERTIARY") {
                 $index = $quote->code + 1;
                 Models\IndexNumberModel::where("programme", $programme)->where("year", date("Y"))
@@ -431,242 +467,260 @@ class SystemController extends Controller
             }
         }
     }
-    public function getProgrammeTypes() {
+
+    public function getProgrammeTypes()
+    {
 
 
-        $school = \DB::table('tpoly_programme')->where("TYPE","!=","")->groupBy("TYPE")->orderBy("TYPE")
+        $school = \DB::table('tpoly_programme')->where("TYPE", "!=", "")->groupBy("TYPE")->orderBy("TYPE")
             ->lists('TYPE', 'TYPE');
         return $school;
 
 
     }
-    public function hallData($hall) {
-        $info = \DB::table('tpoly_hall')->where("HALL_NAME",$hall)->first();
+
+    public function hallData($hall)
+    {
+        $info = \DB::table('tpoly_hall')->where("HALL_NAME", $hall)->first();
 
         return $info;
 
     }
-    public function hallAccount($hall) {
-        $info = \DB::table('tpoly_hall')->where("HALL_NAME",$hall)->first();
+
+    public function hallAccount($hall)
+    {
+        $info = \DB::table('tpoly_hall')->where("HALL_NAME", $hall)->first();
 
         return $info->ACCOUNTNUMBER;
 
     }
-    public function hallFees($hall) {
-        $info = \DB::table('tpoly_hall')->where("HALL_NAME",$hall)->first();
+
+    public function hallFees($hall)
+    {
+        $info = \DB::table('tpoly_hall')->where("HALL_NAME", $hall)->first();
 
         return $info->AMOUNT;
 
     }
-    public function hallRoomConsumed($hall) {
-        $info = \DB::table('tpoly_applicants')->where("HALL_ADMITTED",$hall)->count();
+
+    public function hallRoomConsumed($hall)
+    {
+        $info = \DB::table('tpoly_applicants')->where("HALL_ADMITTED", $hall)->count();
 
         return $info;
 
     }
-    public function getStudentAccountInfo($indexno) {
+
+    public function getStudentAccountInfo($indexno)
+    {
 
 
-        $info = \DB::table('tpoly_log_portal')->where("username",$indexno)->first();
-        if(!empty($info )){
+        $info = \DB::table('tpoly_log_portal')->where("username", $indexno)->first();
+        if (!empty($info)) {
             return $info->biodata_update;
         }
 
     }
-    public function getYearBill($year,$level,$program) {
+
+    public function getYearBill($year, $level, $program)
+    {
 
 
-        $fee = \DB::table('tpoly_bills')->where("PROGRAMME",$program)
-            ->where('LEVEL',$level)
-            ->where('YEAR',$year)
+        $fee = \DB::table('tpoly_bills')->where("PROGRAMME", $program)
+            ->where('LEVEL', $level)
+            ->where('YEAR', $year)
             ->first();
 
-        if(!empty($fee)){
+        if (!empty($fee)) {
             return $fee->AMOUNT;
-        }
-        else{
+        } else {
             // throw new HttpException(Response::HTTP_UNAUTHORIZED, 'The program that you are adding the student does not have school fees in the system.create the school fee for the program first. Go back');
             return 0.00;
         }
 
 
     }
-    public function getYearBillLevelPostgraduate($year,$level,$program) {
+
+    public function getYearBillLevelPostgraduate($year, $level, $program)
+    {
 
 
-        $fee = \DB::table('tpoly_bills')->where("PROGRAMME",$program)
+        $fee = \DB::table('tpoly_bills')->where("PROGRAMME", $program)
             ->where('LEVEL', '500MT')
-            ->where('YEAR',$year)
+            ->where('YEAR', $year)
             ->first();
 
-        if(!empty($fee)){
+        if (!empty($fee)) {
             return $fee->AMOUNT;
-        }
-        else{
+        } else {
             throw new HttpException(Response::HTTP_UNAUTHORIZED, 'The program that you are adding the student does not have school fees in the system.create the school fee for the program first. Go back');
 
         }
 
 
     }
-    public function getYearBillLevel100($year,$level,$program) {
+
+    public function getYearBillLevel100($year, $level, $program)
+    {
 
 
-        $fee = \DB::table('tpoly_bills')->where("PROGRAMME",$program)
-            ->where('LEVEL','LIKE','%100%')
-            ->where('YEAR',$year)
+        $fee = \DB::table('tpoly_bills')->where("PROGRAMME", $program)
+            ->where('LEVEL', 'LIKE', '%100%')
+            ->where('YEAR', $year)
             ->first();
 
-        if(!empty($fee)){
+        if (!empty($fee)) {
             return $fee->AMOUNT;
         }
-
 
 
     }
-    public function getYearBillInject($year,$level,$program) {
+
+    public function getYearBillInject($year, $level, $program)
+    {
 
 
-        $fee = \DB::table('tpoly_bills')->where("PROGRAMME",$program)
-            ->where('LEVEL',$level)
-            ->where('YEAR',$year)
+        $fee = \DB::table('tpoly_bills')->where("PROGRAMME", $program)
+            ->where('LEVEL', $level)
+            ->where('YEAR', $year)
             ->first();
 
-        if(!empty($fee)){
+        if (!empty($fee)) {
             return $fee->AMOUNT;
-        }
-        else{
+        } else {
             return 0;
         }
 
 
     }
-    public function graduatingGroup($indexNo) {
-       // $level= substr($indexNo, 2,2);
-       // $group="20".$level;
-       // $group_=($group + 3)."/".($group + 4);
 
-       // return $group_;
+    public function graduatingGroup($indexNo)
+    {
+        // $level= substr($indexNo, 2,2);
+        // $group="20".$level;
+        // $group_=($group + 3)."/".($group + 4);
+
+        // return $group_;
 
     }
-    public function getProgramDepartment($program){
 
-        $department = \DB::table('tpoly_programme')->where('PROGRAMMECODE',$program)->get();
+    public function getProgramDepartment($program)
+    {
+
+        $department = \DB::table('tpoly_programme')->where('PROGRAMMECODE', $program)->get();
 
         return @$department[0]->DEPTCODE;
 
     }
-    public function getClass($cgpa){
 
-        $class = \DB::table('tpoly_classes')->where('lowerBoundary','<=',$cgpa)
-            ->where("upperBoundary",">=",$cgpa)
+    public function getClass($cgpa)
+    {
+
+        $class = \DB::table('tpoly_classes')->where('lowerBoundary', '<=', $cgpa)
+            ->where("upperBoundary", ">=", $cgpa)
             ->first();
 
         return @$class->class;
 
     }
-    public function getTrails($indexno){
-        $resultData=array();
-        $trailsArray = \DB::table('tpoly_academic_record')->where('indexno',$indexno)
-            ->where("grade","F")
+
+    public function getTrails($indexno)
+    {
+        $resultData = array();
+        $trailsArray = \DB::table('tpoly_academic_record')->where('indexno', $indexno)
+            ->where("grade", "F")
             ->get();
-        foreach ($trailsArray as $row){
-            array_push($resultData,$row->grade);
+        foreach ($trailsArray as $row) {
+            array_push($resultData, $row->grade);
         }
 
 
-        return implode(",",$resultData);
+        return implode(",", $resultData);
     }
-    public function getLecturer($lecturer){
 
-        $staff = \DB::table('tpoly_workers')->where('id',$lecturer)->get();
+    public function getLecturer($lecturer)
+    {
+
+        $staff = \DB::table('tpoly_workers')->where('id', $lecturer)->get();
 
         return @$staff;
 
     }
-    public function getLecturerFromStaffID($lecturer){
 
-        $staff = @\DB::table('tpoly_workers')->where('staffID',$lecturer)->get();
+    public function getLecturerFromStaffID($lecturer)
+    {
+
+        $staff = @\DB::table('tpoly_workers')->where('staffID', $lecturer)->get();
 
         return @$staff[0]->id;
 
     }
 
-    public function getDepartmentName($deptCode){
+    public function getDepartmentName($deptCode)
+    {
 
-        $department = \DB::table('tpoly_department')->where('DEPTCODE',$deptCode)->get();
+        $department = \DB::table('tpoly_department')->where('DEPTCODE', $deptCode)->get();
 
         return @$department[0]->DEPARTMENT;
 
     }
-    function selectcount($table_field, $Yes_or_No, $lecturer, $coursecode,$sem,$year)
+
+    function selectcount($table_field, $Yes_or_No, $lecturer, $coursecode, $sem, $year)
     {
         $array = $this->getSemYear();
 
-        $qa= $array[0]->QA;
+        $qa = $array[0]->QA;
 
-        $data=explode(",",$qa);
+        $data = explode(",", $qa);
 
         //$year=$data[0];
 
         //$sem=$data[1];
 
 
-
         //$query="SELECT count($table_field)  from questionnaire_table where lecturer='$lecturer' AND programmecode='$programmecode'";
         //$query="SELECT COUNT($table_field) from questionnaire_table as total WHERE  $table_field='$Yes_or_No' and lecturer='$lecturer' and coursecode='$coursecode'";
-        $total=Models\QAquestionModel::
-            where("$table_field","$Yes_or_No")
-            ->where("lecturer",$lecturer)
-            ->where("course",$coursecode)
-            ->where("academic_year",$year)
-            ->where("semester",$sem)
+        $total = Models\QAquestionModel::
+        where("$table_field", "$Yes_or_No")
+            ->where("lecturer", $lecturer)
+            ->where("course", $coursecode)
+            ->where("academic_year", $year)
+            ->where("semester", $sem)
             ->count("$table_field");
 
 
         return $total;
     }
-/*//counting the lecturer involved
-$queryc="SELECT COUNT(lecturer) from questionnaire_table as total2 WHERE coursecode='$coursecode' and lecturer='$lecturer'";
-echo  $queryc;
-$query_resultc=mysql_query($queryc) or die("error in counting lecturer1");
-$datac =mysql_fetch_row($query_resultc) or die('Error here too');
-$total_course_assessed= $datac[0];*/
+
+    /*//counting the lecturer involved
+    $queryc="SELECT COUNT(lecturer) from questionnaire_table as total2 WHERE coursecode='$coursecode' and lecturer='$lecturer'";
+    echo  $queryc;
+    $query_resultc=mysql_query($queryc) or die("error in counting lecturer1");
+    $datac =mysql_fetch_row($query_resultc) or die('Error here too');
+    $total_course_assessed= $datac[0];*/
 
 
     function remark($percentage_score)
     {
-        if ($percentage_score >=80)
-        {
-            $remark_var="Excellent";
-        }
-        else if($percentage_score >=70)
-        {
-            $remark_var="Very Good";
-        }
-        else if($percentage_score >=60)
-        {
-            $remark_var="Good";
-        }
-        else if($percentage_score >=50)
-        {
-            $remark_var="Satisfactory";
-        }
-        else
-        {
-            $remark_var="Poor";
+        if ($percentage_score >= 80) {
+            $remark_var = "Excellent";
+        } else if ($percentage_score >= 70) {
+            $remark_var = "Very Good";
+        } else if ($percentage_score >= 60) {
+            $remark_var = "Good";
+        } else if ($percentage_score >= 50) {
+            $remark_var = "Satisfactory";
+        } else {
+            $remark_var = "Poor";
         }
         return $remark_var; //return remark of lecturer
     }
 
-    function count_poor($remark_seen,$question_no)
+    function count_poor($remark_seen, $question_no)
     {
-        if  ($remark_seen =="Poor")
-        {
+        if ($remark_seen == "Poor") {
             return $question_no;
-        }
-        else
-        {
+        } else {
             //echo "";
         }
     }// end of count_poor function
@@ -674,232 +728,237 @@ $total_course_assessed= $datac[0];*/
 
     function total_mark_remark($value)
     {
-        if ($value >= 16)
-        {
-            $t_remark_var="Excellent";
-        }
-        else if($value >=14)
-        {
-            $t_remark_var="Very Good";
-        }
-        else if($value >=12)
-        {
-            $t_remark_var="Good";
-        }
-        else if($value >=10)
-        {
+        if ($value >= 16) {
+            $t_remark_var = "Excellent";
+        } else if ($value >= 14) {
+            $t_remark_var = "Very Good";
+        } else if ($value >= 12) {
+            $t_remark_var = "Good";
+        } else if ($value >= 10) {
             $t_remark_var = "Satisfactory";
-        }
-        else
-        {
-            $t_remark_var="Poor";
+        } else {
+            $t_remark_var = "Poor";
         }
         return $t_remark_var; //return remark of lecturer
     }
-    public  function qaStatistics(){
-        $comprehensive_outline ='comprehensive_outline';
-        $outline_based_on_sylla= 'outline_based_on_sylla';   //to be removed
-        $outline_recommended_books='outline_recommended_books';
-        $lecturer_person_details ='lecturer_person_details';
-        $course_objective_spelt='course_objective_spelt';
-        $course_material_list ='course_material_list';
 
-        $class_start_week='class_start_week';
-        $class_met_regularly='class_met_regularly';
-        $lecturer_punctual='lecturer_punctual';
-        $lecturer_missed_reason='lecturer_missed_reason';
+    public function qaStatistics()
+    {
+        $comprehensive_outline = 'comprehensive_outline';
+        $outline_based_on_sylla = 'outline_based_on_sylla';   //to be removed
+        $outline_recommended_books = 'outline_recommended_books';
+        $lecturer_person_details = 'lecturer_person_details';
+        $course_objective_spelt = 'course_objective_spelt';
+        $course_material_list = 'course_material_list';
+
+        $class_start_week = 'class_start_week';
+        $class_met_regularly = 'class_met_regularly';
+        $lecturer_punctual = 'lecturer_punctual';
+        $lecturer_missed_reason = 'lecturer_missed_reason';
 
         $lecturer_stays_period = 'lecturer_stays_period';    //recently added
 
-        $demonstrate_knowledge='demonstrate_knowledge';
-        $well_organised_delivery='well_organised_delivery';
-        $communicate_effectively='communicate_effectively';
-        $class_time_prom_learn='class_time_prom_learn';
+        $demonstrate_knowledge = 'demonstrate_knowledge';
+        $well_organised_delivery = 'well_organised_delivery';
+        $communicate_effectively = 'communicate_effectively';
+        $class_time_prom_learn = 'class_time_prom_learn';
         $varying_teaching_meth = 'varying_teaching_meth';
-        $encourage_stud_participation='encourage_stud_participation';
-        $encourage_problem_solving='encourage_problem_solving';
-        $respond_to_stud_concerns='respond_to_stud_concerns';
-        $other_media_delivery='other_media_delivery';
-        $room_for_question='room_for_question';
-        $adequate_assignment='adequate_assignment';
-        $state_feedback_time='state_feedback_time';
-        $mark_assignment='mark_assignment';
-        $discuss_in_class='discuss_in_class';
-        $stud_progress_concern='stud_progress_concern';
-        $stud_responsibility='stud_responsibility';
-        $deadline_assignment='deadline_assignment';
-        $disclose_marks ='disclose_marks';
-        $late_submission_policy='late_submission_policy';
+        $encourage_stud_participation = 'encourage_stud_participation';
+        $encourage_problem_solving = 'encourage_problem_solving';
+        $respond_to_stud_concerns = 'respond_to_stud_concerns';
+        $other_media_delivery = 'other_media_delivery';
+        $room_for_question = 'room_for_question';
+        $adequate_assignment = 'adequate_assignment';
+        $state_feedback_time = 'state_feedback_time';
+        $mark_assignment = 'mark_assignment';
+        $discuss_in_class = 'discuss_in_class';
+        $stud_progress_concern = 'stud_progress_concern';
+        $stud_responsibility = 'stud_responsibility';
+        $deadline_assignment = 'deadline_assignment';
+        $disclose_marks = 'disclose_marks';
+        $late_submission_policy = 'late_submission_policy';
         $variety_assignment_used = 'variety_assignment_used';
-        $course_objective_achieved ='course_objective_achieved';
-        $expectations_communicated ='expectations_communicated';
-        $sold_handout='sold_handout';
-        $created_friendly_atmosphere='created_friendly_atmosphere';
-        $programmecode='programmecode';
+        $course_objective_achieved = 'course_objective_achieved';
+        $expectations_communicated = 'expectations_communicated';
+        $sold_handout = 'sold_handout';
+        $created_friendly_atmosphere = 'created_friendly_atmosphere';
+        $programmecode = 'programmecode';
     }
 
 
-    public function getDepartmentProgramme($pCode){
-        $program = \DB::table('tpoly_programme')->where('PROGRAMMECODE',$pCode)->first();
+    public function getDepartmentProgramme($pCode)
+    {
+        $program = \DB::table('tpoly_programme')->where('PROGRAMMECODE', $pCode)->first();
 
 
-        $department = \DB::table('tpoly_department')->where('DEPTCODE',$program->DEPTCODE)->get();
+        $department = \DB::table('tpoly_department')->where('DEPTCODE', $program->DEPTCODE)->get();
 
         return @$department[0]->DEPARTMENT;
 
     }
 
 
+    public function getSchoolCode($dept)
+    {
 
-    public function getSchoolCode($dept){
-
-        $school = \DB::table('tpoly_department')->where('DEPTCODE',$dept)->get();
+        $school = \DB::table('tpoly_department')->where('DEPTCODE', $dept)->get();
 
         return @$school[0]->FACCODE;
 
     }
-    public function courseSearchByCode() {
+
+    public function courseSearchByCode()
+    {
 
         $course = \DB::table('tpoly_courses')->get();
 
-        foreach($course as $p=>$value){
-            $courses[]=$value->COURSE_CODE;
+        foreach ($course as $p => $value) {
+            $courses[] = $value->COURSE_CODE;
         }
         return $courses;
     }
-    public function programmeSearchByCode() {
+
+    public function programmeSearchByCode()
+    {
 
         $program = \DB::table('tpoly_programme')->get();
 
-        foreach($program as $p=>$value){
-            $programs[]=$value->PROGRAMMECODE;
+        foreach ($program as $p => $value) {
+            $programs[] = $value->PROGRAMMECODE;
         }
         return $programs;
     }
-    public function programmeCategorySearchByCode() {
+
+    public function programmeCategorySearchByCode()
+    {
 
         $program = \DB::table('tpoly_programme')->get();
 
-        foreach($program as $p=>$value){
-            $programs[]=$value->SLUG;
+        foreach ($program as $p => $value) {
+            $programs[] = $value->SLUG;
         }
         return $programs;
     }
-    public function studentSearchByIndexNo($program) {
 
-        $arr = \DB::table('tpoly_students')->where("PROGRAMMECODE",$program)->get();
+    public function studentSearchByIndexNo($program)
+    {
+
+        $arr = \DB::table('tpoly_students')->where("PROGRAMMECODE", $program)->get();
         //dd($arr);
-        foreach($arr as $p=>$value){
-            $objects[]=$value->INDEXNO;
+        foreach ($arr as $p => $value) {
+            $objects[] = $value->INDEXNO;
         }
         return $objects;
     }
-    public function studentSearchByCode($year,$sem,$course,$student) {
 
-        $studentArr= @\DB::table('tpoly_academic_record')->where('year',$year)
-            ->where('sem',$sem)
-            ->where('course',$course)
-            ->where('indexno',$student)
+    public function studentSearchByCode($year, $sem, $course, $student)
+    {
+
+        $studentArr = @\DB::table('tpoly_academic_record')->where('year', $year)
+            ->where('sem', $sem)
+            ->where('course', $course)
+            ->where('indexno', $student)
             ->get();
 
-        if(!empty($studentArr)){
-            foreach($studentArr as $p=>$value){
-                $array[]=$value->indexno;
+        if (!empty($studentArr)) {
+            foreach ($studentArr as $p => $value) {
+                $array[] = $value->indexno;
             }
             return @$array;
-        }
-        else{
+        } else {
 
         }
     }
 
-    public function getSchoolName($dept){
+    public function getSchoolName($dept)
+    {
 
-        $faculty = \DB::table('tpoly_faculty')->where('FACCODE',$dept)->get();
+        $faculty = \DB::table('tpoly_faculty')->where('FACCODE', $dept)->get();
 
         return @$faculty[0]->FACULTY;
 
     }
-    public function getProgrammeMinCredit($program) {
-        $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE',$program)->get();
+
+    public function getProgrammeMinCredit($program)
+    {
+        $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE', $program)->get();
 
         return @$programme[0]->MINCREDITS;
     }
-    public function getProgramCode($id){
 
-        $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE',$id)->get();
+    public function getProgramCode($id)
+    {
+
+        $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE', $id)->get();
 
         return @$programme[0]->PROGRAMMECODE;
 
     }
-    public function getProgramName($code){
 
-        $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE',$code)->get();
+    public function getProgramName($code)
+    {
+
+        $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE', $code)->get();
 
         return @$programme[0]->PROGRAMME;
 
     }
 
-    public function getProgramSlug($code){
+    public function getProgramSlug($code)
+    {
 
-        $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE',$code)->get();
+        $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE', $code)->get();
 
         return @$programme[0]->SLUG;
 
     }
 
 
+    public function getProgramListEvening()
+    {
 
-    public function getProgramListEvening() {
-        
-        if( @\Auth::user()->role=='FSupport' ){
-            $user_school= @\Auth::user()->department;
-            $program = \DB::table('tpoly_programme')->join('tpoly_department','tpoly_department.DEPTCODE', '=', 'tpoly_programme.DEPTCODE')->where('tpoly_department.FACCODE',$user_school)->where("PROGRAMME","!LIKE","%"."Evening"."%")->orderby("tpoly_programme.PROGRAMME")->lists('tpoly_programme.PROGRAMME', 'tpoly_programme.PROGRAMMECODE');
+        if (@\Auth::user()->role == 'FSupport') {
+            $user_school = @\Auth::user()->department;
+            $program = \DB::table('tpoly_programme')->join('tpoly_department', 'tpoly_department.DEPTCODE', '=', 'tpoly_programme.DEPTCODE')->where('tpoly_department.FACCODE', $user_school)->where("PROGRAMME", "!LIKE", "%" . "Evening" . "%")->orderby("tpoly_programme.PROGRAMME")->lists('tpoly_programme.PROGRAMME', 'tpoly_programme.PROGRAMMECODE');
             return $program;
 
 
-        }
-        elseif( @\Auth::user()->role=='Support' ){
-            $user_department= @\Auth::user()->department;
-            $program = \DB::table('tpoly_programme')->where("PROGRAMME","!LIKE","%"."Evening"."%")->where('DEPTCODE',$user_department)->orderby("PROGRAMME")
+        } elseif (@\Auth::user()->role == 'Support') {
+            $user_department = @\Auth::user()->department;
+            $program = \DB::table('tpoly_programme')->where("PROGRAMME", "!LIKE", "%" . "Evening" . "%")->where('DEPTCODE', $user_department)->orderby("PROGRAMME")
+                ->lists('PROGRAMME', 'PROGRAMMECODE');
+            return $program;
+        } else {
+            $program = \DB::table('tpoly_programme')->where("PROGRAMME", "!LIKE", "%" . "Evening" . "%")->orderby("PROGRAMME")
                 ->lists('PROGRAMME', 'PROGRAMMECODE');
             return $program;
         }
 
-       else{
-            $program = \DB::table('tpoly_programme')->where("PROGRAMME","!LIKE","%"."Evening"."%")->orderby("PROGRAMME")
-                ->lists('PROGRAMME', 'PROGRAMMECODE');
-            return $program;
-        }
-        
 
     }
+
     // this is purposely for select box
-    public function getProgramList() {
-        $departmentArray=explode(",",@\Auth::user()->department);
-        if( @\Auth::user()->department=='btech'){
-            $program = \DB::table('tpoly_programme')->where('TYPE','BTECH')->orWhere('TYPE','MTECH')->orderby("PROGRAMME")
+    public function getProgramList()
+    {
+        $departmentArray = explode(",", @\Auth::user()->department);
+        if (@\Auth::user()->department == 'btech') {
+            $program = \DB::table('tpoly_programme')->where('TYPE', 'BTECH')->orWhere('TYPE', 'MTECH')->orderby("PROGRAMME")
                 ->lists('PROGRAMME', 'PROGRAMMECODE');
             return $program;
-        }
-        
-        elseif( @\Auth::user()->role=='FSupport' ){
-            $user_school= @\Auth::user()->department;
-            $program = \DB::table('users')->join('tpoly_faculty','users.department', '=', 'tpoly_faculty.FACCODE')->join('tpoly_department','tpoly_faculty.FACCODE', '=', 'tpoly_department.FACCODE')->join('tpoly_programme','tpoly_department.DEPTCODE', '=', 'tpoly_programme.DEPTCODE')->where('users.department',$user_school)->orderby("tpoly_programme.PROGRAMME")->groupby("tpoly_programme.PROGRAMME")->lists('tpoly_programme.PROGRAMME', 'tpoly_programme.PROGRAMMECODE');
+        } elseif (@\Auth::user()->role == 'FSupport') {
+            $user_school = @\Auth::user()->department;
+            $program = \DB::table('users')->join('tpoly_faculty', 'users.department', '=', 'tpoly_faculty.FACCODE')->join('tpoly_department', 'tpoly_faculty.FACCODE', '=', 'tpoly_department.FACCODE')->join('tpoly_programme', 'tpoly_department.DEPTCODE', '=', 'tpoly_programme.DEPTCODE')->where('users.department', $user_school)->orderby("tpoly_programme.PROGRAMME")->groupby("tpoly_programme.PROGRAMME")->lists('tpoly_programme.PROGRAMME', 'tpoly_programme.PROGRAMMECODE');
             return $program;
 
             //SELECT e.PROGRAMMECODE FROM users a join tpoly_faculty c on a.department = c.FACCODE join tpoly_department d on c.FACCODE = d.FACCODE join tpoly_programme e on d.DEPTCODE = e.DEPTCODE WHERE a.department = 'SAA' GROUP by e.PROGRAMMECODE
 
 
-        }
-        elseif( @\Auth::user()->role=='Support' ){
+        } elseif (@\Auth::user()->role == 'Support') {
             // $user_department= @\Auth::user()->department;
             $program = \DB::table('tpoly_programme')->whereIn('DEPTCODE', $departmentArray)->orderby("PROGRAMME")
                 ->lists('PROGRAMME', 'PROGRAMMECODE');
             return $program;
-        }
-
-        else{
+        } else {
             $program = \DB::table('tpoly_programme')->orderby("PROGRAMME")
                 ->lists('PROGRAMME', 'PROGRAMMECODE');
             return $program;
@@ -909,24 +968,22 @@ $total_course_assessed= $datac[0];*/
 
 
     // this is purposely for select box
-    public function getProgramList5() {
-        $departmentArray=explode(",",@\Auth::user()->department);
-        
-        if( @\Auth::user()->role=='FSupport' ){
-            $user_school= @\Auth::user()->department;
-            $program = \DB::table('tpoly_programme')->join('tpoly_department','tpoly_department.DEPTCODE', '=', 'tpoly_programme.DEPTCODE')->where('tpoly_department.FACCODE',$user_school)->orderby("tpoly_programme.PROGRAMME")->lists('tpoly_programme.PROGRAMME', 'tpoly_programme.PROGRAMMECODE');
+    public function getProgramList5()
+    {
+        $departmentArray = explode(",", @\Auth::user()->department);
+
+        if (@\Auth::user()->role == 'FSupport') {
+            $user_school = @\Auth::user()->department;
+            $program = \DB::table('tpoly_programme')->join('tpoly_department', 'tpoly_department.DEPTCODE', '=', 'tpoly_programme.DEPTCODE')->where('tpoly_department.FACCODE', $user_school)->orderby("tpoly_programme.PROGRAMME")->lists('tpoly_programme.PROGRAMME', 'tpoly_programme.PROGRAMMECODE');
             return $program;
 
 
-        }
-        elseif( @\Auth::user()->role=='Support' ){
+        } elseif (@\Auth::user()->role == 'Support') {
             // $user_department= @\Auth::user()->department;
             $program = \DB::table('tpoly_programme')->orderby("PROGRAMME")
                 ->lists('PROGRAMME', 'PROGRAMMECODE');
             return $program;
-        }
-
-        else{
+        } else {
             $program = \DB::table('tpoly_programme')->orderby("PROGRAMME")
                 ->lists('PROGRAMME', 'PROGRAMMECODE');
             return $program;
@@ -935,49 +992,48 @@ $total_course_assessed= $datac[0];*/
     }
 
 
-    public function totalRegistered($sem,$year,$course,$level,$lecturer) {
-        if(@\Auth::user()->role=='Lecturer' || @\Auth::user()->role=='HOD' ||@\Auth::user()->role=='Dean'){
+    public function totalRegistered($sem, $year, $course, $level, $lecturer)
+    {
+        if (@\Auth::user()->role == 'Lecturer' || @\Auth::user()->role == 'HOD' || @\Auth::user()->role == 'Dean') {
 
-            $query=Models\AcademicRecordsModel::where('sem',$sem)
-                ->where('year',$year)
-                ->where('level',$level)
-
-                ->where('lecturer',$lecturer)
-                ->where('code',$course)->get();
-        }
-        else{
-            $query=Models\AcademicRecordsModel::where('sem',$sem)
-                ->where('year',$year)
-                ->where('level',$level)
-
-
-                ->where('code',$course)->get();
+            $query = Models\AcademicRecordsModel::where('sem', $sem)
+                ->where('year', $year)
+                ->where('level', $level)
+                ->where('lecturer', $lecturer)
+                ->where('code', $course)->get();
+        } else {
+            $query = Models\AcademicRecordsModel::where('sem', $sem)
+                ->where('year', $year)
+                ->where('level', $level)
+                ->where('code', $course)->get();
         }
 
         return count($query);
 
     }
-    public function years() {
-    if(@\Auth::user()->department=='Tptop'){
-        for ($i =1998; $i <= 3030; $i++) {
-            $year = $i - 1 . "/" . $i;
-            $years[$year] = $year;
-        }
 
-        }
-        else{
-            for ($i =2019; $i <= 3030; $i++) {
-            $year = $i - 1 . "/" . $i;
-            $years[$year] = $year;
-        }
+    public function years()
+    {
+        if (@\Auth::user()->department == 'Tptop') {
+            for ($i = 1998; $i <= 3030; $i++) {
+                $year = $i - 1 . "/" . $i;
+                $years[$year] = $year;
+            }
+
+        } else {
+            for ($i = 2019; $i <= 3030; $i++) {
+                $year = $i - 1 . "/" . $i;
+                $years[$year] = $year;
+            }
         }
 
         return $years;
     }
 
-    public function years22() {
+    public function years22()
+    {
 
-        for ($i =2018; $i <= 2018; $i++) {
+        for ($i = 2018; $i <= 2018; $i++) {
             $year = $i - 1 . "/" . $i;
             $years[$year] = $year;
         }
@@ -985,127 +1041,143 @@ $total_course_assessed= $datac[0];*/
     }
 
     // this is purposely for select box
-    public function getCourseList() {
+    public function getCourseList()
+    {
         $course = Models\CourseModel::
-        select('COURSE_NAME', 'ID',"PROGRAMME","COURSE_SEMESTER","COURSE_LEVEL","COURSE_CODE")->orderBy("COURSE_NAME")->get();
+        select('COURSE_NAME', 'ID', "PROGRAMME", "COURSE_SEMESTER", "COURSE_LEVEL", "COURSE_CODE")->orderBy("COURSE_NAME")->get();
         return $course;
 
 
     }
-    public function getProgramList2() {
-        $program= Models\ProgrammeModel::
+
+    public function getProgramList2()
+    {
+        $program = Models\ProgrammeModel::
         select('PROGRAMMECODE', "PROGRAMME")->orderBy("PROGRAMME")->get();
         return $program;
 
 
     }
 
-    public function getMountedCourseList() {
+    public function getMountedCourseList()
+    {
 
-        if(@\Auth::user()->role=='Lecturer'){
-            $course=@\DB::table('tpoly_mounted_courses')
-                ->join('tpoly_courses','tpoly_courses.COURSE_CODE', '=', 'tpoly_mounted_courses.COURSE_CODE')->where('tpoly_mounted_courses.Lecturer',@\Auth::user()->fund )->lists('tpoly_courses.COURSE_NAME', 'tpoly_mounted_courses.COURSE_CODE');
+        if (@\Auth::user()->role == 'Lecturer') {
+            $course = @\DB::table('tpoly_mounted_courses')
+                ->join('tpoly_courses', 'tpoly_courses.COURSE_CODE', '=', 'tpoly_mounted_courses.COURSE_CODE')->where('tpoly_mounted_courses.Lecturer', @\Auth::user()->fund)->lists('tpoly_courses.COURSE_NAME', 'tpoly_mounted_courses.COURSE_CODE');
             return $course;
 
-        }
-        else {
-            $course=@\DB::table('tpoly_mounted_courses')
-                ->join('tpoly_courses','tpoly_courses.COURSE_CODE', '=', 'tpoly_mounted_courses.COURSE_CODE')->lists('tpoly_courses.COURSE_NAME', 'tpoly_mounted_courses.COURSE_CODE');
-            return $course;
-        }
-    }
-
-     public function getMountedCourseList2() {
-
-        if(@\Auth::user()->role=='Lecturer'){
-            $course=@\DB::table('tpoly_mounted_courses')
-                ->join('tpoly_courses','tpoly_courses.COURSE_CODE', '=', 'tpoly_mounted_courses.COURSE_CODE')->where('tpoly_mounted_courses.Lecturer',@\Auth::user()->fund )->select('tpoly_courses.COURSE_NAME', 'tpoly_mounted_courses.COURSE_CODE','tpoly_mounted_courses.COURSE_SEMESTER')->groupby('tpoly_mounted_courses.COURSE_CODE')->get();
-            return $course;
-
-        }
-        else {
-            $course=@\DB::table('tpoly_mounted_courses')
-                ->join('tpoly_courses','tpoly_courses.COURSE_CODE', '=', 'tpoly_mounted_courses.COURSE_CODE')->select('tpoly_courses.COURSE_NAME', 'tpoly_mounted_courses.COURSE_CODE','tpoly_mounted_courses.COURSE_SEMESTER')->get();
+        } else {
+            $course = @\DB::table('tpoly_mounted_courses')
+                ->join('tpoly_courses', 'tpoly_courses.COURSE_CODE', '=', 'tpoly_mounted_courses.COURSE_CODE')->lists('tpoly_courses.COURSE_NAME', 'tpoly_mounted_courses.COURSE_CODE');
             return $course;
         }
     }
 
+    public function getMountedCourseList2()
+    {
 
-    public function getMountedCourseList3() {
-        $currentResult=$this->getSemYear();
-        $currentResultsArray=$currentResult[0]->RESULT_DATE;
-       // dd($resultb);
+        if (@\Auth::user()->role == 'Lecturer') {
+            $course = @\DB::table('tpoly_mounted_courses')
+                ->join('tpoly_courses', 'tpoly_courses.COURSE_CODE', '=', 'tpoly_mounted_courses.COURSE_CODE')->where('tpoly_mounted_courses.Lecturer', @\Auth::user()->fund)->select('tpoly_courses.COURSE_NAME', 'tpoly_mounted_courses.COURSE_CODE', 'tpoly_mounted_courses.COURSE_SEMESTER')->groupby('tpoly_mounted_courses.COURSE_CODE')->get();
+            return $course;
 
-        $currentResultsArray1 = explode(',',$currentResultsArray);
+        } else {
+            $course = @\DB::table('tpoly_mounted_courses')
+                ->join('tpoly_courses', 'tpoly_courses.COURSE_CODE', '=', 'tpoly_mounted_courses.COURSE_CODE')->select('tpoly_courses.COURSE_NAME', 'tpoly_mounted_courses.COURSE_CODE', 'tpoly_mounted_courses.COURSE_SEMESTER')->get();
+            return $course;
+        }
+    }
+
+
+    public function getMountedCourseList3()
+    {
+        $currentResult = $this->getSemYear();
+        $currentResultsArray = $currentResult[0]->RESULT_DATE;
+        // dd($resultb);
+
+        $currentResultsArray1 = explode(',', $currentResultsArray);
         $year = $currentResultsArray1[0];
         $sem = $currentResultsArray1[1];
 
-        if(@\Auth::user()->role=='Lecturer'){
-            $course=@\DB::table('tpoly_mounted_courses')
-                ->join('tpoly_courses','tpoly_courses.COURSE_CODE', '=', 'tpoly_mounted_courses.COURSE_CODE')->where('tpoly_mounted_courses.Lecturer',@\Auth::user()->fund )->where('tpoly_mounted_courses.COURSE_SEMESTER','=', $sem)->where('tpoly_mounted_courses.COURSE_YEAR','=', $year)->select('tpoly_courses.COURSE_NAME', 'tpoly_mounted_courses.COURSE_CODE','tpoly_mounted_courses.COURSE_SEMESTER')->groupby('tpoly_mounted_courses.COURSE_CODE')->get();
+        if (@\Auth::user()->role == 'Lecturer') {
+            $course = @\DB::table('tpoly_mounted_courses')
+                ->join('tpoly_courses', 'tpoly_courses.COURSE_CODE', '=', 'tpoly_mounted_courses.COURSE_CODE')->where('tpoly_mounted_courses.Lecturer', @\Auth::user()->fund)->where('tpoly_mounted_courses.COURSE_SEMESTER', '=', $sem)->where('tpoly_mounted_courses.COURSE_YEAR', '=', $year)->select('tpoly_courses.COURSE_NAME', 'tpoly_mounted_courses.COURSE_CODE', 'tpoly_mounted_courses.COURSE_SEMESTER')->groupby('tpoly_mounted_courses.COURSE_CODE')->get();
             return $course;
 
-        }
-        else {
-            $course=@\DB::table('tpoly_mounted_courses')
-                ->join('tpoly_courses','tpoly_courses.COURSE_CODE', '=', 'tpoly_mounted_courses.COURSE_CODE')->where('tpoly_mounted_courses.COURSE_SEMESTER','=', $sem)->select('tpoly_courses.COURSE_NAME', 'tpoly_mounted_courses.COURSE_CODE','tpoly_mounted_courses.COURSE_SEMESTER')->groupby('tpoly_mounted_courses.COURSE_CODE')->get();
+        } else {
+            $course = @\DB::table('tpoly_mounted_courses')
+                ->join('tpoly_courses', 'tpoly_courses.COURSE_CODE', '=', 'tpoly_mounted_courses.COURSE_CODE')->where('tpoly_mounted_courses.COURSE_SEMESTER', '=', $sem)->select('tpoly_courses.COURSE_NAME', 'tpoly_mounted_courses.COURSE_CODE', 'tpoly_mounted_courses.COURSE_SEMESTER')->groupby('tpoly_mounted_courses.COURSE_CODE')->get();
             return $course;
         }
     }
-    // this is purposely for select box
-    public function getLectureList() {
 
-        $lecturer = \DB::table('tpoly_workers')->where('designation','Lecturer')
-            ->where('department',$user_department)->orderby("fullName")
+    // this is purposely for select box
+    public function getLectureList()
+    {
+
+        $lecturer = \DB::table('tpoly_workers')->where('designation', 'Lecturer')
+            ->where('department', $user_department)->orderby("fullName")
             ->lists('fullName', 'id');
         return $lecturer;
 
 
     }
-    public function getLectureList_All() {
+
+    public function getLectureList_All()
+    {
 
         $lecturer = \DB::table('tpoly_workers')->orderby("fullName")
-
             ->lists('fullName', 'staffID');
         return $lecturer;
 
 
     }
-    public function getLectureStaffID($id) {
 
-        $lecturer = \DB::table('tpoly_workers')->Select("staffID")->where("id",$id)->first();
+    public function getLectureStaffID($id)
+    {
+
+        $lecturer = \DB::table('tpoly_workers')->Select("staffID")->where("id", $id)->first();
 
 
         return $lecturer->staffID;
 
 
     }
-    public function getLectureName($staffID) {
 
-        $lecturer = \DB::table('tpoly_workers')->Select("fullName")->where("staffID",$staffID)->first();
+    public function getLectureName($staffID)
+    {
+
+        $lecturer = \DB::table('tpoly_workers')->Select("fullName")->where("staffID", $staffID)->first();
 
 
         return $lecturer->fullName;
 
 
     }
+
     // this is purposely for select box
-    public function getUsers() {
-        $user= \DB::table('users')
+    public function getUsers()
+    {
+        $user = \DB::table('users')
             ->lists('name', 'id');
         return $user;
 
 
     }
-    public function department() {
-        $department= \DB::table('tpoly_department')->orderby("DEPARTMENT")
+
+    public function department()
+    {
+        $department = \DB::table('tpoly_department')->orderby("DEPARTMENT")
             ->lists('DEPARTMENT', 'DEPTCODE');
         return $department;
 
 
     }
-    public function WASSCE_Grades() {
-        $grade= \DB::table('tbl_waec_grades_system')
+
+    public function WASSCE_Grades()
+    {
+        $grade = \DB::table('tbl_waec_grades_system')
             ->lists('grade', 'grade');
         return $grade;
 
@@ -1177,191 +1249,209 @@ $total_course_assessed= $datac[0];*/
 //
 //    }
 //
-//   public function firesms($message,$phone,$receipient){
-//
-//                    $array=  $this->getSemYear();
-//        $sem=$array[0]->SEMESTER;
-//               $year=$array[0]->YEAR;
-//                  $user = \Auth::user()->fund;
-//
-//
-//
-//               $phone="+233".\substr($phone,1,9);
-//            $phone = str_replace(' ', '', $phone);
-//                 $phone = str_replace('-', '', $phone);
-//                $key = "bcb86ecbc1a058663a07"; //your unique API key;
-//           // $key = "83f76e13c92d33e27895"; //your unique API key;
-//            $message=urlencode($message); //encode url;
-//        $sender_id="TTU";
-//
-//        $url = "http://sms.gadeksystems.com/smsapi?key=$key&to=$phone&msg=$message&sender_id=$sender_id";
-//        //print_r($url);
-//           $result = file_get_contents($url); //call url and store result;
-//
-//                   if ($result == 1000) {
-//
-//                   $result="Message was successfully sent";
-//
-//                    }elseif ($result == 1002){
-//                    $result="Message failed to send. Error: " .  $result;
-//
-//                    }
-//                    elseif ($result == 1003){
-//                    $result="insufficient balance ";
-//
-//                    }
-//                     elseif ($result == 1004){
-//                    $result="invalid API key ";
-//
-//                    }
-//                    elseif ($result == 1005){
-//                    $result="invalid Phone number ";
-//
-//                    }
-//                    elseif ($result == 1006){
-//                        $result="invalid Sender ID. Sender ID must not be more than 11 Characters. Characters include white space";
-//                    }
-//                     elseif ($result == 1007){
-//                    $result=" Message scheduled for later delivery ";
-//
-//                    }
-//                    else{
-//                         $result=" Empty Message ";
-//                    }
-//
-//
-//
-//                  $sms=new MessagesModel();
-//                    $sms->dates=\DB::raw("NOW()");
-//                    $sms->message=$message;
-//                    $sms->phone=$phone;
-//                    $sms->status=$result;
-//                    $sms->type="Admission Notifications";
-//
-//                    $sms->sender=$user;
-//              $sms->term=$sem;
-//                   $sms->year=$year;
-//                    $sms->receipient=$receipient;
-//
-//                   $sms->save();
-//
-//           return $result;
-//
-//
-//
-//
-//
-//    }
+    public function firesms($message,$phone,$receipient)
+    {
 
-    public function getMessage($applicantNumber) {
-        $data=@Models\MessagesModel::where("receipient",$applicantNumber)->where("type","Admission Notifications")->groupBy("receipient")->first();
+        $array = $this->getSemYear();
+        $sem = $array[0]->SEMESTER;
+        $year = $array[0]->YEAR;
+        $user = \Auth::user()->fund;
+
+        $loginname = "teamtitiofei";
+        $loginpassword = "@Admin2020$";
+
+
+        $phone = "+233" . \substr($phone, 1, 9);
+        $phone = str_replace(' ', '', $phone);
+        $phone = str_replace('-', '', $phone);
+        $key = "bcb86ecbc1a058663a07"; //your unique API key;
+        // $key = "83f76e13c92d33e27895"; //your unique API key;
+        $message = urlencode($message); //encode url;
+        $sender_id = "ABS-SMS";
+
+        $url = "http://quicksmsgh.com/bulksms/?username=$loginname&password=$loginpassword&type=0&dlr=1&destination=$phone&source=$sender_id&message=$message";
+        //print_r($url);
+        $result = file_get_contents($url); //call url and store result;
+
+        if ($result == 1701) {
+
+            $result = "Message was successfully sent";
+
+        } elseif ($result == 1703) {
+            $result = "Invalid value in username or password field: " . $result;
+
+        } elseif ($result == 1025) {
+            $result = "insufficient balance ";
+
+        } elseif ($result == 1004) {
+            $result = "invalid API key ";
+
+        } elseif ($result == 1005) {
+            $result = "invalid Phone number ";
+
+        } elseif ($result == 1006) {
+            $result = "invalid Sender ID. Sender ID must not be more than 11 Characters. Characters include white space";
+        } elseif ($result == 1007) {
+            $result = " Message scheduled for later delivery ";
+
+        } else {
+            $result = " Empty Message ";
+        }
+
+
+        $sms = new MessagesModel();
+        $sms->dates = \DB::raw("NOW()");
+        $sms->message = $message;
+        $sms->phone = $phone;
+        $sms->status = $result;
+        $sms->type = "ABS Notifications";
+
+        $sms->sender = $user;
+        $sms->term = $sem;
+        $sms->year = $year;
+        $sms->receipient = $receipient;
+
+        $sms->save();
+
+        return $result;
+
+
+    }
+
+    public function getMessage($applicantNumber)
+    {
+        $data = @Models\MessagesModel::where("receipient", $applicantNumber)->where("type", "Admission Notifications")->groupBy("receipient")->first();
 
         //dd($data);
-        if($data!=null){
+        if ($data != null) {
             return $data->message;
-        }
-        else{
+        } else {
             return "No sms sent";
         }
 
     }
+
     /**
      * Get current sem and year
      *
-     * @param  Request  $request
+     * @param  Request $request
      * @return Response
      */
     public function getSemYear()
     {
-        $sql =\DB::table('tpoly_academic_settings')->where('ID', \DB::raw("(select max(`ID`) from tpoly_academic_settings)"))->get();
+        $sql = \DB::table('tpoly_academic_settings')->where('ID', \DB::raw("(select max(`ID`) from tpoly_academic_settings)"))->get();
         return $sql;
     }
 
-    public function getProgram($code){
+    public function getProgram($code)
+    {
 
-        $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE',$code)->get();
+        $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE', $code)->get();
 
         return @$programme[0]->PROGRAMME;
 
     }
-    public function getStudentPassword($user){
 
-        $userArr = \DB::table('tpoly_log_portal')->where('username',$user)->get();
+    public function getStudentPassword($user)
+    {
+
+        $userArr = \DB::table('tpoly_log_portal')->where('username', $user)->get();
 
         return @$userArr[0]->real_password;
 
     }
-    public function getProgramArray($code){
 
-        $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE',$code)->get();
+    public function getProgramArray($code)
+    {
+
+        $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE', $code)->get();
 
         return @$programme;
 
     }
-    public function getCreditHour($courseCode,$sem,$level,$program) {
-        $course = \DB::table('tpoly_courses')->where('COURSE_CODE',$courseCode)->where('COURSE_SEMESTER',$sem)->where('COURSE_LEVEL',$level)
-            ->where("PROGRAMME",$program)
+
+    public function getCreditHour($courseCode, $sem, $level, $program)
+    {
+        $course = \DB::table('tpoly_courses')->where('COURSE_CODE', $courseCode)->where('COURSE_SEMESTER', $sem)->where('COURSE_LEVEL', $level)
+            ->where("PROGRAMME", $program)
             ->get();
 
         return @$course[0]->COURSE_CREDIT;
     }
-    public function getMountedCreditHour($courseCode,$sem,$level,$program) {
-        $course = \DB::table('tpoly_mounted_courses')->where('COURSE_CODE',$courseCode)->where('COURSE_SEMESTER',$sem)->where('COURSE_LEVEL',$level)
-            ->where("PROGRAMME",$program)
+
+    public function getMountedCreditHour($courseCode, $sem, $level, $program)
+    {
+        $course = \DB::table('tpoly_mounted_courses')->where('COURSE_CODE', $courseCode)->where('COURSE_SEMESTER', $sem)->where('COURSE_LEVEL', $level)
+            ->where("PROGRAMME", $program)
             ->get();
 
         return @$course[0]->COURSE_CREDIT;
     }
-    public function getStudentByID($id){
 
-        $student = \DB::table('tpoly_students')->where('ID',$id)->get();
+    public function getStudentByID($id)
+    {
+
+        $student = \DB::table('tpoly_students')->where('ID', $id)->get();
 
         return @$student[0]->INDEXNO;
 
     }
-    public function getStudentIDfromIndexno($indexno) {
-        $student = \DB::table('tpoly_students')->where('INDEXNO',$indexno)->get();
 
-        return  @$student[0]->ID;
+    public function getStudentIDfromIndexno($indexno)
+    {
+        $student = \DB::table('tpoly_students')->where('INDEXNO', $indexno)->get();
+
+        return @$student[0]->ID;
     }
-    public function getStudentAppnofromIndexno($indexno) {
-        $student = \DB::table('tpoly_students')->where('INDEXNO',$indexno)->get();
 
-        return  @$student[0]->STNO;
+    public function getStudentAppnofromIndexno($indexno)
+    {
+        $student = \DB::table('tpoly_students')->where('INDEXNO', $indexno)->get();
+
+        return @$student[0]->STNO;
     }
-    public function getStudentprogramfromIndexno($indexno) {
-        $student = \DB::table('tpoly_students')->where('INDEXNO',$indexno)->get();
 
-        return  @$student[0]->PROGRAMMECODE;
+    public function getStudentprogramfromIndexno($indexno)
+    {
+        $student = \DB::table('tpoly_students')->where('INDEXNO', $indexno)->get();
+
+        return @$student[0]->PROGRAMMECODE;
     }
-    public function getStudentyeargroupfromIndexno($indexno) {
-        $student = \DB::table('tpoly_students')->where('INDEXNO',$indexno)->get();
 
-        return  @$student[0]->GRADUATING_GROUP;
+    public function getStudentyeargroupfromIndexno($indexno)
+    {
+        $student = \DB::table('tpoly_students')->where('INDEXNO', $indexno)->get();
+
+        return @$student[0]->GRADUATING_GROUP;
     }
-    public function getStudentNameByID($id){
 
-        $student = \DB::table('tpoly_students')->where('ID',$id)->get();
+    public function getStudentNameByID($id)
+    {
+
+        $student = \DB::table('tpoly_students')->where('ID', $id)->get();
 
         return @$student[0]->NAME;
 
     }
-    public function getStudent($indexNo){
 
-        $student = \DB::table('tpoly_students')->where('INDEXNO',$indexNo)->get();
+    public function getStudent($indexNo)
+    {
+
+        $student = \DB::table('tpoly_students')->where('INDEXNO', $indexNo)->get();
 
         return @$student;
 
     }
 
 
-    public function getStudentsTotalPerLevel2($level){
+    public function getStudentsTotalPerLevel2($level)
+    {
         $array = $this->getSemYear();
 
         $year = $array[0]->YEAR;
-        $sem=$array[0]->SEMESTER;
+        $sem = $array[0]->SEMESTER;
 
-        $total = \DB::table('tpoly_students')->where('LEVEL',$level)->where("REGISTERED","1")
+        $total = \DB::table('tpoly_students')->where('LEVEL', $level)->where("REGISTERED", "1")
             ->count();
         return $total;
     }
@@ -1371,16 +1461,16 @@ $total_course_assessed= $datac[0];*/
     //            ->count();
     //    return $total;
 
-    public function getStudentsTotalPerLevel($level){
+    public function getStudentsTotalPerLevel($level)
+    {
         $array = $this->getSemYear();
 
         $year = $array[0]->YEAR;
-        $sem=$array[0]->SEMESTER;
+        $sem = $array[0]->SEMESTER;
 
         $total = \DB::table('tpoly_students')->leftJoin('tpoly_academic_record', 'tpoly_students.ID', '=', 'tpoly_academic_record.student')
-
             //->where('tpoly_students.PROGRAMMECODE', $program)
-            ->where('tpoly_academic_record.level', "LIKE", "%". $level . "%")
+            ->where('tpoly_academic_record.level', "LIKE", "%" . $level . "%")
             ->where('tpoly_academic_record.year', $year)
             ->where('tpoly_academic_record.sem', $sem)
             ->groupBy('tpoly_academic_record.student')
@@ -1388,16 +1478,17 @@ $total_course_assessed= $datac[0];*/
         return count($total);
     }
 
-    public function getStudentsTotalOverAll($level){
+    public function getStudentsTotalOverAll($level)
+    {
         $array = $this->getSemYear();
 
         $year = $array[0]->YEAR;
-        $sem=$array[0]->SEMESTER;
+        $sem = $array[0]->SEMESTER;
 
         $total = \DB::table('tpoly_levelgender')
             //->where('STATUS','In school')
             //->where('tpoly_students.PROGRAMMECODE', $program)
-            ->where('tpoly_levelgender.LEVEL', "LIKE", "%". $level . "%")
+            ->where('tpoly_levelgender.LEVEL', "LIKE", "%" . $level . "%")
             //->where('tpoly_levelgender.LEVEL', "LIKE", "%". $level . "%")
             //->where('tpoly_academic_record.sem', $sem)
             // ->groupBy('tpoly_academic_record.student')
@@ -1408,11 +1499,12 @@ $total_course_assessed= $datac[0];*/
         return $total;
     }
 
-    public function getPaidTotalOverAll(){
+    public function getPaidTotalOverAll()
+    {
         $array = $this->getSemYear();
 
         $year = $array[0]->YEAR;
-        $sem=$array[0]->SEMESTER;
+        $sem = $array[0]->SEMESTER;
 
         $total = \DB::table('tpoly_levelgender')
             //->where('STATUS','In school')
@@ -1428,11 +1520,12 @@ $total_course_assessed= $datac[0];*/
         return ($total);
     }
 
-    public function getOweTotalOverAll(){
+    public function getOweTotalOverAll()
+    {
         $array = $this->getSemYear();
 
         $year = $array[0]->YEAR;
-        $sem=$array[0]->SEMESTER;
+        $sem = $array[0]->SEMESTER;
 
         $total = \DB::table('tpoly_levelgender')
             //->where('STATUS','In school')
@@ -1448,132 +1541,129 @@ $total_course_assessed= $datac[0];*/
         return ($total);
     }
 
-    public function getStudentsHighestCGPA_HND($skip){
+    public function getStudentsHighestCGPA_HND($skip)
+    {
         $array = $this->getSemYear();
 
-        $currentResultsArray=$array[0]->RESULT_DATE;
-       // dd($resultb);
+        $currentResultsArray = $array[0]->RESULT_DATE;
+        // dd($resultb);
 
-        $currentResultsArray1 = explode(',',$currentResultsArray);
+        $currentResultsArray1 = explode(',', $currentResultsArray);
         $resultyear = $currentResultsArray1[0];
         $resultsem = $currentResultsArray1[1];
 
         $year = $array[0]->GRAD;
-       // if ($array[0]->YEAR != $resultyear) {
-           // $year = $resultyear;
+        // if ($array[0]->YEAR != $resultyear) {
+        // $year = $resultyear;
         //}
         //$sem=$array[0]->SEMESTER;
 
 
-        if (@\Auth::user()->role=="Support") {
-            $departmentArray=explode(",",@\Auth::user()->department);
-            $total  =Models\StudentModel::
-          //  ->join('tpoly_programme', 'tpoly_students.PROGRAMMECODE', '=', 'tpoly_programme.PROGRAMMECODE')
+        if (@\Auth::user()->role == "Support") {
+            $departmentArray = explode(",", @\Auth::user()->department);
+            $total = Models\StudentModel::
+            //  ->join('tpoly_programme', 'tpoly_students.PROGRAMMECODE', '=', 'tpoly_programme.PROGRAMMECODE')
             //->where('tpoly_students.STATUS','In school')
-            where('tpoly_students.LEVEL', "LIKE", "%"."H")
-            ->where('tpoly_students.GRADUATING_GROUP', "=", $year)
-            ->where('tpoly_students.TOTAL_CREDIT_DONE', ">", "75")->whereHas('programme', function($q)use($departmentArray) {
-                $q->whereHas('departments', function($q)use($departmentArray) {
-                    $q->whereIn('DEPTCODE',  $departmentArray);
-                });
-            })->orderby("tpoly_students.CGPA",'DESC')
-            ->skip($skip)
-            ->take(1)
-            //->lists('INDEXNO', 'CGPA');
-            // ->where('tpoly_academic_record.year', $year)
-            //->where('tpoly_academic_record.sem', $sem)
-            // ->groupBy('tpoly_academic_record.student')
-            ->get();
+            where('tpoly_students.LEVEL', "LIKE", "%" . "H")
+                ->where('tpoly_students.GRADUATING_GROUP', "=", $year)
+                ->where('tpoly_students.TOTAL_CREDIT_DONE', ">", "75")->whereHas('programme', function ($q) use ($departmentArray) {
+                    $q->whereHas('departments', function ($q) use ($departmentArray) {
+                        $q->whereIn('DEPTCODE', $departmentArray);
+                    });
+                })->orderby("tpoly_students.CGPA", 'DESC')
+                ->skip($skip)
+                ->take(1)
+                //->lists('INDEXNO', 'CGPA');
+                // ->where('tpoly_academic_record.year', $year)
+                //->where('tpoly_academic_record.sem', $sem)
+                // ->groupBy('tpoly_academic_record.student')
+                ->get();
+        } else {
+
+            $total = \DB::table('tpoly_students')
+                ->join('tpoly_programme', 'tpoly_students.PROGRAMMECODE', '=', 'tpoly_programme.PROGRAMMECODE')
+                //->where('tpoly_students.STATUS','In school')
+                ->where('tpoly_students.LEVEL', "LIKE", "%" . "H")
+                ->where('tpoly_students.GRADUATING_GROUP', "=", $year)
+                ->where('tpoly_students.TOTAL_CREDIT_DONE', ">", "75")
+                ->orderby("tpoly_students.CGPA", 'DESC')
+                ->skip($skip)
+                ->take(1)
+                //->lists('INDEXNO', 'CGPA');
+                // ->where('tpoly_academic_record.year', $year)
+                //->where('tpoly_academic_record.sem', $sem)
+                // ->groupBy('tpoly_academic_record.student')
+                ->get();
         }
-        else{
-
-        $total = \DB::table('tpoly_students')
-            ->join('tpoly_programme', 'tpoly_students.PROGRAMMECODE', '=', 'tpoly_programme.PROGRAMMECODE')
-            //->where('tpoly_students.STATUS','In school')
-            ->where('tpoly_students.LEVEL', "LIKE", "%"."H")
-            ->where('tpoly_students.GRADUATING_GROUP', "=", $year)
-            ->where('tpoly_students.TOTAL_CREDIT_DONE', ">", "75")
-            ->orderby("tpoly_students.CGPA",'DESC')
-            ->skip($skip)
-            ->take(1)
-            //->lists('INDEXNO', 'CGPA');
-            // ->where('tpoly_academic_record.year', $year)
-            //->where('tpoly_academic_record.sem', $sem)
-            // ->groupBy('tpoly_academic_record.student')
-            ->get();
-    }
 
 
-
-        
         return ($total);
     }
 
 
-    public function getNABPTEXyearGroup($year){
+    public function getNABPTEXyearGroup($year)
+    {
         //$array = $this->getSemYear();
 
         //$currentResultsArray=$array[0]->RESULT_DATE;
-       // dd($resultb);
+        // dd($resultb);
 
-        $currentResultsArray1 = explode('/',$year);
+        $currentResultsArray1 = explode('/', $year);
         $resultyear = $currentResultsArray1[0];
         //$resultsem = $currentResultsArray1[1];
         $nabptexYearFull = $resultyear - 2;
-        
+
         $nabptexYear = substr($nabptexYearFull, 2);
 
-       // dd($nabptexYear);
+        // dd($nabptexYear);
         //$sem=$array[0]->SEMESTER;
 
-        
+
         return ($nabptexYear);
     }
 
     //$users = DB::table('users')->skip(10)->take(5)->get();
 
-    public function getStudentsTotalPerLevelAll($level){
+    public function getStudentsTotalPerLevelAll($level)
+    {
         $array = $this->getSemYear();
 
         $year = $array[0]->YEAR;
-        $sem=$array[0]->SEMESTER;
+        $sem = $array[0]->SEMESTER;
 
-        if (@\Auth::user()->role=="Support") {
-            $departmentArray=explode(",",@\Auth::user()->department);
-            $total  =Models\StudentModel::
-          //  ->join('tpoly_programme', 'tpoly_students.PROGRAMMECODE', '=', 'tpoly_programme.PROGRAMMECODE')
+        if (@\Auth::user()->role == "Support") {
+            $departmentArray = explode(",", @\Auth::user()->department);
+            $total = Models\StudentModel::
+            //  ->join('tpoly_programme', 'tpoly_students.PROGRAMMECODE', '=', 'tpoly_programme.PROGRAMMECODE')
             //->where('tpoly_students.STATUS','In school')
-            where('STATUS','In school')
-            
-            ->where('tpoly_students.LEVEL', $level)->whereHas('programme', function($q)use($departmentArray) {
-                $q->whereHas('departments', function($q)use($departmentArray) {
-                    $q->whereIn('DEPTCODE',  $departmentArray);
-                });
-            })
-            ->get();
-        }
-        else{
+            where('STATUS', 'In school')
+                ->where('tpoly_students.LEVEL', $level)->whereHas('programme', function ($q) use ($departmentArray) {
+                    $q->whereHas('departments', function ($q) use ($departmentArray) {
+                        $q->whereIn('DEPTCODE', $departmentArray);
+                    });
+                })
+                ->get();
+        } else {
 
-        $total = \DB::table('tpoly_students')
-            ->where('STATUS','In school')
-            
-            ->where('tpoly_students.LEVEL', $level)
-            
-            ->get();
+            $total = \DB::table('tpoly_students')
+                ->where('STATUS', 'In school')
+                ->where('tpoly_students.LEVEL', $level)
+                ->get();
         }
         return count($total);
     }
 
-    public function getStudentsTotalPerLevelAllGen($level,$gen){
+    public function getStudentsTotalPerLevelAllGen($level, $gen)
+    {
         $array = $this->getSemYear();
 
         $year = $array[0]->YEAR;
-        $sem=$array[0]->SEMESTER;
+        $sem = $array[0]->SEMESTER;
 
         $total = \DB::table('tpoly_students')
-            ->where('STATUS','In school')
+            ->where('STATUS', 'In school')
             ->where('tpoly_students.SEX', $gen)
-            ->where('tpoly_students.LEVEL',$level)
+            ->where('tpoly_students.LEVEL', $level)
             // ->where('tpoly_academic_record.year', $year)
             //->where('tpoly_academic_record.sem', $sem)
             // ->groupBy('tpoly_academic_record.student')
@@ -1582,109 +1672,110 @@ $total_course_assessed= $datac[0];*/
     }
 
 
-    public function getStudentsTotalPerLevelAllGrad($level){
+    public function getStudentsTotalPerLevelAllGrad($level)
+    {
         $array = $this->getSemYear();
 
         $year = $array[0]->YEAR;
-        $sem=$array[0]->SEMESTER;
-        $grad=$array[0]->GRAD;
+        $sem = $array[0]->SEMESTER;
+        $grad = $array[0]->GRAD;
 
-        if (@\Auth::user()->role=="Support") {
-            $departmentArray=explode(",",@\Auth::user()->department);
-            $total  =Models\StudentModel::
-          where('tpoly_students.GRADUATING_GROUP', $grad)
-            ->where('tpoly_students.LEVEL', $level)->whereHas('programme', function($q)use($departmentArray) {
-                $q->whereHas('departments', function($q)use($departmentArray) {
-                    $q->whereIn('DEPTCODE',  $departmentArray);
-                });
-            })
-            ->get();
-        }
-        else{
+        if (@\Auth::user()->role == "Support") {
+            $departmentArray = explode(",", @\Auth::user()->department);
+            $total = Models\StudentModel::
+            where('tpoly_students.GRADUATING_GROUP', $grad)
+                ->where('tpoly_students.LEVEL', $level)->whereHas('programme', function ($q) use ($departmentArray) {
+                    $q->whereHas('departments', function ($q) use ($departmentArray) {
+                        $q->whereIn('DEPTCODE', $departmentArray);
+                    });
+                })
+                ->get();
+        } else {
 
-        $total = \DB::table('tpoly_students')
-            ->where('tpoly_students.GRADUATING_GROUP', $grad)
-            ->where('tpoly_students.LEVEL', $level)
-            ->get();
+            $total = \DB::table('tpoly_students')
+                ->where('tpoly_students.GRADUATING_GROUP', $grad)
+                ->where('tpoly_students.LEVEL', $level)
+                ->get();
         }
         return count($total);
     }
 
-    public function getStudentsTotalPerLevelAllGenGrad($level,$gen){
+    public function getStudentsTotalPerLevelAllGenGrad($level, $gen)
+    {
         $array = $this->getSemYear();
 
         $year = $array[0]->YEAR;
-        $sem=$array[0]->SEMESTER;
-        $grad=$array[0]->GRAD;
+        $sem = $array[0]->SEMESTER;
+        $grad = $array[0]->GRAD;
         //dd($grad);
 
-        if (@\Auth::user()->role=="Support") {
-            $departmentArray=explode(",",@\Auth::user()->department);
-            $total  =Models\StudentModel::
-          where('tpoly_students.SEX', $gen)
-            ->where('tpoly_students.LEVEL',$level)
-            ->where('tpoly_students.GRADUATING_GROUP', $grad)->whereHas('programme', function($q)use($departmentArray) {
-                $q->whereHas('departments', function($q)use($departmentArray) {
-                    $q->whereIn('DEPTCODE',  $departmentArray);
-                });
-            })
-            ->get();
-        }
-        else{
+        if (@\Auth::user()->role == "Support") {
+            $departmentArray = explode(",", @\Auth::user()->department);
+            $total = Models\StudentModel::
+            where('tpoly_students.SEX', $gen)
+                ->where('tpoly_students.LEVEL', $level)
+                ->where('tpoly_students.GRADUATING_GROUP', $grad)->whereHas('programme', function ($q) use ($departmentArray) {
+                    $q->whereHas('departments', function ($q) use ($departmentArray) {
+                        $q->whereIn('DEPTCODE', $departmentArray);
+                    });
+                })
+                ->get();
+        } else {
 
-        $total = \DB::table('tpoly_students')
-            //->where('STATUS','Alumni')
-            ->where('tpoly_students.SEX', $gen)
-            ->where('tpoly_students.LEVEL',$level)
-            ->where('tpoly_students.GRADUATING_GROUP', $grad)
-            //->where('tpoly_academic_record.sem', $sem)
-            // ->groupBy('tpoly_academic_record.student')
-            ->get();
+            $total = \DB::table('tpoly_students')
+                //->where('STATUS','Alumni')
+                ->where('tpoly_students.SEX', $gen)
+                ->where('tpoly_students.LEVEL', $level)
+                ->where('tpoly_students.GRADUATING_GROUP', $grad)
+                //->where('tpoly_academic_record.sem', $sem)
+                // ->groupBy('tpoly_academic_record.student')
+                ->get();
 
         }
         return count($total);
     }
 
-    public function getStudentsTotalPerLevelAllRegistered($level){
+    public function getStudentsTotalPerLevelAllRegistered($level)
+    {
         $array = $this->getSemYear();
 
         $year = $array[0]->YEAR;
-        $sem=$array[0]->SEMESTER;
+        $sem = $array[0]->SEMESTER;
 
-        if (@\Auth::user()->role=="Support") {
-            $departmentArray=explode(",",@\Auth::user()->department);
-            $total  =Models\StudentModel::
-          //  ->join('tpoly_programme', 'tpoly_students.PROGRAMMECODE', '=', 'tpoly_programme.PROGRAMMECODE')
+        if (@\Auth::user()->role == "Support") {
+            $departmentArray = explode(",", @\Auth::user()->department);
+            $total = Models\StudentModel::
+            //  ->join('tpoly_programme', 'tpoly_students.PROGRAMMECODE', '=', 'tpoly_programme.PROGRAMMECODE')
             //->where('tpoly_students.STATUS','In school')
-            where('STATUS','In school')
-            ->where('tpoly_students.REGISTERED',1)
-            ->where('tpoly_students.LEVEL',$level)->whereHas('programme', function($q)use($departmentArray) {
-                $q->whereHas('departments', function($q)use($departmentArray) {
-                    $q->whereIn('DEPTCODE',  $departmentArray);
-                });
-            })
-            ->get();
-        }
-        else{
+            where('STATUS', 'In school')
+                ->where('tpoly_students.REGISTERED', 1)
+                ->where('tpoly_students.LEVEL', $level)->whereHas('programme', function ($q) use ($departmentArray) {
+                    $q->whereHas('departments', function ($q) use ($departmentArray) {
+                        $q->whereIn('DEPTCODE', $departmentArray);
+                    });
+                })
+                ->get();
+        } else {
 
-        $total = \DB::table('tpoly_students')
-            ->where('STATUS','In school')
-            ->where('tpoly_students.REGISTERED',1)
-            ->where('tpoly_students.LEVEL',$level)
-            // ->where('tpoly_academic_record.year', $year)
-            //->where('tpoly_academic_record.sem', $sem)
-            // ->groupBy('tpoly_academic_record.student')
-            ->get();
+            $total = \DB::table('tpoly_students')
+                ->where('STATUS', 'In school')
+                ->where('tpoly_students.REGISTERED', 1)
+                ->where('tpoly_students.LEVEL', $level)
+                // ->where('tpoly_academic_record.year', $year)
+                //->where('tpoly_academic_record.sem', $sem)
+                // ->groupBy('tpoly_academic_record.student')
+                ->get();
 
         }
         return count($total);
     }
 
-    public function getStudentsTotalPerProgramLevel($program,$level){
+    public function getStudentsTotalPerProgramLevel($program, $level)
+    {
         $array = $this->getSemYear();
 
         $year = $array[0]->YEAR;
-        $sem=$array[0]->SEMESTER;
+        $sem = $array[0]->SEMESTER;
 //         $total = \DB::select( \DB::raw(" s.level,s.year,s.PROGRAMMECODE,s.indexno,a.student FROM `tpoly_students` as s JOIN tpoly_academic_record as a on s.id=a.student WHERE s.PROGRAMMECODE='$program'and "
 //                 . ""
 //                 . "a.level='$level' and a.year='$year'
@@ -1693,9 +1784,8 @@ $total_course_assessed= $datac[0];*/
 //         dd($total);
 
         $total = \DB::table('tpoly_students')->leftJoin('tpoly_academic_record', 'tpoly_students.ID', '=', 'tpoly_academic_record.student')
-
             ->where('tpoly_students.PROGRAMMECODE', $program)
-            ->where('tpoly_academic_record.level', "LIKE", "%". $level . "%")
+            ->where('tpoly_academic_record.level', "LIKE", "%" . $level . "%")
             ->where('tpoly_academic_record.year', $year)
             ->where('tpoly_academic_record.sem', $sem)
             ->groupBy('tpoly_academic_record.student')
@@ -1704,12 +1794,12 @@ $total_course_assessed= $datac[0];*/
     }
 
 
-
-    public function getStudentsTotalPerProgramLevel2($program,$level){
+    public function getStudentsTotalPerProgramLevel2($program, $level)
+    {
         $array = $this->getSemYear();
 
         $year = $array[0]->YEAR;
-        $sem=$array[0]->SEMESTER;
+        $sem = $array[0]->SEMESTER;
 //         $total = \DB::select( \DB::raw(" s.level,s.year,s.PROGRAMMECODE,s.indexno,a.student FROM `tpoly_students` as s JOIN tpoly_academic_record as a on s.id=a.student WHERE s.PROGRAMMECODE='$program'and "
 //                 . ""
 //                 . "a.level='$level' and a.year='$year'
@@ -1719,21 +1809,21 @@ $total_course_assessed= $datac[0];*/
 
         $total = \DB::table('tpoly_students')
             ->where('PROGRAMMECODE', $program)
-            ->where('LEVEL', "LIKE", "%". $level . "%")
+            ->where('LEVEL', "LIKE", "%" . $level . "%")
             ->where('REGISTERED', 1)
             ->get();
         return count($total);
     }
 
 
-    public function getStudentsTotalPerProgram($program){
+    public function getStudentsTotalPerProgram($program)
+    {
         $array = $this->getSemYear();
 
         $year = $array[0]->YEAR;
-        $sem=$array[0]->SEMESTER;
+        $sem = $array[0]->SEMESTER;
 
         $total = \DB::table('tpoly_students')->leftJoin('tpoly_academic_record', 'tpoly_students.ID', '=', 'tpoly_academic_record.student')
-
             ->where('tpoly_students.PROGRAMMECODE', $program)
             // ->where('tpoly_academic_record.level', "LIKE", "%". $level . "%")
             ->where('tpoly_academic_record.year', $year)
@@ -1742,276 +1832,304 @@ $total_course_assessed= $datac[0];*/
             ->get();
         return count($total);
     }
-    public function getApplicantAdmitted(){
+
+    public function getApplicantAdmitted()
+    {
         $array = $this->getSemYear();
 
         $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
-        $total = \DB::table('tpoly_applicants')->where("ADMITTED",1)->where("YEAR_ADMISSION",$year)->count();
+        $total = \DB::table('tpoly_applicants')->where("ADMITTED", 1)->where("YEAR_ADMISSION", $year)->count();
 
-        return  $total ;
+        return $total;
     }
-    public function getApplicantTotalPerProgram($program){
+
+    public function getApplicantTotalPerProgram($program)
+    {
         // $array = $this->getSemYear();
 
         // $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
 
-        $total = \DB::table('tpoly_applicants')->where("ADMITTED",1)->where("PROGRAMME_ADMITTED",$program)->count();
+        $total = \DB::table('tpoly_applicants')->where("ADMITTED", 1)->where("PROGRAMME_ADMITTED", $program)->count();
 
-        return  $total ;
+        return $total;
     }
 
-    public function getApplicantTotalPerProgramConditional($program){
+    public function getApplicantTotalPerProgramConditional($program)
+    {
         // $array = $this->getSemYear();
 
         // $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
 
-        $total = \DB::table('tpoly_applicants')->where("ADMISSION_TYPE","conditional")->where("PROGRAMME_ADMITTED",$program)->count();
+        $total = \DB::table('tpoly_applicants')->where("ADMISSION_TYPE", "conditional")->where("PROGRAMME_ADMITTED", $program)->count();
 
-        return  $total ;
+        return $total;
     }
 
-    public function getApplicantTotalPerProgramProvisional($program){
+    public function getApplicantTotalPerProgramProvisional($program)
+    {
         // $array = $this->getSemYear();
 
         // $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
 
-        $total = \DB::table('tpoly_applicants')->where("ADMISSION_TYPE","provisional")->where("PROGRAMME_ADMITTED",$program)->count();
+        $total = \DB::table('tpoly_applicants')->where("ADMISSION_TYPE", "provisional")->where("PROGRAMME_ADMITTED", $program)->count();
 
-        return  $total ;
+        return $total;
     }
 
-    public function getApplicantTotalPerProgramTechnical($program){
+    public function getApplicantTotalPerProgramTechnical($program)
+    {
         // $array = $this->getSemYear();
 
         // $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
 
-        $total = \DB::table('tpoly_applicants')->where("ADMISSION_TYPE","technical")->where("PROGRAMME_ADMITTED",$program)->count();
+        $total = \DB::table('tpoly_applicants')->where("ADMISSION_TYPE", "technical")->where("PROGRAMME_ADMITTED", $program)->count();
 
-        return  $total ;
+        return $total;
     }
 
-    public function getApplicantTotalPerProgramRegular($program){
+    public function getApplicantTotalPerProgramRegular($program)
+    {
         // $array = $this->getSemYear();
 
         // $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
 
-        $total = \DB::table('tpoly_applicants')->where("ADMISSION_TYPE","regular")->where("PROGRAMME_ADMITTED",$program)->count();
+        $total = \DB::table('tpoly_applicants')->where("ADMISSION_TYPE", "regular")->where("PROGRAMME_ADMITTED", $program)->count();
 
-        return  $total ;
+        return $total;
     }
 
 
-    public function getApplicantTotalPerProgramMature($program){
+    public function getApplicantTotalPerProgramMature($program)
+    {
         // $array = $this->getSemYear();
 
         // $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
 
-        $total = \DB::table('tpoly_applicants')->where("ADMISSION_TYPE","mature")->where("PROGRAMME_ADMITTED",$program)->count();
+        $total = \DB::table('tpoly_applicants')->where("ADMISSION_TYPE", "mature")->where("PROGRAMME_ADMITTED", $program)->count();
 
-        return  $total ;
+        return $total;
     }
 
-    public function allApplicantsChoice1($program){
+    public function allApplicantsChoice1($program)
+    {
         // $array = $this->getSemYear();
 
         // $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
 
-        $total = \DB::table('tpoly_applicants')->where("FIRST_CHOICE",$program)->count();
+        $total = \DB::table('tpoly_applicants')->where("FIRST_CHOICE", $program)->count();
 
-        return  $total ;
+        return $total;
     }
 
-    public function allApplicantsChoice2($program){
+    public function allApplicantsChoice2($program)
+    {
         // $array = $this->getSemYear();
 
         // $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
 
-        $total = \DB::table('tpoly_applicants')->where("SECOND_CHOICE",$program)->count();
+        $total = \DB::table('tpoly_applicants')->where("SECOND_CHOICE", $program)->count();
 
-        return  $total ;
+        return $total;
     }
 
 
-    public function allApplicantsChoice3($program){
+    public function allApplicantsChoice3($program)
+    {
         // $array = $this->getSemYear();
 
         // $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
 
-        $total = \DB::table('tpoly_applicants')->where("THIRD_CHOICE",$program)->count();
+        $total = \DB::table('tpoly_applicants')->where("THIRD_CHOICE", $program)->count();
 
-        return  $total ;
+        return $total;
     }
 
-    public function allApplicants($program){
+    public function allApplicants($program)
+    {
         // $array = $this->getSemYear();
 
         // $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
 
-        $total = \DB::table('tpoly_applicants')->where("FIRST_CHOICE",$program)->count();
+        $total = \DB::table('tpoly_applicants')->where("FIRST_CHOICE", $program)->count();
 
-        return  $total ;
+        return $total;
     }
-    public function allApplicantGender($program,$gender){
+
+    public function allApplicantGender($program, $gender)
+    {
         // $array = $this->getSemYear();
 
         // $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
 
-        $total = \DB::table('tpoly_applicants')->where("FIRST_CHOICE",$program)->where("GENDER",$gender)->count();
+        $total = \DB::table('tpoly_applicants')->where("FIRST_CHOICE", $program)->where("GENDER", $gender)->count();
 
-        return  $total ;
+        return $total;
     }
 
 
     // qualification
-    public function allQualifiedApplicant($program){
+    public function allQualifiedApplicant($program)
+    {
         // $array = $this->getSemYear();
 
         // $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
 
-        $total = \DB::table('tpoly_applicants')->where("QUALIFY","Yes")->where("FIRST_CHOICE",$program)->count();
+        $total = \DB::table('tpoly_applicants')->where("QUALIFY", "Yes")->where("FIRST_CHOICE", $program)->count();
 
-        return  $total ;
-    }
-    public function allQualifiedApplicantGender($program,$gender){
-        // $array = $this->getSemYear();
-
-        // $year = $array[0]->YEAR;
-        // $sem=$array[0]->SEMESTER;
-
-
-        $total = \DB::table('tpoly_applicants')->where("QUALIFY","Yes")->where("FIRST_CHOICE",$program)->where("GENDER",$gender)->count();
-
-        return  $total ;
+        return $total;
     }
 
-    public function getApplicantTotalPerProgramAdmissionType($type){
+    public function allQualifiedApplicantGender($program, $gender)
+    {
         // $array = $this->getSemYear();
 
         // $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
-        $total = \DB::table('tpoly_applicants')->where("ADMISSION_TYPE",$type)->where("ADMITTED",1)->count();
 
-        return  $total ;
+        $total = \DB::table('tpoly_applicants')->where("QUALIFY", "Yes")->where("FIRST_CHOICE", $program)->where("GENDER", $gender)->count();
+
+        return $total;
     }
-    public function getApplicantTotalPerProgramGender($program,$gender){
+
+    public function getApplicantTotalPerProgramAdmissionType($type)
+    {
         // $array = $this->getSemYear();
 
         // $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
-        $total = \DB::table('tpoly_applicants')->where("ADMITTED","1")->where("PROGRAMME_ADMITTED",$program)->where("GENDER",$gender)->count();
+        $total = \DB::table('tpoly_applicants')->where("ADMISSION_TYPE", $type)->where("ADMITTED", 1)->count();
 
-        return  $total ;
+        return $total;
     }
-    public function getApplicantAccommodation($hall){
+
+    public function getApplicantTotalPerProgramGender($program, $gender)
+    {
         // $array = $this->getSemYear();
 
         // $year = $array[0]->YEAR;
         // $sem=$array[0]->SEMESTER;
 
-        $total = \DB::table('tpoly_applicants')->where("HALL_ADMITTED",$hall)->first();
+        $total = \DB::table('tpoly_applicants')->where("ADMITTED", "1")->where("PROGRAMME_ADMITTED", $program)->where("GENDER", $gender)->count();
+
+        return $total;
+    }
+
+    public function getApplicantAccommodation($hall)
+    {
+        // $array = $this->getSemYear();
+
+        // $year = $array[0]->YEAR;
+        // $sem=$array[0]->SEMESTER;
+
+        $total = \DB::table('tpoly_applicants')->where("HALL_ADMITTED", $hall)->first();
 
         return count($total);
     }
-    public function getStudentsTotalPerProgram4($program,$level=NULL){
-        if($level==NULL){
-            $total = \DB::table('tpoly_students')->where('PROGRAMMECODE',$program)
-                ->where("STATUS","In school")->where("SYSUPDATE","1")
+
+    public function getStudentsTotalPerProgram4($program, $level = NULL)
+    {
+        if ($level == NULL) {
+            $total = \DB::table('tpoly_students')->where('PROGRAMMECODE', $program)
+                ->where("STATUS", "In school")->where("SYSUPDATE", "1")
                 ->count();
             return $total;
-        }
-        else{
-            $total = \DB::table('tpoly_students')->where('PROGRAMMECODE',$program)
-                ->where("year",$level)->where("STATUS","In school")->where("SYSUPDATE","1")
-
+        } else {
+            $total = \DB::table('tpoly_students')->where('PROGRAMMECODE', $program)
+                ->where("year", $level)->where("STATUS", "In school")->where("SYSUPDATE", "1")
                 ->count();
             return $total;
         }
 
 
     }
-    public function getStudentsTotalPerProgram2($level){
 
-        $total = \DB::table('tpoly_students')->where('LEVEL',$level)->where("REGISTERED","1")
-            ->where("STATUS","In school")
+    public function getStudentsTotalPerProgram2($level)
+    {
+
+        $total = \DB::table('tpoly_students')->where('LEVEL', $level)->where("REGISTERED", "1")
+            ->where("STATUS", "In school")
             ->count();
         return $total;
 
 
-
     }
-    public function getTotalStudentsByProgramCount($program,$level){
-        $array=$this->getSemYear();
 
-        $year=$array[0]->YEAR;
-        $total= \DB::table('tpoly_students')
+    public function getTotalStudentsByProgramCount($program, $level)
+    {
+        $array = $this->getSemYear();
+
+        $year = $array[0]->YEAR;
+        $total = \DB::table('tpoly_students')
             ->join('tpoly_feedetails', 'tpoly_feedetails.STUDENT', '=', 'tpoly_students.ID')
-
-            ->where('tpoly_students.PROGRAMMECODE',$program)
-            ->where('tpoly_feedetails.LEVEL',$level)
-            ->where('tpoly_feedetails.YEAR',$year)
+            ->where('tpoly_students.PROGRAMMECODE', $program)
+            ->where('tpoly_feedetails.LEVEL', $level)
+            ->where('tpoly_feedetails.YEAR', $year)
             ->count("tpoly_feedetails.ID");
 
         return @$total;
 
     }
 
-    public function getProgramStudent($student){        
+    public function getProgramStudent($student)
+    {
 
-        $program = \DB::table('tpoly_students')->where('INDEXNO',$student)->get();                 
+        $program = \DB::table('tpoly_students')->where('INDEXNO', $student)->get();
 
-        return @$program[0]->PROGRAMMECODE;     
-
-    }
-
-    public function getLevelStudent($student){        
-
-        $level = \DB::table('tpoly_students')->where('INDEXNO',$student)->get();                 
-
-        return @$level[0]->LEVEL;     
+        return @$program[0]->PROGRAMMECODE;
 
     }
 
-    public function getStudentFee($student,$level){
+    public function getLevelStudent($student)
+    {
+
+        $level = \DB::table('tpoly_students')->where('INDEXNO', $student)->get();
+
+        return @$level[0]->LEVEL;
+
+    }
+
+    public function getStudentFee($student, $level)
+    {
         $array = $this->getSemYear();
-        
-            $yearr = $array[0]->YEAR;
-       $program=  $this->getProgramStudent($student);
 
-        $fee = \DB::table('tpoly_bills')->where('PROGRAMME',$program)->where('LEVEL',$level)->where('YEAR',$yearr)->get();
+        $yearr = $array[0]->YEAR;
+        $program = $this->getProgramStudent($student);
 
-          //dd($fee[0]->AMOUNT);       
+        $fee = \DB::table('tpoly_bills')->where('PROGRAMME', $program)->where('LEVEL', $level)->where('YEAR', $yearr)->get();
+
+        //dd($fee[0]->AMOUNT);
 
         return @$fee[0]->AMOUNT;
 
-                // dd($total);
+        // dd($total);
 
         //return @$total;
 
@@ -2021,10 +2139,10 @@ $total_course_assessed= $datac[0];*/
     {
         //$sys = new SystemController();
         $array = $this->getSemYear();
-        
-            $yearr = $array[0]->YEAR;
-        
-        $id = $this->getStudentIDfromIndexno($student);        
+
+        $yearr = $array[0]->YEAR;
+
+        $id = $this->getStudentIDfromIndexno($student);
 
         $appNo = $this->getStudentAppnofromIndexno($student);
 
@@ -2038,104 +2156,118 @@ $total_course_assessed= $datac[0];*/
     }
 
 
-    public function getTotalPaymentByProgram($program,$level){
-        $array=$this->getSemYear();
+    public function getTotalPaymentByProgram($program, $level)
+    {
+        $array = $this->getSemYear();
 
-        $year=$array[0]->YEAR;
-        $amount= \DB::table('tpoly_students')
+        $year = $array[0]->YEAR;
+        $amount = \DB::table('tpoly_students')
             ->join('tpoly_feedetails', 'tpoly_feedetails.STUDENT', '=', 'tpoly_students.ID')
-
-            ->where('tpoly_students.PROGRAMMECODE',$program)
-            ->where('tpoly_feedetails.LEVEL',$level)
-            ->where('tpoly_feedetails.YEAR',$year)
+            ->where('tpoly_students.PROGRAMMECODE', $program)
+            ->where('tpoly_feedetails.LEVEL', $level)
+            ->where('tpoly_feedetails.YEAR', $year)
             ->sum("tpoly_feedetails.AMOUNT");
 
         return @$amount;
 
     }
-    public function getTotalRegistered($program,$level){
 
-        $total= \DB::table('tpoly_students')
-            ->where('tpoly_students.PROGRAMMECODE',$program)
-            ->where('tpoly_students.LEVEL',$level)
-            ->where('tpoly_students.REGISTERED',1)
+    public function getTotalRegistered($program, $level)
+    {
+
+        $total = \DB::table('tpoly_students')
+            ->where('tpoly_students.PROGRAMMECODE', $program)
+            ->where('tpoly_students.LEVEL', $level)
+            ->where('tpoly_students.REGISTERED', 1)
             ->count("tpoly_students.ID");
 
         return @$total;
 
     }
 
-    public function getTotalRegistered100($program){
-        $level=100;
+    public function getTotalRegistered100($program)
+    {
+        $level = 100;
 
-        $total= \DB::table('tpoly_students')
-            ->where('tpoly_students.PROGRAMMECODE',$program)
-            ->where('tpoly_students.LEVEL','LIKE',$level.'%')
-            ->where('tpoly_students.REGISTERED',1)
+        $total = \DB::table('tpoly_students')
+            ->where('tpoly_students.PROGRAMMECODE', $program)
+            ->where('tpoly_students.LEVEL', 'LIKE', $level . '%')
+            ->where('tpoly_students.REGISTERED', 1)
             ->count("tpoly_students.ID");
 
         return @$total;
 
     }
-    public function getTotalOwingbyProgram($program,$level){
 
-        $total= \DB::table('tpoly_students')
-            ->where('tpoly_students.PROGRAMMECODE',$program)
-            ->where('tpoly_students.LEVEL',$level)
-            ->where('tpoly_students.STATUS','In school')
+    public function getTotalOwingbyProgram($program, $level)
+    {
+
+        $total = \DB::table('tpoly_students')
+            ->where('tpoly_students.PROGRAMMECODE', $program)
+            ->where('tpoly_students.LEVEL', $level)
+            ->where('tpoly_students.STATUS', 'In school')
             ->sum("tpoly_students.BILL_OWING");
 
         return @$total;
 
     }
-    public function getTotalStudentOwing($program,$level){
 
-        $total= \DB::table('tpoly_students')
-            ->where('tpoly_students.PROGRAMMECODE',$program)
-            ->where('tpoly_students.LEVEL',$level)
-            ->where('tpoly_students.STATUS','In school')
-            ->where("tpoly_students.BILL_OWING",">",0)
+    public function getTotalStudentOwing($program, $level)
+    {
+
+        $total = \DB::table('tpoly_students')
+            ->where('tpoly_students.PROGRAMMECODE', $program)
+            ->where('tpoly_students.LEVEL', $level)
+            ->where('tpoly_students.STATUS', 'In school')
+            ->where("tpoly_students.BILL_OWING", ">", 0)
             ->count("tpoly_students.ID");
         return @$total;
 
     }
-    public function getTotalBillForProgram($program,$level ){
-        $array=$this->getSemYear();
 
-        $year=$array[0]->YEAR;
-        $amount= \DB::table('tpoly_bills')
-            ->where('tpoly_bills.PROGRAMME',$program)
-            ->where('tpoly_bills.LEVEL',$level)
-            ->where('tpoly_bills.YEAR',$year)
+    public function getTotalBillForProgram($program, $level)
+    {
+        $array = $this->getSemYear();
+
+        $year = $array[0]->YEAR;
+        $amount = \DB::table('tpoly_bills')
+            ->where('tpoly_bills.PROGRAMME', $program)
+            ->where('tpoly_bills.LEVEL', $level)
+            ->where('tpoly_bills.YEAR', $year)
             ->first();
 
         return @$amount->AMOUNT;
 
     }
-    public function getStaffAccount($id){
 
-        $staff = \DB::table('tpoly_workers')->where('staffID',$id)->get();
+    public function getStaffAccount($id)
+    {
+
+        $staff = \DB::table('tpoly_workers')->where('staffID', $id)->get();
 
         return $staff;
 
     }
-    public function getProgramCodeByID($id){
 
-        $programme = \DB::table('tpoly_programme')->where('ID',$id)->get();
+    public function getProgramCodeByID($id)
+    {
+
+        $programme = \DB::table('tpoly_programme')->where('ID', $id)->get();
 
         return @$programme[0]->PROGRAMMECODE;
 
     }
+
     // return course array based on code
-    public function getCourseByCodeObject($id) {
+    public function getCourseByCodeObject($id)
+    {
 
-        $course = \DB::table('tpoly_courses')->where('COURSE_CODE',$id)->get();
+        $course = \DB::table('tpoly_courses')->where('COURSE_CODE', $id)->get();
 
-        if($course!=""){
+        if ($course != "") {
             return @$course;
-        }
-        else{
-            $course = \DB::table('tpoly_mounted_courses')->where('COURSE_CODE',$id)->get();
+        } else {
+            $course = \DB::table('tpoly_mounted_courses')->where('COURSE_CODE', $id)->get();
             return @$course;
         }
 
@@ -2143,110 +2275,128 @@ $total_course_assessed= $datac[0];*/
 
 
     // return course array based on mouted courses
-    public function getCourseByCodeProgramObject($id,$program) {
+    public function getCourseByCodeProgramObject($id, $program)
+    {
 
-        $courseObject = \DB::table('tpoly_mounted_courses')->where('COURSE_CODE',$id)->where("PROGRAMME",$program)->select
+        $courseObject = \DB::table('tpoly_mounted_courses')->where('COURSE_CODE', $id)->where("PROGRAMME", $program)->select
         ("COURSE")->get();
-        if(!empty($courseObject)){
-            $courseMount=$courseObject[0]->COURSE;
-            $course = \DB::table('tpoly_courses')->where('ID',$courseMount)->get();
-            if(!empty($course)){
+        if (!empty($courseObject)) {
+            $courseMount = $courseObject[0]->COURSE;
+            $course = \DB::table('tpoly_courses')->where('ID', $courseMount)->get();
+            if (!empty($course)) {
                 return @$course;
-            }
-            else{
+            } else {
                 //$course = \DB::table('tpoly_mounted_courses')->where('COURSE_CODE',$id)->where("PROGRAMME",$program)->get();
-                $course = \DB::table('tpoly_courses')->where('COURSE_CODE',$id)->get();
+                $course = \DB::table('tpoly_courses')->where('COURSE_CODE', $id)->get();
                 return @$course;
             }
-        }
-        else{
+        } else {
             //$course = \DB::table('tpoly_mounted_courses')->where('COURSE_CODE',$id)->where("PROGRAMME",$program)->get();
-            $course = \DB::table('tpoly_courses')->where('COURSE_CODE',$id)->get();
+            $course = \DB::table('tpoly_courses')->where('COURSE_CODE', $id)->get();
             return @$course;
         }
     }
 
 
-    public function getCourseByCode($code) {
-        $course = \DB::table('tpoly_courses')->where('COURSE_CODE',$code)->get();
+    public function getCourseByCode($code)
+    {
+        $course = \DB::table('tpoly_courses')->where('COURSE_CODE', $code)->get();
 
         return @$course[0]->ID;
     }
-    public function getCourseByCode2($code,$program) {
-        $course = \DB::table('tpoly_courses')->where('COURSE_CODE',$code)
-            ->where("PROGRAMME",$program)
+
+    public function getCourseByCode2($code, $program)
+    {
+        $course = \DB::table('tpoly_courses')->where('COURSE_CODE', $code)
+            ->where("PROGRAMME", $program)
             ->get();
 
         return @$course[0]->ID;
     }
 
-    public function getCourseByCodeCourse($code, $course) {
-        $course = \DB::table('tpoly_courses')->where('COURSE_CODE',$code)
-            ->where("COURSE_NAME",$course)
+    public function getCourseByCodeCourse($code, $course)
+    {
+        $course = \DB::table('tpoly_courses')->where('COURSE_CODE', $code)
+            ->where("COURSE_NAME", $course)
             ->get();
 
         return @$course[0]->ID;
 
     }
-    public function getProgramByID($id) {
-        $programme = \DB::table('tpoly_programme')->where('ID',$id)->get();
+
+    public function getProgramByID($id)
+    {
+        $programme = \DB::table('tpoly_programme')->where('ID', $id)->get();
 
         return @$programme[0]->PROGRAMME;
     }
-    public function getProgramByGradeSystem($program) {
-        $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE',$program)->get();
+
+    public function getProgramByGradeSystem($program)
+    {
+        $programme = \DB::table('tpoly_programme')->where('PROGRAMMECODE', $program)->get();
 
         return @$programme[0]->GRADING_SYSTEM;
     }
-    public function getCourseProgrammeMounted($course) {
 
-        $programme= \DB::table('tpoly_courses')->where('COURSE_CODE',$course)->get();
+    public function getCourseProgrammeMounted($course)
+    {
 
-        return @$programme[0]->PROGRAMME;
-    }
-    public function getCourseProgramme($course) {
-
-        $programme= \DB::table('tpoly_courses')->where('ID',$course)->get();
+        $programme = \DB::table('tpoly_courses')->where('COURSE_CODE', $course)->get();
 
         return @$programme[0]->PROGRAMME;
     }
-    public function getCourseProgramme2($course) {
 
-        $programme= \DB::table('tpoly_courses')->where('COURSE_CODE',$course)->get();
+    public function getCourseProgramme($course)
+    {
+
+        $programme = \DB::table('tpoly_courses')->where('ID', $course)->get();
 
         return @$programme[0]->PROGRAMME;
     }
-    public function getGrade($mark,$type){
+
+    public function getCourseProgramme2($course)
+    {
+
+        $programme = \DB::table('tpoly_courses')->where('COURSE_CODE', $course)->get();
+
+        return @$programme[0]->PROGRAMME;
+    }
+
+    public function getGrade($mark, $type)
+    {
 
         $grade = \DB::table('tpoly_grade_system')
-            ->where('lower','<=',$mark)
-            ->where('upper','>=',$mark)
-            ->where('type',$type)
+            ->where('lower', '<=', $mark)
+            ->where('upper', '>=', $mark)
+            ->where('type', $type)
             ->get();
 
         return $grade;
 
     }
 
-    public function getGradeLetter($mark,$type){
+    public function getGradeLetter($mark, $type)
+    {
 
         $grade = \DB::table('tpoly_grade_system')
-            ->where('lower','<=',$mark)
-            ->where('upper','>=',$mark)
-            ->where('type',$type)
-            ->where("grade","!=","E")
+            ->where('lower', '<=', $mark)
+            ->where('upper', '>=', $mark)
+            ->where('type', $type)
+            ->where("grade", "!=", "E")
             ->get();
 
         return @$grade[0]->grade;
 
     }
-    public function getGradeValue($mark,$type){
+
+    public function getGradeValue($mark, $type)
+    {
 
         $grade = \DB::table('tpoly_grade_system')
-            ->where('lower','<=',$mark)
-            ->where('uppers','>=',$mark)
-            ->where('type',$type)
-            ->where("grade","!=","E")
+            ->where('lower', '<=', $mark)
+            ->where('uppers', '>=', $mark)
+            ->where('type', $type)
+            ->where("grade", "!=", "E")
             ->select('value')->get();
 
         return @$grade[0]->value;
@@ -2254,102 +2404,119 @@ $total_course_assessed= $datac[0];*/
     }
 
 
-    public function getCourseCodeByID($id){
+    public function getCourseCodeByID($id)
+    {
 
-        $course= \DB::table('tpoly_academic_record')
+        $course = \DB::table('tpoly_academic_record')
             ->join('tpoly_mounted_courses', 'tpoly_academic_record.code', '=', 'tpoly_mounted_courses.COURSE_CODE')
             ->join('tpoly_courses', 'tpoly_mounted_courses.COURSE_CODE', '=', 'tpoly_courses.COURSE_CODE')
-            ->select('tpoly_courses.COURSE_CODE')->where('tpoly_academic_record.code',$id)
+            ->select('tpoly_courses.COURSE_CODE')->where('tpoly_academic_record.code', $id)
             ->get();
 
         return @$course[0]->COURSE_CODE;
 
     }
-    public function getCourseName($id){
 
-        $course= \DB::table('tpoly_courses')
-            ->join('tpoly_mounted_courses',  'tpoly_mounted_courses.COURSE', '=', 'tpoly_courses.ID')
+    public function getCourseName($id)
+    {
 
-            ->select('*')->where('tpoly_mounted_courses.PROGRAMME',"!=","")->where('tpoly_mounted_courses.ID',$id)
+        $course = \DB::table('tpoly_courses')
+            ->join('tpoly_mounted_courses', 'tpoly_mounted_courses.COURSE', '=', 'tpoly_courses.ID')
+            ->select('*')->where('tpoly_mounted_courses.PROGRAMME', "!=", "")->where('tpoly_mounted_courses.ID', $id)
             ->get();
 
         return @$course;
 
     }
 
-    public function getCourseCodeByIDArray($id){
+    public function getCourseCodeByIDArray($id)
+    {
 
-        $course= \DB::table('tpoly_courses')->where('ID',$id)
-            ->get();
-
-        return @$course;
-
-    }
-    public function getCourseCodeByIDArray2($id){
-
-        $course= \DB::table('tpoly_courses')->where('COURSE_CODE',$id)
-            ->get();
-
-        return  @$course;
-
-    }
-    public function getCourseMountedInfo($id){
-
-        $course= \DB::table('tpoly_mounted_courses')->where('COURSE_CODE',$id)
+        $course = \DB::table('tpoly_courses')->where('ID', $id)
             ->get();
 
         return @$course;
 
     }
 
-public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
+    public function getCourseCodeByIDArray2($id)
+    {
 
-        $course = \DB::table('tpoly_mounted_courses')->where('COURSE_CODE',$courseCode)->where('COURSE_SEMESTER',$sem)->where('COURSE_LEVEL',$level)->where('COURSE_YEAR',$year)
-            ->where("PROGRAMME",$program)
+        $course = \DB::table('tpoly_courses')->where('COURSE_CODE', $id)
             ->get();
 
         return @$course;
 
     }
 
-    public function getCourseByIDCode($code){
+    public function getCourseMountedInfo($id)
+    {
 
-        $course= \DB::table('tpoly_academic_record')
+        $course = \DB::table('tpoly_mounted_courses')->where('COURSE_CODE', $id)
+            ->get();
+
+        return @$course;
+
+    }
+
+    public function getCourseMountedInfo2($courseCode, $sem, $level, $year, $program)
+    {
+
+        $course = \DB::table('tpoly_mounted_courses')->where('COURSE_CODE', $courseCode)->where('COURSE_SEMESTER', $sem)->where('COURSE_LEVEL', $level)->where('COURSE_YEAR', $year)
+            ->where("PROGRAMME", $program)
+            ->get();
+
+        return @$course;
+
+    }
+
+    public function getCourseByIDCode($code)
+    {
+
+        $course = \DB::table('tpoly_academic_record')
             ->leftjoin('tpoly_mounted_courses', 'tpoly_academic_record.course', '=', 'tpoly_mounted_courses.ID')
             ->leftjoin('tpoly_courses', 'tpoly_mounted_courses.COURSE', '=', 'tpoly_courses.ID')
-            ->select('tpoly_academic_record.course')->where('tpoly_courses.COURSE_CODE',$code)
+            ->select('tpoly_academic_record.course')->where('tpoly_courses.COURSE_CODE', $code)
             ->get();
 
         return @$course[0]->course;
 
     }
-    public function getCourseByID($id){
 
-        $course = \DB::table('tpoly_courses')->where('COURSE_CODE',$id)->get();
+    public function getCourseByID($id)
+    {
 
-        return @$course[0]->COURSE_NAME;
-
-    }
-    public function getCourse($id){
-
-        $course = \DB::table('tpoly_courses')->where('ID',$id)->get();
+        $course = \DB::table('tpoly_courses')->where('COURSE_CODE', $id)->get();
 
         return @$course[0]->COURSE_NAME;
 
     }
-    public function getTotalFeeByProrammeLevel($program,$level){
-        $program=  $this->getProgramCodeByID($program);
-        $total = \DB::table('tpoly_students')->where('PROGRAMMECODE',$program)->where('YEAR',$level)->where('STATUS','=','In school')->COUNT('*');
+
+    public function getCourse($id)
+    {
+
+        $course = \DB::table('tpoly_courses')->where('ID', $id)->get();
+
+        return @$course[0]->COURSE_NAME;
+
+    }
+
+    public function getTotalFeeByProrammeLevel($program, $level)
+    {
+        $program = $this->getProgramCodeByID($program);
+        $total = \DB::table('tpoly_students')->where('PROGRAMMECODE', $program)->where('YEAR', $level)->where('STATUS', '=', 'In school')->COUNT('*');
         // dd($total);
         return @$total;
 
     }
-    public function picture($path,$target){
-        if(file_exists($path)){
+
+    public function picture($path, $target)
+    {
+        if (file_exists($path)) {
             $mypic = getimagesize($path);
 
-            $width=$mypic[0];
-            $height=$mypic[1];
+            $width = $mypic[0];
+            $height = $mypic[1];
 
             if ($width > $height) {
                 $percentage = ($target / $width);
@@ -2364,19 +2531,21 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
             return "width=\"$width\" height=\"$height\"";
 
 
-
-        }else{}
+        } else {
+        }
 
 
     }
 
 
-    public function pictureid($stuid) {
+    public function pictureid($stuid)
+    {
 
         return str_replace('/', '', $stuid);
     }
 
-    function formatMoney($number, $fractional=false) {
+    function formatMoney($number, $fractional = false)
+    {
         if ($fractional) {
             $number = sprintf('%.2f', $number);
         }
@@ -2390,14 +2559,17 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
         }
         return $number;
     }
-    public function formatCurrency($amount) {
-        return number_format($amount,3);
+
+    public function formatCurrency($amount)
+    {
+        return number_format($amount, 3);
 
     }
+
     /**
      * Create a new task.
      *
-     * @param  Request  $request
+     * @param  Request $request
      * @return Response
      */
     public function store(Request $request)
@@ -2416,8 +2588,8 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
     /**
      * Destroy the given task.
      *
-     * @param  Request  $request
-     * @param  Task  $task
+     * @param  Request $request
+     * @param  Task $task
      * @return Response
      */
     public function destroy(Request $request, Task $task)
@@ -2428,111 +2600,40 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
 
         return redirect('/tasks');
     }
-    public function firesms($message,$phone,$receipient){
 
-
-        if (!empty($phone)&& !empty($message)&& !empty($receipient)) {
-            \DB::beginTransaction();
-            try {
-
-
-                $phone="+233".\substr($phone,-9);
-                $phone = str_replace(' ', '', $phone);
-                $phone = str_replace('-', '', $phone);
-                if (!empty($message) && !empty($phone)) {
-
-                    $key = "bcb86ecbc1a058663a07"; //your unique API key;
-
-                    // $sender_id="TTU";
-
-
-
-
-                    $message=urlencode($message); //encode url;
-                    $sender_id="TTU";
-
-                    $url = "http://sms.gadeksystems.com/smsapi?key=$key&to=$phone&msg=$message&sender_id=$sender_id";
-
-
-
-                    $ch = \curl_init();
-                    \curl_setopt($ch, CURLOPT_URL, $url);
-                    \curl_setopt($ch, CURLOPT_HEADER, 0);
-                    \curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                    $result = \curl_exec($ch);
-                    \curl_close($ch);
-
-                    $result="Message was successfully sent";
-
-
-                    $array=  $this->getSemYear();
-                    $sem=$array[0]->SEMESTER;
-                    $year=$array[0]->YEAR;
-                    $user = \Auth::user()->serial;
-
-
-                    $user = \Auth::user()->fund;
-                    $sms=new MessagesModel();
-                    $sms->dates=\DB::raw("NOW()");
-                    $sms->message=$message;
-                    $sms->phone=$phone;
-                    $sms->status=$result;
-                    $sms->type="Admission Notifications";
-
-                    $sms->sender=$user;
-                    $sms->term=$sem;
-                    $sms->year=$year;
-                    $sms->receipient=$receipient;
-
-                    $sms->save();
-                    \DB::commit();
-                }
-
-            }
-            catch (\Exception $e) {
-                \DB::rollback();
-            }
-        }
-
-
-
-    }
-
-    public function getPinSerial($applicant) {
-        $data= \DB::table('tpoly_forms')->where("FORM_NO",$applicant)->first();
+    public function getPinSerial($applicant)
+    {
+        $data = \DB::table('tpoly_forms')->where("FORM_NO", $applicant)->first();
         return $data;
 
     }
 
-    public function sysSMS(){
-        $data= Models\ApplicantModel::where("ADMITTED",1)->where("ADMISSION_TYPE","mature")->get();
+    public function sysSMS()
+    {
+        $data = Models\ApplicantModel::where("ADMITTED", 1)->where("ADMISSION_TYPE", "mature")->get();
 
-        foreach($data as $key){
+        foreach ($data as $key) {
             // dd();
-            $info= $this->getPinSerial($key->APPLICATION_NUMBER);
-            $serial=$info->serial;
-            $pin=$info->PIN;
-            $receipient=$key->APPLICATION_NUMBER;
-            $phone=$key->PHONE;
-            $name=$key->FIRSTNAME;
-            $type="mature";
-            $program= $this->getProgram($key->PROGRAMME_ADMITTED);
+            $info = $this->getPinSerial($key->APPLICATION_NUMBER);
+            $serial = $info->serial;
+            $pin = $info->PIN;
+            $receipient = $key->APPLICATION_NUMBER;
+            $phone = $key->PHONE;
+            $name = $key->FIRSTNAME;
+            $type = "mature";
+            $program = $this->getProgram($key->PROGRAMME_ADMITTED);
             $regular = "Congrats! $name. You have been admitted to TTU to pursue $program.Your serial no is $serial and pin code is $pin,Print your letter using the link http://admissions.ttuportal.com";
             $conditional = "Congrats! $name. You have been offered a conditional admission to TTU to pursue $program.Your serial no is $serial and pin code is $pin,Print your letter using the link http://admissions.ttuportal.com";
 
             $provisional = "Congrats! $name. You have been offered a provisional admission to TTU to pursue $program. You will be required to send your results when published to complete the admission process.Your serial no is $serial and pin code is $pin, Print your letter using the link http://admissions.ttuportal.com";
 
-            if ($type=="conditional")
-            {
-                $message=$conditional;
+            if ($type == "conditional") {
+                $message = $conditional;
 
-            }
-            elseif($type=="regular" ){
-                $message= $regular;
-            }
-
-            elseif ($type=="provisional") {
-                $message= $provisional;
+            } elseif ($type == "regular") {
+                $message = $regular;
+            } elseif ($type == "provisional") {
+                $message = $provisional;
             }
             @Models\ApplicantModel::where("APPLICATION_NUMBER", $receipient)->update(array("SMS_SENT" => 1));
             @$this->firesms($message, $phone, $receipient);
@@ -2541,81 +2642,73 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
     }
 
 
+    public function sendSingleSMS($phone, $receipient, $type, $name)
+    {
+        $info = $this->getPinSerial($receipient);
+        $serial = $info->serial;
+        $pin = $info->PIN;
 
-
-
-
-
-    public function sendSingleSMS( $phone,$receipient,$type,$name){
-        $info= $this->getPinSerial($receipient);
-        $serial=$info->serial;
-        $pin=$info->PIN;
-
-        $data= Models\ApplicantModel::where("ADMITTED",1)->where("APPLICATION_NUMBER",$receipient)->first();
-        $program= $this->getProgram($data->PROGRAMME_ADMITTED);
+        $data = Models\ApplicantModel::where("ADMITTED", 1)->where("APPLICATION_NUMBER", $receipient)->first();
+        $program = $this->getProgram($data->PROGRAMME_ADMITTED);
         $regular = "Congrats! $name. You have been admitted to TTU to pursue $program.Your serial no is $serial and pin code is $pin,Print your letter using the link http://admissions.ttuportal.com";
         $conditional = "Congrats! $name. You have been offered a conditional admission to TTU to pursue $program.Your serial no is $serial and pin code is $pin,Print your letter using the link http://admissions.ttuportal.com";
 
         $provisional = "Congrats! $name. You have been offered a provisional admission to TTU to pursue $program. You will be required to send your results when published to complete the admission process.Your serial no is $serial and pin code is $pin, Print your letter using the link http://admissions.ttuportal.com";
 
-        if ($type=="conditional")
-        {
-            $message=$conditional;
+        if ($type == "conditional") {
+            $message = $conditional;
 
-        }
-        elseif($type=="regular" ){
-            $message= $regular;
-        }
-
-        elseif ($type=="provisional") {
-            $message= $provisional;
+        } elseif ($type == "regular") {
+            $message = $regular;
+        } elseif ($type == "provisional") {
+            $message = $provisional;
         }
         @Models\ApplicantModel::where("APPLICATION_NUMBER", $receipient)->update(array("SMS_SENT" => 1));
         @$this->firesms($message, $phone, $receipient);
         return redirect("/applicants/view");
     }
-    public function sendOutreachSingleSMS( $phone,$id,$type,$name){
 
-        $data= Models\OutreachModel::where("admitted",1)->where("id",$id)->first();
-        $receipient=$data->applicationNumber;
-        $program= $this->getProgram($data->programmeAdmitted);
+    public function sendOutreachSingleSMS($phone, $id, $type, $name)
+    {
+
+        $data = Models\OutreachModel::where("admitted", 1)->where("id", $id)->first();
+        $receipient = $data->applicationNumber;
+        $program = $this->getProgram($data->programmeAdmitted);
         $regular = "Congrats! $name. You have been admitted to TTU to pursue $program.Your application number is $receipient, Print your letter using the link http://outreach.ttuportal.com";
         $conditional = "Congrats! $name. You have been offered a conditional admission to TTU to pursue $program.Your application number is $receipient, Print your letter using the link http://outreach.ttuportal.com";
 
         $provisional = "Congrats! $name. You have been offered a provisional admission to TTU to pursue $program. You will be required to send your results when published to complete the admission process.Your application number is $receipient, Print your letter using the link http://outreach.ttuportal.com";
 
-        if ($type=="conditional")
-        {
-            $message=$conditional;
+        if ($type == "conditional") {
+            $message = $conditional;
 
-        }
-        elseif($type=="regular" ){
-            $message= $regular;
-        }
-
-        elseif ($type=="provisional") {
-            $message= $provisional;
+        } elseif ($type == "regular") {
+            $message = $regular;
+        } elseif ($type == "provisional") {
+            $message = $provisional;
         }
         @Models\OutreachModel::where("applicationNumber", $receipient)->update(array("sms_sent" => 1));
         @$this->firesms($message, $phone, $receipient);
         return redirect("/outreach/view");
     }
-    public function getStudentOwingaAmount($indexno){
 
-        $total= \DB::table('tpoly_students')->where("INDEXNO",$indexno)->first();
+    public function getStudentOwingaAmount($indexno)
+    {
+
+        $total = \DB::table('tpoly_students')->where("INDEXNO", $indexno)->first();
         return $total->BILL_OWING;
     }
 
 
+    public function sendAuthOutreach()
+    {
 
-    public function sendAuthOutreach(){
+        $data = Models\OutreachModel::where("admitted", 1)->get();
+        $auth = Models\FormModel::where("serial", "LIKE", "TTUCR17%")->where("FORM_NO", "0")->get();
 
-        $data= Models\OutreachModel::where("admitted",1)->get();
-        $auth= Models\FormModel::where("serial","LIKE","TTUCR17%")->where("FORM_NO","0")->get();
+        foreach ($data as $row) {
 
-        foreach($data as $row){
-
-            foreach($auth as $salt){
+            foreach ($auth as $salt) {
                 //dd($salt);
                 $message = "Hi $row->name, kindly login into admissions.ttuportal.com with serial $salt->serial and pin  $salt->PIN to update your data.Thanks";
                 //dd($message);
@@ -2626,8 +2719,10 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
 
         //return redirect("/outreach/view");
     }
-    public function sendSrms($applicant){
-        $url="/send";
+
+    public function sendSrms($applicant)
+    {
+        $url = "/send";
 
         $content = json_encode($applicant);
 
@@ -2644,79 +2739,74 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
         $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
 
-
         curl_close($curl);
 
         $response = json_decode($json_response, true);
     }
-    public function fetchData($url){
+
+    public function fetchData($url)
+    {
 
         $postdata = http_build_query(
             array(
                 'userName' => 'sisaemma@yahoo.co.uk',
                 'passWord' => 'PRINT45dull',
-                'startDate'   => '2017-09-01',
-                'endDate'   => date("Y-m-d"),
-                'accountNumber'=>'6010406900',
-                'processType'=>''
+                'startDate' => '2017-09-01',
+                'endDate' => date("Y-m-d"),
+                'accountNumber' => '6010406900',
+                'processType' => ''
             )
         );
         $ch = curl_init();
         $timeout = 5;
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch,CURLOPT_POSTFIELDS,$postdata);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
         $data = curl_exec($ch);
         curl_close($ch);
         return json_decode($data);
     }
-    public function fireLostSMS(){
-        $academicDetails=$this->getSemYear();
-        $sem=$academicDetails[0]->SEMESTER;
-        $year=$academicDetails[0]->YEAR;
+
+    public function fireLostSMS()
+    {
+        $academicDetails = $this->getSemYear();
+        $sem = $academicDetails[0]->SEMESTER;
+        $year = $academicDetails[0]->YEAR;
         // $data =  $this->fetchData("https://www.zenithbank.com.gh/realtimenotification/api/bankpaydetail");
 
-        $sql=Models\ApplicantModel::where("ADMITTED","1")->where("ID",">","2000")->get();
+        $sql = Models\ApplicantModel::where("ADMITTED", "1")->where("ID", ">", "2000")->get();
 
-        foreach ($sql as $student)
-        {
+        foreach ($sql as $student) {
             //freshers
 
-            if(!empty($student->APPLICATION_NUMBER)) {
-                $program=$student->PROGRAMME_ADMITTED;
-                $ptype=$this->getProgrammeType($program);
-                if($ptype=="NON TERTIARY"){
-                    $level="100NT";
-                }
-                elseif($ptype=="HND"){
-                    $level="100H";
-                }
-                elseif($ptype=="BTECH"){
-                    $level="100BTT";
-                }
-                else{
-                    $level="500";
+            if (!empty($student->APPLICATION_NUMBER)) {
+                $program = $student->PROGRAMME_ADMITTED;
+                $ptype = $this->getProgrammeType($program);
+                if ($ptype == "NON TERTIARY") {
+                    $level = "100NT";
+                } elseif ($ptype == "HND") {
+                    $level = "100H";
+                } elseif ($ptype == "BTECH") {
+                    $level = "100BTT";
+                } else {
+                    $level = "500";
                 }
 //dd($level);
-                if($program=="MTECHT"||$program=="MTECHP"||$program=="MTECHG"){
+                if ($program == "MTECHT" || $program == "MTECHP" || $program == "MTECHG") {
                     $fee = $this->getYearBillLevelPostgraduate($year, $level, $program);
-                }
-                else{
+                } else {
                     $fee = $this->getYearBillLevel100($year, $level, $program);
                 }
 
 
-
-
                 //$this->getPassword($student->APPLICATION_NUMBER);
                 $que = Models\PortalPasswordModel::where("username", $student->APPLICATION_NUMBER)->first();
-                $indexno=$student->APPLICATION_NUMBER;
-                $real=$que->real_password;
+                $indexno = $student->APPLICATION_NUMBER;
+                $real = $que->real_password;
 
 
                 $message = "TTU Online Credentials: visit records.ttuportal.com with $student->APPLICATION_NUMBER as username and $real as password and follow the course registration steps \n\nYour registration will be revoked if full fees payment is not made before mid sem Exams.\n\nApproach personnel in TPConnect branded attire for enquiries.";
-
 
 
                 @$this->firesms($message, $student->PHONE, $student->APPLICATION_NUMBER);
@@ -2724,50 +2814,43 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
         }
 
 
-
-
     }
-    public function pullApplicants(){
-        $academicDetails=$this->getSemYear();
-        $sem=$academicDetails[0]->SEMESTER;
-        $year=$academicDetails[0]->YEAR;
+
+    public function pullApplicants()
+    {
+        $academicDetails = $this->getSemYear();
+        $sem = $academicDetails[0]->SEMESTER;
+        $year = $academicDetails[0]->YEAR;
         // $data =  $this->fetchData("https://www.zenithbank.com.gh/realtimenotification/api/bankpaydetail");
 
-        $sql=Models\ApplicantModel::where("ADMITTED","1")->get();
+        $sql = Models\ApplicantModel::where("ADMITTED", "1")->get();
 
-        foreach ($sql as $student)
-        {
+        foreach ($sql as $student) {
             //freshers
 
-            if(!empty($student->APPLICATION_NUMBER)) {
-                $program=$student->PROGRAMME_ADMITTED;
-                $ptype=$this->getProgrammeType($program);
-                if($ptype=="NON TERTIARY"){
-                    $level="100NT";
-                }
-                elseif($ptype=="HND"){
-                    $level="100H";
-                }
-                elseif($ptype=="BTECH"){
-                    $level="100BTT";
-                }
-                else{
-                    $level="500";
+            if (!empty($student->APPLICATION_NUMBER)) {
+                $program = $student->PROGRAMME_ADMITTED;
+                $ptype = $this->getProgrammeType($program);
+                if ($ptype == "NON TERTIARY") {
+                    $level = "100NT";
+                } elseif ($ptype == "HND") {
+                    $level = "100H";
+                } elseif ($ptype == "BTECH") {
+                    $level = "100BTT";
+                } else {
+                    $level = "500";
                 }
 //dd($level);
-                if($program=="MTECHT"||$program=="MTECHP"||$program=="MTECHG"){
+                if ($program == "MTECHT" || $program == "MTECHP" || $program == "MTECHG") {
                     $fee = $this->getYearBillLevelPostgraduate($year, $level, $program);
-                }
-                else{
+                } else {
                     $fee = $this->getYearBillLevel100($year, $level, $program);
                 }
 
 
-
-                $checker=Models\StudentModel::where("INDEXNO",$student->APPLICATION_NUMBER)
+                $checker = Models\StudentModel::where("INDEXNO", $student->APPLICATION_NUMBER)
                     ->first();
-                if(empty($checker)) {
-
+                if (empty($checker)) {
 
 
                     /////////////////////////////////////////////////////
@@ -2813,19 +2896,16 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
                 }
                 //$this->getPassword($student->APPLICATION_NUMBER);
                 $que = Models\PortalPasswordModel::where("username", $student->APPLICATION_NUMBER)->first();
-                $indexno=$student->APPLICATION_NUMBER;
-                $ptype=$this->getProgrammeType($student->PROGRAMME_ADMITTED);
-                if($ptype=="NON TERTIARY"){
-                    $level="100NT";
-                }
-                elseif($ptype=="HND"){
-                    $level="100H";
-                }
-                elseif($ptype=="BTECH"){
-                    $level="100BTT";
-                }
-                else{
-                    $level="500";
+                $indexno = $student->APPLICATION_NUMBER;
+                $ptype = $this->getProgrammeType($student->PROGRAMME_ADMITTED);
+                if ($ptype == "NON TERTIARY") {
+                    $level = "100NT";
+                } elseif ($ptype == "HND") {
+                    $level = "100H";
+                } elseif ($ptype == "BTECH") {
+                    $level = "100BTT";
+                } else {
+                    $level = "500";
                 }
                 if (empty($que) && !empty($indexno)) {
                     $program = $student->PROGRAMME_ADMITTED;
@@ -2847,28 +2927,26 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
                     $message = "TTU Online Credentials: visit records.ttuportal.com with $student->APPLICATION_NUMBER as username and $real as password and follow the course registration steps \n\nYour registration will be revoked if full fees payment is not made before mid sem Exams.\n\nApproach personnel in TPConnect branded attire for enquiries.";
 
 
-
                     @$this->firesms($message, $student->PHONE, $student->APPLICATION_NUMBER);
                 }
             }
 
 
-
         }
     }
 
-    public function getZenith(){
-        $academicDetails=$this->getSemYear();
-        $sem=$academicDetails[0]->SEMESTER;
-        $year=$academicDetails[0]->YEAR;
+    public function getZenith()
+    {
+        $academicDetails = $this->getSemYear();
+        $sem = $academicDetails[0]->SEMESTER;
+        $year = $academicDetails[0]->YEAR;
         // $data =  $this->fetchData("https://www.zenithbank.com.gh/realtimenotification/api/bankpaydetail");
-        foreach ($data->records as $item)
-        {
+        foreach ($data->records as $item) {
 
             //freshers
-            $student=Models\ApplicantModel::where("APPLICATION_NUMBER",$item->StudentID)->first();
+            $student = Models\ApplicantModel::where("APPLICATION_NUMBER", $item->StudentID)->first();
 
-            if(!empty($student->APPLICATION_NUMBER)) {
+            if (!empty($student->APPLICATION_NUMBER)) {
                 $program = $student->PROGRAMME_ADMITTED;
                 $ptype = $this->getProgrammeType($program);
                 if ($ptype == "NON TERTIARY") {
@@ -2973,9 +3051,9 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
                         Models\StudentModel::where("STNO", $item->StudentID)->update(array("BILL_OWING" => $owing));
                     }
                 }
-            }elseif(empty($student->APPLICATION_NUMBER)) {
+            } elseif (empty($student->APPLICATION_NUMBER)) {
 
-                $oldStudent = Models\StudentModel::where("STNO",  $item->StudentID)->orWhere("INDEXNO",  $item->StudentID)->orWhere("INDEXNO","!=","07160052")->first();
+                $oldStudent = Models\StudentModel::where("STNO", $item->StudentID)->orWhere("INDEXNO", $item->StudentID)->orWhere("INDEXNO", "!=", "07160052")->first();
                 $level = $oldStudent->LEVEL;
                 $index = $oldStudent->INDEXNO;
                 $program = $oldStudent->PROGRAMMECODE;
@@ -3012,15 +3090,14 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
                     $feeLedger->SEMESTER = $sem;
                     $feeLedger->save();
                     if ($feeLedger->save()) {
-                        @StudentModel::where("INDEXNO",  $item->StudentID)->orWhere("STNO",  $item->StudentID)->update(array("BILL_OWING" => $bill_owing, "BILLS" => $bill));
+                        @StudentModel::where("INDEXNO", $item->StudentID)->orWhere("STNO", $item->StudentID)->update(array("BILL_OWING" => $bill_owing, "BILLS" => $bill));
 
                         $this->updateReceipt();
                     }
 
 
                 }
-            }
-            else{
+            } else {
                 continue;
             }
         }
@@ -3028,50 +3105,46 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
 
     }
 
-    public function pushData(){
-        $academicDetails=$this->getSemYear();
-        $sem=$academicDetails[0]->SEMESTER;
-        $year=$academicDetails[0]->YEAR;
+    public function pushData()
+    {
+        $academicDetails = $this->getSemYear();
+        $sem = $academicDetails[0]->SEMESTER;
+        $year = $academicDetails[0]->YEAR;
         // $data =  $this->fetchData("https://www.zenithbank.com.gh/realtimenotification/api/bankpaydetail");
-        foreach ($data->records as $item)
-        {
+        foreach ($data->records as $item) {
             //freshers
-            $student=Models\ApplicantModel::where("APPLICATION_NUMBER",$item->StudentID)->first();
-            if(!empty($student->APPLICATION_NUMBER)) {
-                $program=$student->PROGRAMME_ADMITTED;
-                $ptype=$this->getProgrammeType($program);
-                if($ptype=="NON TERTIARY"){
-                    $level="100NT";
-                }
-                elseif($ptype=="HND"){
-                    $level="100H";
-                }
-                elseif($ptype=="BTECH"){
-                    $level="100BTT";
-                }
-                else{
-                    $level="500";
+            $student = Models\ApplicantModel::where("APPLICATION_NUMBER", $item->StudentID)->first();
+            if (!empty($student->APPLICATION_NUMBER)) {
+                $program = $student->PROGRAMME_ADMITTED;
+                $ptype = $this->getProgrammeType($program);
+                if ($ptype == "NON TERTIARY") {
+                    $level = "100NT";
+                } elseif ($ptype == "HND") {
+                    $level = "100H";
+                } elseif ($ptype == "BTECH") {
+                    $level = "100BTT";
+                } else {
+                    $level = "500";
                 }
                 //dd($level);
-                if($program=="MTECHT"||$program=="MTECHP"||$program=="MTECHG"){
+                if ($program == "MTECHT" || $program == "MTECHP" || $program == "MTECHG") {
                     $fee = $this->getYearBillLevelPostgraduate($year, $level, $program);
-                }
-                else{
+                } else {
                     $fee = $this->getYearBillLevel100($year, $level, $program);
                 }
 
 
-                if ($student->ADMISSION_FEES<= $item->Amount) {
+                if ($student->ADMISSION_FEES <= $item->Amount) {
                     $details = "Full payment";
 
                 } else {
                     $details = "Part payment";
                 }
-                $date=$item->PaymentDate;
-                $checker=Models\FeePaymentModel::where("SEMESTER",$sem)
-                    ->where("YEAR",$year)->where("INDEXNO",$item->StudentID)
-                    ->where("CHECKER",$date)->get();
-                if(empty($checker)) {
+                $date = $item->PaymentDate;
+                $checker = Models\FeePaymentModel::where("SEMESTER", $sem)
+                    ->where("YEAR", $year)->where("INDEXNO", $item->StudentID)
+                    ->where("CHECKER", $date)->get();
+                if (empty($checker)) {
                     $feeLedger = new Models\FeePaymentModel();
                     $feeLedger->INDEXNO = $item->StudentID;
                     $feeLedger->PROGRAMME = $student->PROGRAMME_ADMITTED;
@@ -3199,39 +3272,28 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
          }*/
 
 
-
-
-
-
-
-
-
         }
     }
 
-    public  function getPassword($indexno)
+    public function getPassword($indexno)
     {
         $data = Models\StudentModel::where("STNO", $indexno)->orWhere("INDEXNO", $indexno)->first();
         $que = Models\PortalPasswordModel::where("student", $data->ID)->orWhere("username", $data->INDEXNO)->first();
-        $ptype=$this->getProgrammeType($data->PROGRAMMECODE);
-        if($ptype=="NON TERTIARY"){
-            $level="100NT";
-        }
-        elseif($ptype=="HND"){
-            $level="100H";
-        }
-        elseif($ptype=="BTECH"){
-            $level="100BTT";
-        }
-        elseif($ptype=="DEGREE"){
-            $level="100B";
-        }
-        else{
-            $level="500MT";
+        $ptype = $this->getProgrammeType($data->PROGRAMMECODE);
+        if ($ptype == "NON TERTIARY") {
+            $level = "100NT";
+        } elseif ($ptype == "HND") {
+            $level = "100H";
+        } elseif ($ptype == "BTECH") {
+            $level = "100BTT";
+        } elseif ($ptype == "DEGREE") {
+            $level = "100B";
+        } else {
+            $level = "500MT";
         }
         $program = $data->PROGRAMMECODE;
         if (empty($que) && !empty($indexno)) {
-            $studentID=$this->getStudentIDfromIndexno($indexno);
+            $studentID = $this->getStudentIDfromIndexno($indexno);
             $str = 'abcdefhkmnprtuvwxy34678abcdefhkmnprtuvwxy34678';
             $shuffled = str_shuffle($str);
             $vcode = substr($shuffled, 0, 9);
@@ -3247,12 +3309,13 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
                 'password' => bcrypt($real),
             ]);
 
-        }
-        else{
-            Models\PortalPasswordModel::where("username",$indexno)->update(array("level"=>$level,"programme"=>$program));
+        } else {
+            Models\PortalPasswordModel::where("username", $indexno)->update(array("level" => $level, "programme" => $program));
         }
     }
-    public function getReceipt() {
+
+    public function getReceipt()
+    {
         \DB::beginTransaction();
         try {
             $receiptno_query = Models\ReceiptModel::first();
@@ -3264,7 +3327,8 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
         }
     }
 
-    public function updateReceipt() {
+    public function updateReceipt()
+    {
         \DB::beginTransaction();
         try {
             $query = Models\ReceiptModel::first();
@@ -3277,47 +3341,43 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
             \DB::rollback();
         }
     }
+
     public function generateIndexNumbers()
     {
-        $sql=Models\StudentModel::select("INDEXNO","PROGRAMMECODE")->groupBy("PROGRAMMECODE")->get();
-        foreach ($sql as $row){
-            $index=new Models\IndexNumberModel();
-            $index->programme=$row->PROGRAMMECODE;
+        $sql = Models\StudentModel::select("INDEXNO", "PROGRAMMECODE")->groupBy("PROGRAMMECODE")->get();
+        foreach ($sql as $row) {
+            $index = new Models\IndexNumberModel();
+            $index->programme = $row->PROGRAMMECODE;
 
-            $program=$row->PROGRAMMECODE;
+            $program = $row->PROGRAMMECODE;
 
             if (strpos($program, "H") == 0) {
-                $index->code="07".substr(date("Y"),2,2).substr($row->INDEXNO,4,1)."000";
-            } elseif (strpos($program, "D") == 0 || strpos($program, "C") == 0|| strpos($program, "E") == 0) {
-                $index->code="7".substr(date("Y"),2,2).substr($row->INDEXNO,4,1)."000";
+                $index->code = "07" . substr(date("Y"), 2, 2) . substr($row->INDEXNO, 4, 1) . "000";
+            } elseif (strpos($program, "D") == 0 || strpos($program, "C") == 0 || strpos($program, "E") == 0) {
+                $index->code = "7" . substr(date("Y"), 2, 2) . substr($row->INDEXNO, 4, 1) . "000";
             } elseif (strpos($program, "A") == 0) {
-                $index->code="7".substr(date("Y"),2,2).substr($row->INDEXNO,4,1)."000";
-            }
-            elseif (strpos($program, "B") == 0) {
+                $index->code = "7" . substr(date("Y"), 2, 2) . substr($row->INDEXNO, 4, 1) . "000";
+            } elseif (strpos($program, "B") == 0) {
 
-                $index->code="075".substr(date("Y"),2,2).substr($row->INDEXNO,4,1)."000";
-            }
-
-            elseif($program=="MTECHT"||$program=="MTECHP"||$program=="MTECHG"){
+                $index->code = "075" . substr(date("Y"), 2, 2) . substr($row->INDEXNO, 4, 1) . "000";
+            } elseif ($program == "MTECHT" || $program == "MTECHP" || $program == "MTECHG") {
                 //$index->code="07".substr(date("Y"),2,2);
+            } else {
+                $index->code = "7" . substr(date("Y"), 2, 2) . substr($row->INDEXNO, 4, 1) . "000";
             }
-            else {
-                $index->code="7".substr(date("Y"),2,2).substr($row->INDEXNO,4,1)."000";
-            }
 
 
-
-
-            $index->year=date("Y");
+            $index->year = date("Y");
             $index->save();
         }
     }
-    public function getSittingGrade($applicant,$sit){
-        $data=Models\ExamResultsModel::where("APPLICATION_NUMBER",$applicant)
-            ->where("SITTING",$sit)->get();
-        $subjects=array();
-        if(!empty($data)) {
 
+    public function getSittingGrade($applicant, $sit)
+    {
+        $data = Models\ExamResultsModel::where("APPLICATION_NUMBER", $applicant)
+            ->where("SITTING", $sit)->get();
+        $subjects = array();
+        if (!empty($data)) {
 
 
             $no = 1;
@@ -3326,11 +3386,10 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
 
                 ?>
 
-                <?php echo $no;?>
-                <?php echo @$value->subject->NAME;?>
+                <?php echo $no; ?>
+                <?php echo @$value->subject->NAME; ?>
                 <?php echo @$value->GRADE; ?>
                 <br/>
-
 
 
                 <?php
@@ -3341,13 +3400,13 @@ public function getCourseMountedInfo2($courseCode,$sem,$level,$year,$program){
             if (!empty($subjects)) {
                 return $subjects;
             }
-        }
-        else{
+        } else {
             return "None";
         }
     }
 
-    public function generatePassword(){
+    public function generatePassword()
+    {
         $str = 'abcdefhkmnprtuvwxy34678abcdefhkmnprtuvwxy34678';
         $shuffled = str_shuffle($str);
         $vcode = substr($shuffled, 0, 8);

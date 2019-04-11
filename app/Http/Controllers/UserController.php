@@ -621,7 +621,7 @@ class UserController extends Controller
 
        
 
-       $staffs = User::join('tpoly_workers', 'users.staffID', '=', 'tpoly_workers.id')->join('tpoly_department', 'tpoly_department.DEPTCODE', '=', 'tpoly_workers.department')
+       $staffs = User::join('tpoly_workers', 'users.staffID', '=', 'tpoly_workers.id')
 
            ->select(['users.id','tpoly_workers.fullName','tpoly_workers.staffID', 'users.name','users.email', 'users.role','users.department']);
 

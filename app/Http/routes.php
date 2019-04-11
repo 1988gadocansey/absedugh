@@ -66,6 +66,7 @@ Route::group(['middleware' => ['web']], function () {
     Route::get('/upload/fees', function () {
         return view('feeUpload');
     });
+    Route::get('gad_text', 'SystemController@firesms');
     /* Route::get('/upload_fees_gad', function () {
         return view('feeUpload');
     });*/
