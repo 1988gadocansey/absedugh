@@ -498,6 +498,12 @@ Route::group(['middleware' => ['web']], function () {
     Route::get('qa/report/single', 'QualityAssuranceController@printIndividualLecturer');
     Route::get('view/edit', 'CourseController@editResult');
 
+
+
+
+    Route::get('/upload_bills', 'UploadController@uploadStudentData');
+    Route::post('/process_bills', 'UploadController@processStudentUpload')->name("process_bills");
+
 });
 
 

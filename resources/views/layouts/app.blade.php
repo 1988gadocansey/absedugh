@@ -283,14 +283,25 @@
 
                 @if( @Auth::user()->department=='Finance' || @Auth::user()->department=='top')
 
-
                     <li data-uk-dropdown class="uk-hidden-small">
-                        <a href="#"> <i class="sidebar-menu-icon material-icons">attach_file</i><span>File</span></a>
+                        <a href="#"> <i class="sidebar-menu-icon material-icons">people</i><span>Student Management</span></a>
                         <div class="uk-dropdown uk-dropdown-scrollable">
                             <ul class="uk-nav uk-nav-dropdown">
+
                                 <li><a href='{!! url("/students") !!}'>Students</a></li>
                                 <li><a href='{!! url("/transcript") !!}'>Results</a></li>
-                                <li><a href='{!! url("pay_fees") !!}'>Individual Payments</a></li>
+
+
+                            </ul>
+                        </div>
+                    </li>
+                    <li data-uk-dropdown class="uk-hidden-small">
+                        <a href="#"> <i class="sidebar-menu-icon material-icons">attach_file</i><span>Finance Management</span></a>
+                        <div class="uk-dropdown uk-dropdown-scrollable">
+                            <ul class="uk-nav uk-nav-dropdown">
+
+                                <li><a href='{!! url("pay_fees") !!}'>Pay Fees</a></li>
+                                <li><a href='{!! url("pay_fees_penalty") !!}'>Late Registration payment</a></li>
 
                                 <li><a href='{!! url("banks") !!}'>View Banks</a></li>
 
@@ -301,8 +312,7 @@
                                 <li><a href='{!! url("view_payments") !!}'>Payments Ledger</a></li>
 
                                 <li><a href='{!! url("view_payments_master") !!}'>Payments (sum)</a></li>
-                                <li><a href='{!! url("pay_fees_penalty") !!}'>Late Registration payment</a></li>
-                                
+
                             </ul>
                         </div>
                     </li>
@@ -310,7 +320,7 @@
 
                     <li data-uk-dropdown class="uk-hidden-small">
                         <a href="#"> <i
-                                    class="sidebar-menu-icon material-icons">view_headline</i><span>Reports</span></a>
+                                    class="sidebar-menu-icon material-icons">view_headline</i><span>Accounting Reports</span></a>
                         <div class="uk-dropdown uk-dropdown-scrollable">
                             <ul class="uk-nav uk-nav-dropdown">
                                 <li><a href='{!! url("/report/registration") !!}'>Registration</a></li>
@@ -335,7 +345,7 @@
                     </li>
 
                     <li data-uk-dropdown class="uk-hidden-small">
-                        <a href="#"> <i class="sidebar-menu-icon material-icons">people</i><span>Staff</span></a>
+                        <a href="#"> <i class="sidebar-menu-icon material-icons">people</i><span>Staff Management</span></a>
                         <div class="uk-dropdown uk-dropdown-scrollable">
                             <ul class="uk-nav uk-nav-dropdown">
 
@@ -468,7 +478,7 @@
                             <div class="uk-dropdown uk-dropdown-scrollable">
                                 <ul class="uk-nav uk-nav-dropdown">
 
-                                    <li><a href='{!! url("/transcriptOrig") !!}' target="_blank">Transcript</a></li>
+                                    {{--<li><a href='{!! url("/transcriptOrig") !!}' target="_blank">Transcript</a></li>--}}
 
                                     <li><a href='{!! url("/transcript") !!}' target="_blank">Results</a></li>
                                     <li><a href='{!! url("/programmes") !!}'>View Programmes</a></li>
@@ -664,7 +674,8 @@
                             <div class="uk-dropdown uk-dropdown-scrollable">
                                 <ul class="uk-nav uk-nav-dropdown">
                                     <li><a href='{!! url("/transcript") !!}' target="_blank">Results</a></li>
-                                    <li><a href='{!! url("/transcriptOrig") !!}' target="_blank">Transcript</a></li>
+                                    {{--<li><a href='{!! url("/transcriptOrig") !!}' target="_blank">Transcript</a></li>--}}
+                                  {{----}}
                                     <li><a href='{!! url("/programmes") !!}'>View Programmes</a></li>
 
                                     <li><a href='{!! url("/grade_system") !!}'>View Grading Systems</a></li>
@@ -697,7 +708,9 @@
                                         class="sidebar-menu-icon material-icons md-18">attach_money</i><span>Finance</span></a>
                             <div class="uk-dropdown uk-dropdown-scrollable">
                                 <ul class="uk-nav uk-nav-dropdown">
+
                                     <li><a href='{!! url("/finance/reports/fees/") !!}'>View Fees</a></li>
+                                    <li><a href='{!! url("pay_fees") !!}'>Pay Fees</a></li>
                                     <li><a href='{!! url("/finance/upload") !!}'>Finance Fee Upload</a></li>
                                     <li><a href='{!! url("/upload/fees") !!}'>Bank Fees Upload</a></li>
                                     <li><a href='{!! url("banks") !!}'>View Banks</a></li>
@@ -705,7 +718,7 @@
 
                                     <li><a href='{!! url("view_payments_master") !!}'>Payments (sum)</a></li>
                                     <li><a href='{!! url("owing_paid") !!}'>Owing reports</a></li>
-                                    <li><a href='{!! url("pay_fees") !!}'>Individual Payments</a></li>
+
                                     <li><a href='{!! url("owing_excel") !!}'>Owing Excel</a></li>
                                     <li><a href='{!! url("paid_excel") !!}'>Paid Excel</a></li>
                                     <li><a href='{!! url("/print/receipt") !!}'>Print Fee Receipt</a></li>

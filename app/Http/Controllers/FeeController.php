@@ -883,8 +883,8 @@ foreach($programSelect as $row){
 
     public function processPayment(Request $request, SystemController $sys)
     {
-        if ($sys->getUserLevel((@\Auth::user()->department),"enter_fees") == '1' || $sys->getUserLevel((@\Auth::user()->role),"enter_fees") == '1') {
-            $sys = new SystemController();
+
+        if(@\Auth::user()->department=="Finance"){
             $array = $sys->getSemYear();
             //$sem = $array[0]->SEMESTER;
             $year = $array[0]->YEAR;
@@ -892,49 +892,7 @@ foreach($programSelect as $row){
             $status = $request->input('status');
             $user = \Auth::user()->fund;
             $feetype = "School Fees";
-            if ($request->has('type') && $request->input('type') == "Late Registration Penalty") {
-                \DB::beginTransaction();
-                try {
-                    \Session::put('type', 'late');
 
-                    $amount = $request->input('amount');
-                    $receipt = $request->input('receipt');
-                    $indexno = $request->input('student');
-                    $status = $request->input('status');
-                    $program = $request->input('programme');
-                    $level = $request->input('level');
-                    $feeLedger = new FeePaymentModel();
-                    $feeLedger->INDEXNO = $indexno;
-                    $feeLedger->PROGRAMME = $program;
-                    $feeLedger->AMOUNT = $amount;
-                    $feeLedger->PAYMENTTYPE = "Late Registration Fee";
-
-                    $feeLedger->PROGRAMME = $program;
-                    $feeLedger->LEVEL = $level;
-                    $feeLedger->RECIEPIENT = $user;
-
-                    $feeLedger->RECEIPTNO = $receipt;
-                    $feeLedger->YEAR = $year;
-                    $feeLedger->FEE_TYPE = "Late Registration Fee";
-                    //$feeLedger->SEMESTER = $sem;
-                    if ($feeLedger->save()) {
-                        \DB::commit();
-
-                        $message = "Hi $indexno you have just paid GHC$amount as late registration fee";
-//                    if ($sys->firesms($message, $phone, $indexno)) {
-//                        
-//                    }
-                        $this->updateReceipt();
-                        $url = url("printreceiptLate/" . trim($receipt));
-                        $print_window = "<script >window.open('$url','','location=1,status=1,menubar=yes,scrollbars=yes,resizable=yes,width=1000,height=500')</script>";
-                        $request->session()->flash("success", "Payment successfully   $print_window");
-                        return redirect("/pay_fees");
-                    }
-                } catch (\Exception $e) {
-                    \DB::rollback();
-                    redirect()->back()->with('error', 'Error processing payment');
-                }
-            } else {
 
                 //amount = paying now
                 $amount = $request->input('amount');
@@ -1026,7 +984,7 @@ foreach($programSelect as $row){
                     return redirect("/students")->with("error", " <span style='font-weight:bold;font-size:13px;'> Payment already made with this receipt  number  </span>");
 
                 }
-            }
+
 
 
         } else {
@@ -1038,7 +996,6 @@ foreach($programSelect as $row){
     // allow student to register by authority
     public function allowRegister(Request $request, SystemController $sys)
     {
-        if ($sys->getUserLevel((@\Auth::user()->department),"grant_protocol") == '1' || $sys->getUserLevel((@\Auth::user()->role),"grant_protocol") == '1') {
             if ($request->isMethod("get")) {
                 return view("finance.fees.allowRegister");
             } else {
@@ -1060,9 +1017,7 @@ foreach($programSelect as $row){
 
                 }
             }
-        } else {
-            return redirect("/dashboard");
-        }
+
 
     }
 

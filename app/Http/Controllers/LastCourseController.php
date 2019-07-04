@@ -1344,11 +1344,7 @@ if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop'){
                     <tr>
                         <td>
                             <table width="826px" style="margin-left:18px" height="133">
-                                <tr>
-                        
-                                    <td class="uk-text-danger uk-text-left" colspan="3"><blinks>Use Mozilla Firefox or Google Chrome. Contact your HOD or call 0246091283 / 0505284060 for any assistance. </blinks>
-                                    </td>
-                                </tr>
+
                                 <tr>
                                     <td colspan="3" align='left'> <img src="<?php echo url('public/assets/img/academic.jpg')?>" style='width: 826px;height: auto;margin-bottom: 10px;'/>
                                     </td>
@@ -1381,17 +1377,14 @@ if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop'){
                                     <td><?php echo strtoupper($student->program->PROGRAMME)?></td>
                                 </tr>
                                 <tr>
-                                    <td class="uk-text-bold" style="">DATE OF ADMISSION</td> 
-                                    <td><?php echo strtoupper($student->DATE_ADMITTED)?></td>
+                                    <td class="uk-text-bold" style="">COHORT</td>
+                                    <td><?php echo strtoupper($student->COHORT)?></td>
                                 </tr>
                                 <tr>
                                     <td class="uk-text-bold" style="">DATE OF BIRTH</td> 
                                     <td><?PHP echo  $student->DATEOFBIRTH ; ?></td>
                                 </tr>
-                                <tr>
-                                    <td class="uk-text-left" colspan="3">&nbsp;<br/>For HND only. &nbsp;&nbsp;Grade &nbsp;= &nbsp;Value, &nbsp;&nbsp;&nbsp;A+ &nbsp;= &nbsp;5.0, &nbsp;&nbsp;&nbsp;A &nbsp;= &nbsp;4.5, &nbsp;&nbsp;&nbsp;B+ &nbsp;= &nbsp;4.0, &nbsp;&nbsp;&nbsp;B &nbsp;= &nbsp;3.5, &nbsp;&nbsp;&nbsp;C+ &nbsp;= &nbsp;3, &nbsp;&nbsp;&nbsp;C &nbsp;= &nbsp;2.5, &nbsp;&nbsp;&nbsp;D+ &nbsp;= &nbsp;2, &nbsp;&nbsp;&nbsp;D &nbsp;= &nbsp;1.5, &nbsp;&nbsp;&nbsp;F &nbsp;= &nbsp;0, &nbsp;&nbsp;&nbsp;red asterisk means resit
-                                    </td>
-                                </tr>
+
                                 <tr>
                                     <td class="uk-text-left" colspan="3">&nbsp;
                                     </td>
@@ -1451,26 +1444,14 @@ if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop'){
                                 <table style="margin-left:18px"  border="0" width='826px'  class="uk-table uk-table-striped">
                                     <thead >
                                     <tr class="uk-text-bold" style="background-color:#1A337E;color:white;">
-                                        <td  width="86">CODE</td>
-                                        <td  width="418">COURSE</td>
-                                        <td align='center' width="50">CR</td>
-                                            <?php
-                                                if ($rsaProgram != 'RSA') {
-                                            
-                                            ?>
-                                        <td align='center' width="50">GD</td>
-                                            <?php
-                                                }
-                                            ?>
-                                        <td align='center' width="50">MK</td>
-                                            <?php
-                                                if ($rsaProgram != 'RSA') {
-                                            
-                                            ?>
-                                        <td align='center' width="57">GP</td>
-                                            <?php
-                                                }
-                                            ?>
+                                        <td  width="86">Course Code</td>
+                                        <td  width="418">Course Name</td>
+                                        <td align='center' width="50">Credits</td>
+
+                                        <td align='center' width="50">Total Mark</td>
+
+                                        <td align='center' width="57">Grade</td>
+
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -1490,7 +1471,10 @@ if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop'){
                                                 echo "<span style='color:red'>* </span>".@$object[0]->COURSE_NAME."<span style='color:red'> *</span>";}else{echo @$object[0]->COURSE_NAME;}?> </td>
 
                                         <td align='center' <?php // if($rs['grade']=="E"|| $rs['grade']=="F"){ echo "style='display:none'";}?>><?php  @$gcredit+=@$rs['credits'];   $totcredit+=@$rs['credits'];@$a+=$totcredit; if($rs['credits']){ echo $rs['credits'];} else{echo "IC";};?></td>
-                                         <?php
+
+                                        <td align='center' <?php // if($rs['grade']=="E" || $rs['grade']=="F"){ echo "style='display:none'";}?>><?php  @$rsc+=@$rs['total']; if($rs['total']){ echo @$rs['total'];} else{echo "IC";}?></td>
+
+                                        <?php
                                                 if ($rsaProgram != 'RSA') {
                                             
                                             ?>
@@ -1498,132 +1482,69 @@ if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop'){
                                             <?php
                                                 }
                                             ?>
-                                        <td align='center' <?php // if($rs['grade']=="E" || $rs['grade']=="F"){ echo "style='display:none'";}?>><?php  @$rsc+=@$rs['total']; if($rs['total']){ echo @$rs['total'];} else{echo "IC";}?></td>
 
                                             <?php
-                                                if ($rsaProgram != 'RSA') {
-                                            
-                                            ?>
-                                        <td align='center' <?php // if($rs['grade']=="E"|| $rs['grade']=="F"){ echo "style='display:none'";}?>>
-                                            <?php   @$gpoint+=@$rs['gpoint']; @$totgpoint+=@$rs['gpoint'];@$b+=@$totgpoint;if($rs['gpoint']){ echo $rs['gpoint'];} else{echo "0";}  ?></td>
 
-
-
-                                        <?php
-                                    }
                                         }
                                         }?>
                                     </tr>
-                                    <tr>
 
-                                        <td>&nbsp</td>
-
-                                        <?php if ($rsaProgram == 'RSA') 
-                                        {
-                                            
-                                         ?>
-                                         <td class="uk-text-bold"><span>CPA</span>
-                                         <?php
-                                            $rsa = @($rsc/$noCourses); @$totrsa+=@$rsa; echo  number_format(@($totrsa/$totcredit), 3, '.', ','); ?>
-                                            &nbsp; </td>
-                                         <?php
-                                        }
-                                        else
-                                        {
-                                        ?>
-
-                                        <td class="uk-text-bold"><span>GPA</span> <?php echo  number_format(@($gpoint/$gcredit), 3, '.', ',');?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>
-                                        <?php
-                                        }
-                                        ?>
-
-
-                                        <td class="uk-text-bold" align='center'><?php echo $gcredit; ?></td>
-                                        <?php
-                                                if ($rsaProgram != 'RSA') {
-                                            
-                                            ?>
-                                        <td >&nbsp;</td>
-                                        <?php
-                                                }
-                                            
-                                            ?>
-                                        <td class="uk-text-bold" align='center'><?php if ($rsaProgram == 'RSA') { echo $rsc;  }?>&nbsp;</td>
-                                        <?php
-                                                if ($rsaProgram != 'RSA') {
-                                            
-                                            ?>
-                                        <td class="uk-text-bold" align='center'><?php echo $gpoint; ?>&nbsp;</td>
-                                         <?php
-                                                }
-                                            
-                                            ?>
-                                    </tr>
-                                    <tr>
-
-                                        <td>&nbsp</td>
-
-                                        <?php
-                                                if ($rsaProgram == 'RSA') {
-                                        ?>    
-                                            
-                                        <td class="uk-text-bold"> <?php 
-                                        if (@($totrsa/$totcredit) > 3.994) {echo 'Competent with Distinction';}
-                                        elseif(@($totrsa/$totcredit) > 2.994) {echo 'Competent with Merit';}
-                                        elseif(@($totrsa/$totcredit) > 1.994) {echo 'Competent';}
-                                        
-                                        else {echo 'Not yet Competent';}?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>
-                                        
-                                    <?php
-                                    }
-                                    else
-                                    {
-                                        ?>
-
-                                        <td class="uk-text-bold"><span>CGPA</span> <?php echo  number_format(@($totgpoint/$totcredit), 3, '.', ',');
-                                        if ($totgpoint/$totcredit > 3.994) {echo ' &nbsp;&nbsp;&nbsp;&nbsp;First Class';}
-                                        elseif($totgpoint/$totcredit > 2.994) {echo ' &nbsp;&nbsp;&nbsp;&nbsp;Second Upper';}
-                                        elseif($totgpoint/$totcredit > 1.994) {echo ' &nbsp;&nbsp;&nbsp;&nbsp;Second lower';}
-                                        elseif($totgpoint/$totcredit >1.494) {echo ' &nbsp;&nbsp;&nbsp;&nbsp;Pass';}
-                                        else {echo '&nbsp;&nbsp;&nbsp;&nbsp;Fail';}?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </td>
-                                     <?php   
-                                    }
-                                    ?>
-                                        <td class="uk-text-bold" align='center'><?php echo   $totcredit; ?></td>
-                                        <?php
-                                                if ($rsaProgram != 'RSA') {
-                                            
-                                            ?>
-                                        <td >&nbsp;</td>
-                                        <?php
-                                                }
-                                            
-                                            ?>
-                                            <td class="uk-text-bold" align='center'><?php if ($rsaProgram == 'RSA') { echo  number_format(@($rsc/$noCourses), 3, '.', ','); }?>&nbsp;</td>
-                                            <?php
-                                                if ($rsaProgram != 'RSA') {
-                                            
-                                            ?>
-                                        <td class="uk-text-bold" align='center'><?php echo $totgpoint;   $b="";$a=""; ?>&nbsp;</td>
-                                        <?php
-                                                }
-                                            
-                                            ?>
-                                    </tr>
 
                                     </tbody>
 
                                     <?php
-                                    $gpoint=0.0;
-                                    $gcredit=0;
-                                    $rsc=0;
-                                    $noCourses=0;
+
                                     ?>
                                 </table>
+
+                                <table border="0" style="margin-left: 507px; padding: 2px">
+                                    <thead>
+                                        <th>&nbsp;&nbsp;</th>
+                                        <th>&nbsp;&nbsp;</th>
+
+                                        <th>Semester</th>
+                                        <th>Cummulative</th>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td></td>
+                                    <td>Credits Registered:</td>
+                                        <td>Total</td>
+                                        <td>Total</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                    <td>Credits Obtained:</td>
+                                        <td>Total</td>
+                                        <td>Total</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                    <td>Credits Calc:</td>
+                                        <td>Total</td>
+                                        <td>Total</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                    <td>Weighted Marks:</td>
+                                        <td>Total</td>
+                                        <td>Total</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td style="color:#418eff"> CWA:</td>
+                                        <td></td>
+                                        <td>Total</td>
+
+
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div style="margin-left: 21px"><p>Courses Trailing: </p></div>
                             <?php 
 
                             }else{
-                                echo "<p class='uk-text-danger'>No results to display</p>";
+                                echo "<p class='uk-text-danger'  style=\"margin-left: 21px\">No results to display</p>";
                                 ?><?php }?>
                             <p>&nbsp;</p>
                             </div><?php }  }
@@ -1700,7 +1621,7 @@ if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop'){
 //          $courses= Models\MountedCourseModel::query()->where('MOUNTED_BY',$hod) ;
 //      }
 
-        if($request->user()->isSupperAdmin  ||  @\Auth::user()->department=="top" || @\Auth::user()->role=="Admin" ||  @\Auth::user()->department=="Rector" || @\Auth::user()->role=="Lecturer" || @\Auth::user()->role=="Support"){
+        if($request->user()->isSupperAdmin  ||  @\Auth::user()->department=="Tptop"|| @\Auth::user()->department=="top" || @\Auth::user()->role=="Admin" ||  @\Auth::user()->department=="Rector" || @\Auth::user()->role=="Lecturer" || @\Auth::user()->role=="Support"){
 
             $courses= Models\MountedCourse2Model::query() ;
         }

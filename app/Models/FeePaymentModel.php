@@ -18,7 +18,7 @@ class FeePaymentModel extends Model
 
 {
 
-     use LogsActivity;
+     //use LogsActivity;
 
     //
 

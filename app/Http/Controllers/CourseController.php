@@ -1452,11 +1452,7 @@ class CourseController extends Controller
                     <tr>
                         <td>
                             <table width="826px" style="margin-left:18px" height="133">
-                                <tr>
-                        
-                                    <td class="uk-text-danger uk-text-left" colspan="3"><blinks>Use Mozilla Firefox or Google Chrome. Contact your HOD or call 0246091283 / 0505284060 for any assistance. </blinks>
-                                    </td>
-                                </tr>
+                                ddd
                                 <tr>
                                     <td colspan="3" align='left'> <img src="<?php echo url('public/assets/img/academic.jpg')?>" style='width: 826px;height: auto;margin-bottom: 10px;'/>
                                     </td>
@@ -1496,11 +1492,7 @@ class CourseController extends Controller
                                     <td class="uk-text-bold" style="">DATE OF BIRTH</td> 
                                     <td><?PHP echo  $student->DATEOFBIRTH ; ?></td>
                                 </tr>
-                                <tr>
-                                    <td class="uk-text-left" colspan="3"><br/>Red asterisk means resit result&nbsp;<br/><br/>For HND &nbsp;&nbsp;Grade &nbsp;= &nbsp;Value, &nbsp;&nbsp;&nbsp;A+ &nbsp;= &nbsp;5.0, &nbsp;&nbsp;&nbsp;A &nbsp;= &nbsp;4.5, &nbsp;&nbsp;&nbsp;B+ &nbsp;= &nbsp;4.0, &nbsp;&nbsp;&nbsp;B &nbsp;= &nbsp;3.5, &nbsp;&nbsp;&nbsp;C+ &nbsp;= &nbsp;3, &nbsp;&nbsp;&nbsp;C &nbsp;= &nbsp;2.5, &nbsp;&nbsp;&nbsp;D+ &nbsp;= &nbsp;2, &nbsp;&nbsp;&nbsp;D &nbsp;= &nbsp;1.5, &nbsp;&nbsp;&nbsp;F &nbsp;= &nbsp;0
-                                        <br/><br/>For CBT &nbsp;&nbsp;Grade &nbsp;= &nbsp;Meaning, &nbsp;&nbsp;&nbsp;CD &nbsp;= &nbsp;Competent With Distinction, &nbsp;&nbsp;&nbsp;CM &nbsp;= &nbsp;Competent With Merit, &nbsp;&nbsp;&nbsp;C &nbsp;= &nbsp;Competent, &nbsp;&nbsp;&nbsp;NC &nbsp;= &nbsp;Not Yet Competent
-                                    </td>
-                                </tr>
+
                                 <tr>
                                     <td class="uk-text-left" colspan="3">&nbsp;
                                     </td>
