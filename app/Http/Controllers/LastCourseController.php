@@ -20,7 +20,6 @@ class CourseController extends Controller
     /**
      * Create a new controller instance.
      *
-
      * @return void
      */
     public function __construct()
@@ -32,21 +31,24 @@ class CourseController extends Controller
 
 
     }
-    public function log_query() {
+
+    public function log_query()
+    {
         \DB::listen(function ($sql, $binding, $timing) {
             \Log::info('showing query', array('sql' => $sql, 'bindings' => $binding));
         }
         );
     }
-    public function printCards(Request $request,SystemController $sys){
-        if(@\Auth::user()->role=='HOD' || @\Auth::user()->department=='top' || @\Auth::user()->department=='Tptop'|| @\Auth::user()->role=='Dean' || @\Auth::user()->role=='Lecturer' || @\Auth::user()->department=='Tpmid' || @\Auth::user()->department=='Tptop'){
+
+    public function printCards(Request $request, SystemController $sys)
+    {
+        if (@\Auth::user()->role == 'HOD' || @\Auth::user()->department == 'top' || @\Auth::user()->department == 'Tptop' || @\Auth::user()->role == 'Dean' || @\Auth::user()->role == 'Lecturer' || @\Auth::user()->department == 'Tpmid' || @\Auth::user()->department == 'Tptop') {
             if ($request->isMethod("get")) {
-                $program=$sys->getProgramList();
+                $program = $sys->getProgramList();
 
                 return view('courses.cardview')
-                    ->with('program',$program)->with('year',$sys->years())->with('level', $sys->getLevelList());
-            }
-            else{
+                    ->with('program', $program)->with('year', $sys->years())->with('level', $sys->getLevelList());
+            } else {
 
                 $program = $request->input('program');
 
@@ -57,7 +59,7 @@ class CourseController extends Controller
                 // $query = Models\StudentModel::where("PROGRAMMECODE",$program)->where("LEVEL",$level)->where("STATUS","In School")->get();
 // dd($mark);
 
-                $url = url('/printCards/'.$program.'/program/'.$level.'/level');
+                $url = url('/printCards/' . $program . '/program/' . $level . '/level');
 
                 $print_window = "<script >window.open('$url','','location=1,status=1,menubar=yes,scrollbars=yes,resizable=yes,width=1000,height=500')</script>";
                 $request->session()->flash("success",
@@ -65,68 +67,68 @@ class CourseController extends Controller
                 return redirect("/print/cards");
 
 
-
             }
-        }
-        else{
+        } else {
             throw new HttpException(Response::HTTP_UNAUTHORIZED, 'This action is unauthorized.');
         }
     }
-    public function processCards(Request $request,$program ,$level) {
-        //$year=\Session::get('year');
-        $query = Models\StudentModel::where("PROGRAMMECODE",$program)->where("LEVEL",$level)->where("STATUS","In School")->get();
 
-        return view('courses.printCard')->with('mark', $query)->with("program",$program)
-            ->with("level", $level)
-            ;
+    public function processCards(Request $request, $program, $level)
+    {
+        //$year=\Session::get('year');
+        $query = Models\StudentModel::where("PROGRAMMECODE", $program)->where("LEVEL", $level)->where("STATUS", "In School")->get();
+
+        return view('courses.printCard')->with('mark', $query)->with("program", $program)
+            ->with("level", $level);
 
 
     }
-    public function checkMountedCourses(Request $request,SystemController $sys) {
+
+    public function checkMountedCourses(Request $request, SystemController $sys)
+    {
         $array = $sys->getSemYear();
         $sem = $array[0]->SEMESTER;
         $year = $array[0]->YEAR;
         if ($request->isMethod("get")) {
             $hod = \Auth::user()->fund;
 
-            $courses = Models\MountedCourseModel::where('COURSE', '!=', '')->where("COURSE_SEMESTER",$sem)->where("COURSE_YEAR",$year)->whereHas('courses', function($q) {
-                $q->whereHas('programs', function($q) {
+            $courses = Models\MountedCourseModel::where('COURSE', '!=', '')->where("COURSE_SEMESTER", $sem)->where("COURSE_YEAR", $year)->whereHas('courses', function ($q) {
+                $q->whereHas('programs', function ($q) {
                     $q->whereIn('DEPTCODE', array(@\Auth::user()->department));
                 });
             })->paginate(100);
-            return view('courses.hodChecker')->with('data', $courses) ;
+            return view('courses.hodChecker')->with('data', $courses);
 
-        } else{
-            $hod=\Auth::user()->fund;
-            $checked=1;
-            $check= Models\MountedCourseCheckerModel::where("hod",$hod)->where("sem",$sem)
-                ->where("year",$year)->first();
-            if($check==""){
-                $checker=new Models\MountedCourseCheckerModel();
-                $checker->hod=$hod;
-                $checker->sem=$sem;
-                $checker->year=$year;
-                $checker->checked=$checked;
+        } else {
+            $hod = \Auth::user()->fund;
+            $checked = 1;
+            $check = Models\MountedCourseCheckerModel::where("hod", $hod)->where("sem", $sem)
+                ->where("year", $year)->first();
+            if ($check == "") {
+                $checker = new Models\MountedCourseCheckerModel();
+                $checker->hod = $hod;
+                $checker->sem = $sem;
+                $checker->year = $year;
+                $checker->checked = $checked;
                 $checker->save();
+            } else {
+                Models\MountedCourseCheckerModel::where("hod", $hod)->where("sem", $sem)
+                    ->where("year", $year)->update(array("checked" => $checked));
             }
-            else{
-                Models\MountedCourseCheckerModel::where("hod",$hod)->where("sem",$sem)
-                    ->where("year",$year)->update(array("checked"=>$checked));
-            }
-            return   redirect('mounted_view')->with("success", " <span style='font-weight:bold;font-size:13px;'>Courses has been verified for registration. Thanks!</span> ");
+            return redirect('mounted_view')->with("success", " <span style='font-weight:bold;font-size:13px;'>Courses has been verified for registration. Thanks!</span> ");
 
         }
 
     }
-    public function processCourseUploads(Request $request,SystemController $sys) {
+
+    public function processCourseUploads(Request $request, SystemController $sys)
+    {
 
 
         set_time_limit(36000);
 
 
-
-
-        $valid_exts = array('csv','xls','xlsx'); // valid extensions
+        $valid_exts = array('csv', 'xls', 'xlsx'); // valid extensions
         $file = $request->file('file');
         $name = time() . '-' . $file->getClientOriginalName();
         if (!empty($file)) {
@@ -138,29 +140,28 @@ class CourseController extends Controller
                 // $file->move($destination, $name);
 
                 $path = $request->file('file')->getRealPath();
-                $data = Excel::load($path, function($reader) {
+                $data = Excel::load($path, function ($reader) {
 
                 })->get();
-                $total=count($data);
+                $total = count($data);
 
-                if(!empty($data) && $data->count()){
+                if (!empty($data) && $data->count()) {
 
                     $user = \Auth::user()->id;
-                    foreach($data as $value=>$row)
-                    {
-                        $code=$row->course_code;
-                        $program=$row->programme;
-                        $credit=$row->course_credit;
-                        $name=  strtoupper($row->course_name);
-                        $year=$row->course_level;
-                        $semester=$row->course_semester;
+                    foreach ($data as $value => $row) {
+                        $code = $row->course_code;
+                        $program = $row->programme;
+                        $credit = $row->course_credit;
+                        $name = strtoupper($row->course_name);
+                        $year = $row->course_level;
+                        $semester = $row->course_semester;
 
                         $programme = $sys->programmeSearchByCode(); // check if the programmes in the file tally wat is in the db
                         if (in_array($program, $programme)) {
 
-                            $testQuery=Models\CourseModel::where('COURSE_CODE', $code)->first();
+                            $testQuery = Models\CourseModel::where('COURSE_CODE', $code)->first();
 
-                            if(empty($testQuery)){
+                            if (empty($testQuery)) {
 
 
                                 $course = new Models\CourseModel();
@@ -174,20 +175,15 @@ class CourseController extends Controller
                                 $course->USER = $user;
                                 $course->save();
                                 \DB::commit();
-                            }
-                            else{
+                            } else {
 
-                                Models\CourseModel::where('COURSE_CODE', $code)->update(array("COURSE_LEVEL" =>@$year, "COURSE_SEMESTER" => $semester, "PROGRAMME" => $program,  "COURSE_CREDIT" =>$credit,"COURSE_NAME"=>$name,"USER"=>$user ));
+                                Models\CourseModel::where('COURSE_CODE', $code)->update(array("COURSE_LEVEL" => @$year, "COURSE_SEMESTER" => $semester, "PROGRAMME" => $program, "COURSE_CREDIT" => $credit, "COURSE_NAME" => $name, "USER" => $user));
                                 \DB::commit();
                             }
-                        }
-                        else{
+                        } else {
                             redirect('/upload/courses')->with("error", " <span style='font-weight:bold;font-size:13px;'>File contain unrecognize programme.please try again!</span> ");
 
                         }
-
-
-
 
 
                     }
@@ -205,10 +201,11 @@ class CourseController extends Controller
         return redirect('/courses')->with("success", " <span style='font-weight:bold;font-size:13px;'>$total Courses uploaded successfully</span> ");
 
     }
-    public function processMountedUpload(Request $request,SystemController $sys) {
 
-        if (@\Auth::user()->role == 'HOD' || @\Auth::user()->role == 'Support' || @\Auth::user()->role == 'Admin'|| @\Auth::user()->role == 'Registrar' || @\Auth::user()->department == 'top' || @\Auth::user()->department=='Tpmid' || @\Auth::user()->department=='Tptop') {
+    public function processMountedUpload(Request $request, SystemController $sys)
+    {
 
+        if (@\Auth::user()->role == 'HOD' || @\Auth::user()->role == 'Support' || @\Auth::user()->role == 'Admin' || @\Auth::user()->role == 'Registrar' || @\Auth::user()->department == 'top' || @\Auth::user()->department == 'Tpmid' || @\Auth::user()->department == 'Tptop') {
 
 
             set_time_limit(36000);
@@ -225,7 +222,7 @@ class CourseController extends Controller
                     // $file->move($destination, $name);
 
                     $path = $request->file('file')->getRealPath();
-                    $data = Excel::load($path, function($reader) {
+                    $data = Excel::load($path, function ($reader) {
 
                     })->get();
                     $total = count($data);
@@ -233,13 +230,13 @@ class CourseController extends Controller
                     if (!empty($data) && $data->count()) {
 
                         $user = \Auth::user()->id;
-                        $courseError=array();
-                        $programError=array();
+                        $courseError = array();
+                        $programError = array();
                         foreach ($data as $value => $row) {
 
                             $code = $row->code;
                             $program = $row->program;
-                            $courseID=$sys->getCourseByCode2($code,$program);
+                            $courseID = $sys->getCourseByCode2($code, $program);
                             $credit = $row->credit;
                             $type = $row->type;
                             $level = $row->level;
@@ -250,8 +247,8 @@ class CourseController extends Controller
                             $programme = $sys->programmeSearchByCode(); // check if the programmes in the file tally wat is in the db
                             if (in_array($program, $programme)) {
                                 if (in_array($code, $searchCourse)) {
-                                    $testQuery = Models\MountedCourseModel::where('COURSE', $courseID)->where("COURSE_YEAR",$year)
-                                        ->where("COURSE_SEMESTER",$semester)
+                                    $testQuery = Models\MountedCourseModel::where('COURSE', $courseID)->where("COURSE_YEAR", $year)
+                                        ->where("COURSE_SEMESTER", $semester)
                                         ->first();
 
                                     if (empty($testQuery)) {
@@ -271,11 +268,11 @@ class CourseController extends Controller
                                         \DB::commit();
                                     } else {
 
-                                        Models\MountedCourseModel::where('COURSE', $courseID)->update(array("COURSE_CODE" =>$code,"COURSE_LEVEL" =>$level, "COURSE_SEMESTER" => $semester, "PROGRAMME" => $program, "COURSE_CREDIT" => $credit, "COURSE_TYPE" => $type, "COURSE_YEAR" => $year,"MOUNTED_BY" => $user));
+                                        Models\MountedCourseModel::where('COURSE', $courseID)->update(array("COURSE_CODE" => $code, "COURSE_LEVEL" => $level, "COURSE_SEMESTER" => $semester, "PROGRAMME" => $program, "COURSE_CREDIT" => $credit, "COURSE_TYPE" => $type, "COURSE_YEAR" => $year, "MOUNTED_BY" => $user));
                                         \DB::commit();
                                     }
                                 } else {
-                                    array_push($courseError, $name." ".$code);
+                                    array_push($courseError, $name . " " . $code);
                                     //  redirect('/upload/courses')->with("error", " <span style='font-weight:bold;font-size:13px;'>File contain unrecognize courses.please try again!</span> ");
                                     //  dd($courseError);
                                     continue;
@@ -286,9 +283,9 @@ class CourseController extends Controller
                                 // redirect('/upload/courses')->with("error", " <span style='font-weight:bold;font-size:13px;'>File contain unrecognize programme.please try again!</span> ");
                             }
                         }
-                        if(!empty($programError) || !empty($courseError)){
-                            return     redirect('/upload/mounted')->with("errorP",$programError)
-                                ->with("errorC",$courseError);
+                        if (!empty($programError) || !empty($courseError)) {
+                            return redirect('/upload/mounted')->with("errorP", $programError)
+                                ->with("errorC", $courseError);
 
                         }
                     }
@@ -300,20 +297,16 @@ class CourseController extends Controller
             }
             return redirect('/mounted_view')->with("success", " <span style='font-weight:bold;font-size:13px;'>$total Courses mounted successfully</span> ");
 
-        }
-        else {
+        } else {
 
             return redirect("/dashboard");
         }
 
 
-
-
-
-
     }
 
-    public function processCourseUpload(Request $request,SystemController $sys) {
+    public function processCourseUpload(Request $request, SystemController $sys)
+    {
 
 
         set_time_limit(36000);
@@ -327,19 +320,19 @@ class CourseController extends Controller
                 // Moves file to folder on server
                 // $file->move($destination, $name);
                 $path = $request->file('file')->getRealPath();
-                $data = Excel::load($path, function($reader) {
+                $data = Excel::load($path, function ($reader) {
 
                 })->get();
                 $total = count($data);
                 if (!empty($data) && $data->count()) {
                     $user = \Auth::user()->id;
-                    $courseError=array();
-                    $programError=array();
+                    $courseError = array();
+                    $programError = array();
                     foreach ($data as $value => $row) {
 
                         $code = $row->code;
                         $program = $row->program;
-                        $courseID=$sys->getCourseByCode2($code,$program);
+                        $courseID = $sys->getCourseByCode2($code, $program);
                         $credit = $row->credit;
                         $type = $row->type;
                         $level = $row->level;
@@ -350,8 +343,8 @@ class CourseController extends Controller
                         $programme = $sys->programmeSearchByCode(); // check if the programmes in the file tally wat is in the db
                         if (in_array($program, $programme)) {
                             if (in_array($code, $searchCourse)) {
-                                $testQuery = Models\MountedCourseModel::where('COURSE', $courseID)->where("COURSE_YEAR",$year)
-                                    ->where("COURSE_SEMESTER",$semester)
+                                $testQuery = Models\MountedCourseModel::where('COURSE', $courseID)->where("COURSE_YEAR", $year)
+                                    ->where("COURSE_SEMESTER", $semester)
                                     ->first();
                                 if (empty($testQuery)) {
                                     $course = new Models\MountedCourseModel();
@@ -367,11 +360,11 @@ class CourseController extends Controller
                                     $course->save();
                                     \DB::commit();
                                 } else {
-                                    Models\MountedCourseModel::where('COURSE', $courseID)->update(array("COURSE_CODE" =>$code,"COURSE_LEVEL" =>$level, "COURSE_SEMESTER" => $semester, "PROGRAMME" => $program, "COURSE_CREDIT" => $credit, "COURSE_TYPE" => $type, "COURSE_YEAR" => $year,"MOUNTED_BY" => $user));
+                                    Models\MountedCourseModel::where('COURSE', $courseID)->update(array("COURSE_CODE" => $code, "COURSE_LEVEL" => $level, "COURSE_SEMESTER" => $semester, "PROGRAMME" => $program, "COURSE_CREDIT" => $credit, "COURSE_TYPE" => $type, "COURSE_YEAR" => $year, "MOUNTED_BY" => $user));
                                     \DB::commit();
                                 }
                             } else {
-                                array_push($courseError, $name." ".$code);
+                                array_push($courseError, $name . " " . $code);
                                 //  redirect('/upload/courses')->with("error", " <span style='font-weight:bold;font-size:13px;'>File contain unrecognize courses.please try again!</span> ");
                                 //  dd($courseError);
                                 continue;
@@ -382,9 +375,9 @@ class CourseController extends Controller
                             // redirect('/upload/courses')->with("error", " <span style='font-weight:bold;font-size:13px;'>File contain unrecognize programme.please try again!</span> ");
                         }
                     }
-                    if(!empty($programError) || !empty($courseError)){
-                        return     redirect('/upload/mounted')->with("errorP",$programError)
-                            ->with("errorC",$courseError);
+                    if (!empty($programError) || !empty($courseError)) {
+                        return redirect('/upload/mounted')->with("errorP", $programError)
+                            ->with("errorC", $courseError);
 
                     }
                 }
@@ -396,19 +389,17 @@ class CourseController extends Controller
         }
 
 
-
         return redirect('/mounted_view')->with("success", " <span style='font-weight:bold;font-size:13px;'>$total Courses mounted successfully</span> ");
 
     }
-    public function uploadMounted(Request $request,SystemController $sys){
 
-        if (@\Auth::user()->role == 'HOD' || @\Auth::user()->role == 'Support' || @\Auth::user()->role == 'Admin'|| @\Auth::user()->role == 'Registrar' || @\Auth::user()->department == 'top' || @\Auth::user()->department=='Tpmid' || @\Auth::user()->department=='Tptop') {
+    public function uploadMounted(Request $request, SystemController $sys)
+    {
 
+        if (@\Auth::user()->role == 'HOD' || @\Auth::user()->role == 'Support' || @\Auth::user()->role == 'Admin' || @\Auth::user()->role == 'Registrar' || @\Auth::user()->department == 'top' || @\Auth::user()->department == 'Tpmid' || @\Auth::user()->department == 'Tptop') {
 
 
             return view('courses.uploadMounted');
-
-
 
 
         } else {
@@ -416,7 +407,9 @@ class CourseController extends Controller
             return redirect("/dashboard");
         }
     }
-    public function processUpdateMounted(SystemController $sys,Request $request) {
+
+    public function processUpdateMounted(SystemController $sys, Request $request)
+    {
         \DB::beginTransaction();
         try {
 
@@ -442,27 +435,28 @@ class CourseController extends Controller
                 $lecturerArr = $lecturer[$i];
 
                 Models\MountedCourseModel::where("ID", $key)
-                    ->update(array("COURSE_CREDIT" => $creditArr,   "COURSE_SEMESTER" => $semArr, "COURSE_TYPE" => $typeArr, "COURSE_LEVEL" => $levelArr, "LECTURER" => $lecturerArr));
+                    ->update(array("COURSE_CREDIT" => $creditArr, "COURSE_SEMESTER" => $semArr, "COURSE_TYPE" => $typeArr, "COURSE_LEVEL" => $levelArr, "LECTURER" => $lecturerArr));
 
                 \DB::commit();
-                Models\AcademicRecordsModel::where("course", $key)->update(array("credits" => $creditArr,   "sem" => $semArr, "level" => $levelArr, "lecturer" => $lecturerArr));
+                Models\AcademicRecordsModel::where("course", $key)->update(array("credits" => $creditArr, "sem" => $semArr, "level" => $levelArr, "lecturer" => $lecturerArr));
 
             }
-            return redirect("/mounted_view")->with("success","Mounted courses updated successfully");
-        }
-        catch (\Exception $e) {
+            return redirect("/mounted_view")->with("success", "Mounted courses updated successfully");
+        } catch (\Exception $e) {
             \DB::rollback();
         }
     }
-    public function updateMounted(SystemController $sys,Request $request, $id) {
-        if (@\Auth::user()->role == 'HOD' || @\Auth::user()->role == 'Support'|| @\Auth::user()->role == 'Admin'|| @\Auth::user()->role == 'Registrar' || @\Auth::user()->department == 'top' || @\Auth::user()->department=='Tpmid' || @\Auth::user()->department=='Tptop') {
+
+    public function updateMounted(SystemController $sys, Request $request, $id)
+    {
+        if (@\Auth::user()->role == 'HOD' || @\Auth::user()->role == 'Support' || @\Auth::user()->role == 'Admin' || @\Auth::user()->role == 'Registrar' || @\Auth::user()->department == 'top' || @\Auth::user()->department == 'Tpmid' || @\Auth::user()->department == 'Tptop') {
 
 
-            $lecturers=$sys->getLectureList_All();
-            $yearList=$sys->years();
-            $program=$sys->getProgramList();
-            $course=$sys->getCourseList();
-            $user=@\Auth::user()->fund;
+            $lecturers = $sys->getLectureList_All();
+            $yearList = $sys->years();
+            $program = $sys->getProgramList();
+            $course = $sys->getCourseList();
+            $user = @\Auth::user()->fund;
             $array = $sys->getSemYear();
             $sem = $array[0]->SEMESTER;
             $year = $array[0]->YEAR;
@@ -470,31 +464,29 @@ class CourseController extends Controller
                 ->where("COURSE_YEAR",$year)
                 ->where("ID",$id)
                 ->where("COURSE_SEMESTER",$sem)->paginate(20);*/
-            $query=  @Models\MountedCourseModel::query()
+            $query = @Models\MountedCourseModel::query()
+                ->where("ID", $id)->paginate(20);
 
-                ->where("ID",$id)->paginate(20);
 
-
-            return view('courses.editMounted')->with("data",@$query)
-                ->with("lecturer",$lecturers)
-                ->with("program",$program)
-                ->with("course",$course)
-                ->with("ID",$id)
+            return view('courses.editMounted')->with("data", @$query)
+                ->with("lecturer", $lecturers)
+                ->with("program", $program)
+                ->with("course", $course)
+                ->with("ID", $id)
                 ->with('level', $sys->getLevelList())
-                ->with("years",$yearList);
+                ->with("years", $yearList);
 
 
-
-        }
-        else{
-            return  redirect()->back();
+        } else {
+            return redirect()->back();
         }
 
 
     }
-    public function gadoo(SystemController $sys,Request $request){
-        if ($request->isMethod("get")) {
 
+    public function gadoo(SystemController $sys, Request $request)
+    {
+        if ($request->isMethod("get")) {
 
 
             $programme = $sys->getProgramList();
@@ -504,8 +496,7 @@ class CourseController extends Controller
                 ->with('course', $course)->with('year', $sys->years());
 
 
-        }
-        else{
+        } else {
             $destination = "public/upload";
 
             $handle = fopen($_FILES['file']['tmp_name'], "r");
@@ -518,16 +509,16 @@ class CourseController extends Controller
             $columns = [];
             $rows = [];
             // first get the headers into an array
-            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE AND $row==0) {
+            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE AND $row == 0) {
                 $columns = $data;
                 $row++;
 
                 // while get the columns start reading the rows too
-                while ($file_line = fgetcsv($handle,1000,",","'")){
+                while ($file_line = fgetcsv($handle, 1000, ",", "'")) {
 
                     $totalRecords = count($file_line);
 
-                    for ($c = 0; $c <$totalRecords; $c++) {
+                    for ($c = 0; $c < $totalRecords; $c++) {
                         $col[$c] = $file_line[$c];
                     }
                     // we dont need the index no column so we remove it using unset which is the
@@ -536,19 +527,19 @@ class CourseController extends Controller
 
                     $aggie = 1;
                     //dd($columns);
-                    foreach ($columns as    $name){
+                    foreach ($columns as $name) {
 
-                        $course=$name;
-                        $exam=$col[$aggie];
-                        $total=$col[$aggie];
-                        $indexNo=$col[0];
-                        $studentDb= $indexNo  ;
-                        $studentID= $sys->getStudentIDfromIndexno($indexNo);
+                        $course = $name;
+                        $exam = $col[$aggie];
+                        $total = $col[$aggie];
+                        $indexNo = $col[0];
+                        $studentDb = $indexNo;
+                        $studentID = $sys->getStudentIDfromIndexno($indexNo);
 
-                        $courseName=$sys->getCourseCodeByIDArray2($course);
+                        $courseName = $sys->getCourseCodeByIDArray2($course);
 
-                        $displayCourse=$courseName[0]->COURSE_NAME;
-                        $displayCode=$courseName[0]->COURSE_CODE;
+                        $displayCourse = $courseName[0]->COURSE_NAME;
+                        $displayCode = $courseName[0]->COURSE_CODE;
                         $studentSearch = $sys->studentSearchByIndexNo($programme); // check if the students in the file tally
                         /*check if the students in the file tally with  students records
                          * this is done so that users don't upload results of students that
@@ -558,37 +549,37 @@ class CourseController extends Controller
                         //if (@in_array($studentDb, $studentSearch)) {
 
 
-                        $total= round($exam,2);
-                        $programmeDetail=$sys->getCourseProgramme2($course);
+                        $total = round($exam, 2);
+                        $programmeDetail = $sys->getCourseProgramme2($course);
 
-                        $program=$sys->getProgramArray($programmeDetail);
+                        $program = $sys->getProgramArray($programmeDetail);
                         $gradeArray = @$sys->getGrade($total, $program[0]->GRADING_SYSTEM);
                         $grade = @$gradeArray[0]->grade;
-                        $credit=$sys->getCreditHour($name,$semester,$level,$studentProgram); // get credit hour of a course
+                        $credit = $sys->getCreditHour($name, $semester, $level, $studentProgram); // get credit hour of a course
 
 
                         $gradePoint = @$gradeArray[0]->value;
-                        $test=Models\AcademicRecordsModel::where("indexno",$indexNo)->where("level",$level)->where("sem",$semester)->where("code",$course)->where("year",$year)->get()->toArray();
-                        if(empty($test)){
+                        $test = Models\AcademicRecordsModel::where("indexno", $indexNo)->where("level", $level)->where("sem", $semester)->where("code", $course)->where("year", $year)->get()->toArray();
+                        if (empty($test)) {
                             $record = new Models\AcademicRecordsModel();
                             $record->indexno = $indexNo;
                             $record->code = $course;
                             $record->sem = $semester;
                             $record->year = $year;
                             $record->credits = $credit;
-                            $record->student= $studentID;
+                            $record->student = $studentID;
                             $record->level = $level;
 
                             $record->exam = $exam;
                             $record->total = $total;
 
                             $record->grade = $grade;
-                            $record->gpoint =round(( $credit*$gradePoint),2);
+                            $record->gpoint = round(($credit * $gradePoint), 2);
                             $record->save();
 
-                            $newCgpa=@$sys->getCGPA($indexNo);
-                                    $class=@$sys->getClass($newCgpa);
-                                    Models\StudentModel::where("INDEXNO",$indexNo)->update(array("CGPA"=>$newCgpa,"CLASS"=>$class));
+                            $newCgpa = @$sys->getCGPA($indexNo);
+                            $class = @$sys->getClass($newCgpa);
+                            Models\StudentModel::where("INDEXNO", $indexNo)->update(array("CGPA" => $newCgpa, "CLASS" => $class));
                             \DB::commit();
 
                         }
@@ -598,7 +589,9 @@ class CourseController extends Controller
             }
         }
     }
-    public function processResit(SystemController $sys,Request $request) {
+
+    public function processResit(SystemController $sys, Request $request)
+    {
 
         $this->validate($request, [
 
@@ -637,16 +630,16 @@ class CourseController extends Controller
             $columns = [];
             $rows = [];
             // first get the headers into an array
-            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE AND $row==0) {
+            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE AND $row == 0) {
                 $columns = $data;
                 $row++;
 
                 // while get the columns start reading the rows too
-                while ($file_line = fgetcsv($handle,1000,",","'")){
+                while ($file_line = fgetcsv($handle, 1000, ",", "'")) {
 
                     $totalRecords = count($file_line);
 
-                    for ($c = 0; $c <$totalRecords; $c++) {
+                    for ($c = 0; $c < $totalRecords; $c++) {
                         $col[$c] = $file_line[$c];
                     }
                     // we dont need the index no column so we remove it using unset which is the
@@ -655,7 +648,7 @@ class CourseController extends Controller
 
                     $aggie = 1;
                     // dd($columns);
-                    foreach ($columns as    $name){
+                    foreach ($columns as $name) {
 
 //                                $gad=new Models\GadModel();
 //                                 $gad->indexno=$col[0];
@@ -664,24 +657,23 @@ class CourseController extends Controller
 //                                  $gad->save();
 
 
+                        $course = $name;
+                        $exam = $col[$aggie];
+                        $total = $col[$aggie];
+                        $indexNo = $col[0];
+                        $studentDb = $indexNo;
+                        $studentID = $sys->getStudentIDfromIndexno($indexNo);
+                        $studentProgram = $programme; //$sys->getStudentprogramfromIndexno($indexNo);
+                        $studentYearGroup = $sys->getStudentyeargroupfromIndexno($indexNo);
 
-                        $course=$name;
-                        $exam=$col[$aggie];
-                        $total=$col[$aggie];
-                        $indexNo=$col[0];
-                        $studentDb= $indexNo  ;
-                        $studentID= $sys->getStudentIDfromIndexno($indexNo);
-                        $studentProgram= $programme; //$sys->getStudentprogramfromIndexno($indexNo);
-                        $studentYearGroup= $sys->getStudentyeargroupfromIndexno($indexNo);
-
-                        $courseid3=@$sys->getCourseMountedInfo2($course,$semester,$level,$yearcc,$programme);
-                        $courseid2= $courseid3[0]->ID;
+                        $courseid3 = @$sys->getCourseMountedInfo2($course, $semester, $level, $yearcc, $programme);
+                        $courseid2 = $courseid3[0]->ID;
 
 
-                        $courseName=@$sys->getCourseCodeByIDArray2($course);
+                        $courseName = @$sys->getCourseCodeByIDArray2($course);
 
-                        $displayCourse=@$courseName[0]->COURSE_NAME;
-                        $displayCode=@$courseName[0]->COURSE_CODE;
+                        $displayCourse = @$courseName[0]->COURSE_NAME;
+                        $displayCode = @$courseName[0]->COURSE_CODE;
                         $studentSearch = @$sys->studentSearchByIndexNo($programme); // check if the students in the file tally
                         /*check if the students in the file tally with  students records
                          * this is done so that users don't upload results of students that
@@ -689,47 +681,46 @@ class CourseController extends Controller
                          */
 
 
+                        $total = round($exam, 2);
+                        $programmeDetail = $sys->getCourseProgramme2($course);
 
-                        $total= round($exam,2);
-                        $programmeDetail=$sys->getCourseProgramme2($course);
-
-                        $program=$sys->getProgramArray($programmeDetail);
+                        $program = $sys->getProgramArray($programmeDetail);
                         $gradeArray = @$sys->getGrade($total, $program[0]->GRADING_SYSTEM);
                         $grade = @$gradeArray[0]->grade;
 
-                        $credit=$courseid3[0]->COURSE_CREDIT; // get credit hour of a course
+                        $credit = $courseid3[0]->COURSE_CREDIT; // get credit hour of a course
 
                         $gradePoint = @$gradeArray[0]->value;
 
-                        $testfail=Models\AcademicRecordsModel::where("indexno",$indexNo)->where("level",$level)->where("sem",$semester)->where("code",$course)->where("grade","!=","F")->where("grade","!=","E")->get()->toArray();
+                        $testfail = Models\AcademicRecordsModel::where("indexno", $indexNo)->where("level", $level)->where("sem", $semester)->where("code", $course)->where("grade", "!=", "F")->where("grade", "!=", "E")->get()->toArray();
 
-                        $test=Models\AcademicRecordsModel::where("indexno",$indexNo)->where("level",$level)->where("sem",$semester)->where("code",$course)->where("grade","!=","F")->where("resit","yes")->get()->toArray();
+                        $test = Models\AcademicRecordsModel::where("indexno", $indexNo)->where("level", $level)->where("sem", $semester)->where("code", $course)->where("grade", "!=", "F")->where("resit", "yes")->get()->toArray();
 
                         //dd($testfail, $test);
 
-                        if(count($testfail)==0){
-                        if(count($test)==0){
-                            if($total>0 || $total!=""){
-                                $record = new Models\AcademicRecordsModel();
-                                $record->indexno = $indexNo;
-                                $record->code = $course;
-                                $record->sem = $semester;
-                                $record->year = $year;
-                                $record->credits = $credit;
-                                $record->student= $studentID;
-                                $record->level = $level;
-                                $record->course = $courseid2;
-                                $record->programme = $studentProgram;
-                                $record->yrgp = $studentYearGroup;
-                                $record->exam = $exam;
-                                $record->total = $total;
-                                $record->resit = "yes";
-                                $record->grade = $grade;
-                                $record->gpoint =round(( $credit*$gradePoint),2);
-                                $record->save();
+                        if (count($testfail) == 0) {
+                            if (count($test) == 0) {
+                                if ($total > 0 || $total != "") {
+                                    $record = new Models\AcademicRecordsModel();
+                                    $record->indexno = $indexNo;
+                                    $record->code = $course;
+                                    $record->sem = $semester;
+                                    $record->year = $year;
+                                    $record->credits = $credit;
+                                    $record->student = $studentID;
+                                    $record->level = $level;
+                                    $record->course = $courseid2;
+                                    $record->programme = $studentProgram;
+                                    $record->yrgp = $studentYearGroup;
+                                    $record->exam = $exam;
+                                    $record->total = $total;
+                                    $record->resit = "yes";
+                                    $record->grade = $grade;
+                                    $record->gpoint = round(($credit * $gradePoint), 2);
+                                    $record->save();
 
-                                //$checkF=Models\AcademicRecordsModel::where("indexno",$indexNo)->where("level",$level)->where("sem",$semester)->where("code",$course)->where("grade","F")->get()->toArray();
-                                   // if(count($checkF)==0){
+                                    //$checkF=Models\AcademicRecordsModel::where("indexno",$indexNo)->where("level",$level)->where("sem",$semester)->where("code",$course)->where("grade","F")->get()->toArray();
+                                    // if(count($checkF)==0){
                                     //    $recordf = new Models\AcademicRecordsModel();
                                     //    $recordf->indexno = $indexNo;
                                     //    $recordf->code = $course;
@@ -749,20 +740,16 @@ class CourseController extends Controller
                                     //    $recordf->save();
                                     //    }
 
-                                    $newCgpa=@$sys->getCGPA($indexNo);
-                                    $class=@$sys->getClass($newCgpa);
-                                    Models\StudentModel::where("INDEXNO",$indexNo)->update(array("CGPA"=>$newCgpa,"CLASS"=>$class));
-                                    if($total > 49){
-                                    Models\AcademicRecordsModel::where("indexno",$indexNo)->where("level",$level)->where("sem",$semester)->where("code",$course)->where("grade","F")->where("resit","!=","yes")->update(array("resit"=>"done","resit"=>"done"));
-                                     }
-                                 \DB::commit();
+                                    $newCgpa = @$sys->getCGPA($indexNo);
+                                    $class = @$sys->getClass($newCgpa);
+                                    Models\StudentModel::where("INDEXNO", $indexNo)->update(array("CGPA" => $newCgpa, "CLASS" => $class));
+                                    if ($total > 49) {
+                                        Models\AcademicRecordsModel::where("indexno", $indexNo)->where("level", $level)->where("sem", $semester)->where("code", $course)->where("grade", "F")->where("resit", "!=", "yes")->update(array("resit" => "done", "resit" => "done"));
+                                    }
+                                    \DB::commit();
+                                }
                             }
                         }
-                         }
-
-
-
-
 
 
                         $aggie++;
@@ -771,22 +758,19 @@ class CourseController extends Controller
 
                 }
             }
-        }
-
-
-
-        else{
+        } else {
             return redirect('upload/resit')->with("error", " <span style='font-weight:bold;font-size:13px;'>Please upload only CSV   file!</span> ");
         }
-        return redirect('/dashboard')->with("success",  " <span style='font-weight:bold;font-size:13px;'> Marks  successfully uploaded !</span> ");
+        return redirect('/dashboard')->with("success", " <span style='font-weight:bold;font-size:13px;'> Marks  successfully uploaded !</span> ");
 
 
     }
-    public function uploadResit(SystemController $sys,Request $request){
-        if(@\Auth::user()->role=='HOD' || @\Auth::user()->department=='top' || @\Auth::user()->department=='Tptop'|| @\Auth::user()->role=='Dean' || @\Auth::user()->role=='Support' || @\Auth::user()->role=='Registrar' || @\Auth::user()->department=='Tpmid' || @\Auth::user()->department=='Tptop'){
+
+    public function uploadResit(SystemController $sys, Request $request)
+    {
+        if (@\Auth::user()->role == 'HOD' || @\Auth::user()->department == 'top' || @\Auth::user()->department == 'Tptop' || @\Auth::user()->role == 'Dean' || @\Auth::user()->role == 'Support' || @\Auth::user()->role == 'Registrar' || @\Auth::user()->department == 'Tpmid' || @\Auth::user()->department == 'Tptop') {
 
             if ($request->isMethod("get")) {
-
 
 
                 $programme = $sys->getProgramList();
@@ -798,72 +782,71 @@ class CourseController extends Controller
 
             }
 
-        }
-
-
-        else{
+        } else {
             return redirect("/dashboard");
         }
     }
-    public function processsUploadLegacy(SystemController $sys,Request $request) {
-if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop'){
-        
-        $this->validate($request, [
 
-            'file' => 'required',
+    public function processsUploadLegacy(SystemController $sys, Request $request)
+    {
+        if (@\Auth::user()->department == 'Tptop' || @\Auth::user()->department == 'Tptop') {
 
-            'sem' => 'required',
-            'year' => 'required',
+            $this->validate($request, [
 
-            'program' => 'required',
-            'level' => 'required',
-        ]);
-        $valid_exts = array('csv'); // valid extensions
-        $file = $request->file('file');
-        $path = $request->file('file')->getRealPath();
+                'file' => 'required',
 
-        $ext = strtolower($file->getClientOriginalExtension());
-        $semester = $request->input('sem');
-        $year = $request->input('year');
-        $arraycc = $sys->getSemYear();
-        $yearcc = $arraycc[0]->YEAR;
+                'sem' => 'required',
+                'year' => 'required',
 
-        $programme = $request->input('program');
-        //dd($programme);
-        $level = $request->input('level');
-        //$credit=$request->input('credit');
-        if (in_array($ext, $valid_exts)) {
-            $destination = "public/upload";
+                'program' => 'required',
+                'level' => 'required',
+            ]);
+            $valid_exts = array('csv'); // valid extensions
+            $file = $request->file('file');
+            $path = $request->file('file')->getRealPath();
 
-            $handle = fopen($_FILES['file']['tmp_name'], "r");
+            $ext = strtolower($file->getClientOriginalExtension());
+            $semester = $request->input('sem');
+            $year = $request->input('year');
+            $arraycc = $sys->getSemYear();
+            $yearcc = $arraycc[0]->YEAR;
 
-            //move_uploaded_file($_FILES["file"]["tmp_name"], $destination);
-            $data = array(); // data array
+            $programme = $request->input('program');
+            //dd($programme);
+            $level = $request->input('level');
+            //$credit=$request->input('credit');
+            if (in_array($ext, $valid_exts)) {
+                $destination = "public/upload";
+
+                $handle = fopen($_FILES['file']['tmp_name'], "r");
+
+                //move_uploaded_file($_FILES["file"]["tmp_name"], $destination);
+                $data = array(); // data array
 
 
-            $row = 0;
-            $columns = [];
-            $rows = [];
-            // first get the headers into an array
-            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE AND $row==0) {
-                $columns = $data;
-                $row++;
+                $row = 0;
+                $columns = [];
+                $rows = [];
+                // first get the headers into an array
+                while (($data = fgetcsv($handle, 1000, ",")) !== FALSE AND $row == 0) {
+                    $columns = $data;
+                    $row++;
 
-                // while get the columns start reading the rows too
-                while ($file_line = fgetcsv($handle,1000,",","'")){
+                    // while get the columns start reading the rows too
+                    while ($file_line = fgetcsv($handle, 1000, ",", "'")) {
 
-                    $totalRecords = count($file_line);
+                        $totalRecords = count($file_line);
 
-                    for ($c = 0; $c <$totalRecords; $c++) {
-                        $col[$c] = $file_line[$c];
-                    }
-                    // we dont need the index no column so we remove it using unset which is the
-                    // first element of the header array
-                    unset($columns[0]);
+                        for ($c = 0; $c < $totalRecords; $c++) {
+                            $col[$c] = $file_line[$c];
+                        }
+                        // we dont need the index no column so we remove it using unset which is the
+                        // first element of the header array
+                        unset($columns[0]);
 
-                    $aggie = 1;
-                    //dd($columns);
-                    foreach ($columns as    $name){
+                        $aggie = 1;
+                        //dd($columns);
+                        foreach ($columns as $name) {
 
 //                                $gad=new Models\GadModel();
 //                                 $gad->indexno=$col[0];
@@ -872,102 +855,100 @@ if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop'){
 //                                  $gad->save();
 
 
+                            $course = $name;
+                            $exam = $col[$aggie];
+                            $total = $col[$aggie];
+                            $indexNo = $col[0];
+                            $studentDb = $indexNo;
+                            $studentID = $sys->getStudentIDfromIndexno($indexNo);
+                            $studentProgram = $programme; //$sys->getStudentprogramfromIndexno($indexNo);
+                            $studentYearGroup = $sys->getStudentyeargroupfromIndexno($indexNo);
 
-                        $course=$name;
-                        $exam=$col[$aggie];
-                        $total=$col[$aggie];
-                        $indexNo=$col[0];
-                        $studentDb= $indexNo  ;
-                        $studentID= $sys->getStudentIDfromIndexno($indexNo);
-                        $studentProgram= $programme; //$sys->getStudentprogramfromIndexno($indexNo);
-                        $studentYearGroup= $sys->getStudentyeargroupfromIndexno($indexNo);
 
+                            $courseName = @$sys->getCourseCodeByIDArray2($course);
 
-                        $courseName=@$sys->getCourseCodeByIDArray2($course);
-
-                        $courseid3=@$sys->getCourseMountedInfo2($course,$semester,$level,$yearcc,$programme);
-                        //dd($course,$semester,$level,$yearcc,$programme);
-                        $courseid2= $courseid3[0]->ID;
-                         //dd($courseid2);
-                        $displayCourse=@$courseName[0]->COURSE_NAME;
-                        $displayCode=@$courseName[0]->COURSE_CODE;
-                        //////$studentSearch = @$sys->studentSearchByIndexNo($programme); // check if the students in the file tally
-                        /*check if the students in the file tally with  students records
-                         * this is done so that users don't upload results of students that
-                         * are not in the system
-                         */
+                            $courseid3 = @$sys->getCourseMountedInfo2($course, $semester, $level, $yearcc, $programme);
+                            //dd($course,$semester,$level,$yearcc,$programme);
+                            $courseid2 = $courseid3[0]->ID;
+                            //dd($courseid2);
+                            $displayCourse = @$courseName[0]->COURSE_NAME;
+                            $displayCode = @$courseName[0]->COURSE_CODE;
+                            //////$studentSearch = @$sys->studentSearchByIndexNo($programme); // check if the students in the file tally
+                            /*check if the students in the file tally with  students records
+                             * this is done so that users don't upload results of students that
+                             * are not in the system
+                             */
 
 //                                     if (@in_array($studentDb, $studentSearch)) {
 //
 //
-                        $total= round($exam,2);
-                        //$programmeDetail=$sys->getCourseProgramme2($course);
-                        $programmeDetail=$studentProgram;
+                            $total = round($exam, 2);
+                            //$programmeDetail=$sys->getCourseProgramme2($course);
+                            $programmeDetail = $studentProgram;
 
-                        $program=$sys->getProgramArray($programmeDetail);
-                        $gradeArray = @$sys->getGrade($total, $program[0]->GRADING_SYSTEM);
-                        $grade = @$gradeArray[0]->grade;
-                        $credit=$courseid3[0]->COURSE_CREDIT;//$sys->getMountedCreditHour($name,$semester,$level,$studentProgram);
-                        //dd($studentProgram); // get credit hour of a course
-                        
+                            $program = $sys->getProgramArray($programmeDetail);
+                            $gradeArray = @$sys->getGrade($total, $program[0]->GRADING_SYSTEM);
+                            $grade = @$gradeArray[0]->grade;
+                            $credit = $courseid3[0]->COURSE_CREDIT;//$sys->getMountedCreditHour($name,$semester,$level,$studentProgram);
+                            //dd($studentProgram); // get credit hour of a course
 
-                        $gradePoint = @$gradeArray[0]->value;
-                        $test=@Models\AcademicRecordsModel::where("indexno",$indexNo)->where("level",$level)->where("sem",$semester)->where("code",$course)->where("resit","!=","yes")->get()->toArray();
-                        if(count($test)==0){
-                            $record = new Models\AcademicRecordsModel();
-                            $record->indexno = $indexNo;
-                            $record->code = $course;
-                            $record->course = $courseid2;
-                            $record->sem = $semester;
-                            $record->year = $year;
-                            $record->credits = $credit;
-                            $record->student= $studentID;
-                            $record->level = $level;
-                            $record->programme = $studentProgram;
-                            $record->yrgp = $studentYearGroup;
-                            $record->exam = $exam;
-                            $record->total = $total;
-                            $record->resit = "no";
-                            $record->grade = $grade;
-                            $record->gpoint =round(( $credit*$gradePoint),2);
-                            $record->save();
 
-                            $cgpa= number_format(@(( $credit*$gradePoint)/$credit), 3, '.', ',');
-                            $newCgpa=@$sys->getCGPA($indexNo);
-                                    $class=@$sys->getClass($newCgpa);
-                                    Models\StudentModel::where("INDEXNO",$indexNo)->update(array("CGPA"=>$newCgpa,"CLASS"=>$class,"STATUS"=>'In school'));
-                            \DB::commit();
+                            $gradePoint = @$gradeArray[0]->value;
+                            $test = @Models\AcademicRecordsModel::where("indexno", $indexNo)->where("level", $level)->where("sem", $semester)->where("code", $course)->where("resit", "!=", "yes")->get()->toArray();
+                            if (count($test) == 0) {
+                                $record = new Models\AcademicRecordsModel();
+                                $record->indexno = $indexNo;
+                                $record->code = $course;
+                                $record->course = $courseid2;
+                                $record->sem = $semester;
+                                $record->year = $year;
+                                $record->credits = $credit;
+                                $record->student = $studentID;
+                                $record->level = $level;
+                                $record->programme = $studentProgram;
+                                $record->yrgp = $studentYearGroup;
+                                $record->exam = $exam;
+                                $record->total = $total;
+                                $record->resit = "no";
+                                $record->grade = $grade;
+                                $record->gpoint = round(($credit * $gradePoint), 2);
+                                $record->save();
 
-                        }
-                        else{
+                                $cgpa = number_format(@(($credit * $gradePoint) / $credit), 3, '.', ',');
+                                $newCgpa = @$sys->getCGPA($indexNo);
+                                $class = @$sys->getClass($newCgpa);
+                                Models\StudentModel::where("INDEXNO", $indexNo)->update(array("CGPA" => $newCgpa, "CLASS" => $class, "STATUS" => 'In school'));
+                                \DB::commit();
 
-                            Models\AcademicRecordsModel::where("indexno",$indexNo)->where("level",$level)->where("sem",$semester)->where("code",$course)->where("resit","!=","yes")->update(
-                                array(
-                                    "indexno" =>$indexNo,
-                                    "code"=>$course,
-                                    "sem" =>$semester,
-                                    "year"=>$year,
-                                    "credits"=>$credit,
-                                    "student"=>$studentID,
-                                    "level"=>$level,
-                                    "course"=>$courseid2,
-                                    "exam" =>$exam,
-                                    "total"=> $total,
-                                    "programme" =>$studentProgram,
-                                    "yrgp"=> $studentYearGroup,
-                                    "resit"=> "no",
+                            } else {
 
-                                    "grade" => $grade,
-                                    "gpoint" =>round(( $credit*$gradePoint),2),
-                                )
+                                Models\AcademicRecordsModel::where("indexno", $indexNo)->where("level", $level)->where("sem", $semester)->where("code", $course)->where("resit", "!=", "yes")->update(
+                                    array(
+                                        "indexno" => $indexNo,
+                                        "code" => $course,
+                                        "sem" => $semester,
+                                        "year" => $year,
+                                        "credits" => $credit,
+                                        "student" => $studentID,
+                                        "level" => $level,
+                                        "course" => $courseid2,
+                                        "exam" => $exam,
+                                        "total" => $total,
+                                        "programme" => $studentProgram,
+                                        "yrgp" => $studentYearGroup,
+                                        "resit" => "no",
 
-                            );
-                           $newCgpa=@$sys->getCGPA($indexNo);
-                                    $class=@$sys->getClass($newCgpa);
-                                    Models\StudentModel::where("INDEXNO",$indexNo)->update(array("CGPA"=>$newCgpa,"CLASS"=>$class,"STATUS"=>'In school'));
+                                        "grade" => $grade,
+                                        "gpoint" => round(($credit * $gradePoint), 2),
+                                    )
 
-                             \DB::commit();
-                        }
+                                );
+                                $newCgpa = @$sys->getCGPA($indexNo);
+                                $class = @$sys->getClass($newCgpa);
+                                Models\StudentModel::where("INDEXNO", $indexNo)->update(array("CGPA" => $newCgpa, "CLASS" => $class, "STATUS" => 'In school'));
+
+                                \DB::commit();
+                            }
 
 
 //dd($newCgpa);
@@ -980,28 +961,23 @@ if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop'){
 //                             
 //                                 
 //                            } 
-                        $aggie++;
+                            $aggie++;
+                        }
+
+
                     }
-
-
                 }
+            } else {
+                return redirect('legacy')->with("error", " <span style='font-weight:bold;font-size:13px;'>Please upload only CSV   file!</span> ");
             }
-        }
-
-
-
-        else{
-            return redirect('legacy')->with("error", " <span style='font-weight:bold;font-size:13px;'>Please upload only CSV   file!</span> ");
-        }
-        return redirect('legacy')->with("success",  " <span style='font-size:13px;'> ".$year." || ".$level." || sem ".$semester." || "."marks  successfully uploaded !</span> ");
+            return redirect('legacy')->with("success", " <span style='font-size:13px;'> " . $year . " || " . $level . " || sem " . $semester . " || " . "marks  successfully uploaded !</span> ");
 
         }
     }
 
-    public function uploadGad2(SystemController $sys,Request $request){
-        if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop'){
-
-
+    public function uploadGad2(SystemController $sys, Request $request)
+    {
+        if (@\Auth::user()->department == 'Tptop' || @\Auth::user()->department == 'Tptop') {
 
 
             $programme = $sys->getProgramList();
@@ -1011,34 +987,22 @@ if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop'){
                 ->with('year', $sys->years());
 
 
-
-
-        }
-        else{
+        } else {
             return redirect("/dashboard");
         }
     }
 
 
+    public function uploadCourse(SystemController $sys, Request $request)
+    {
 
-
-
-    public function uploadCourse(SystemController $sys,Request $request){
-
-        if (@\Auth::user()->role == 'HOD' || @\Auth::user()->role == 'Support'||@\Auth::user()->role == 'Support'|| @\Auth::user()->role == 'Registrar' || @\Auth::user()->department == 'top' || @\Auth::user()->department=='Tpmid' || @\Auth::user()->department=='Tptop') {
-
+        if (@\Auth::user()->role == 'HOD' || @\Auth::user()->role == 'Support' || @\Auth::user()->role == 'Support' || @\Auth::user()->role == 'Registrar' || @\Auth::user()->department == 'top' || @\Auth::user()->department == 'Tpmid' || @\Auth::user()->department == 'Tptop') {
 
 
             return view('courses.uploadCourse');
 
 
-
-
-
-        }
-
-
-        else{
+        } else {
 
             throw new HttpException(Response::HTTP_UNAUTHORIZED, 'This action is unauthorized.');
 
@@ -1047,116 +1011,117 @@ if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop'){
 
     }
 
-    public function registrationInfo(SystemController $sys,Request $request){
+    public function registrationInfo(SystemController $sys, Request $request)
+    {
 
-        if ( @\Auth::user()->role == 'Registrar' || @\Auth::user()->department == 'top' || @\Auth::user()->department == 'Examination' || @\Auth::user()->role == 'Admin'  || @\Auth::user()->department == 'Rector' || @\Auth::user()->department == 'Finance' || @\Auth::user()->department == 'Tpmid' || @\Auth::user()->department=='Tptop') {
+        if (@\Auth::user()->role == 'Registrar' || @\Auth::user()->department == 'top' || @\Auth::user()->department == 'Examination' || @\Auth::user()->role == 'Admin' || @\Auth::user()->department == 'Rector' || @\Auth::user()->department == 'Finance' || @\Auth::user()->department == 'Tpmid' || @\Auth::user()->department == 'Tptop') {
             $array = $sys->getSemYear();
             $sem = $array[0]->SEMESTER;
             $year = $array[0]->YEAR;
             if ($request->isMethod("get")) {
-                $data=  Models\StudentModel::where("REGISTERED",1)->select("PROGRAMMECODE","LEVEL")->orderBy("PROGRAMMECODE")->orderBy("LEVEL")->groupBy("PROGRAMMECODE")->paginate(500);
+                $data = Models\StudentModel::where("REGISTERED", 1)->select("PROGRAMMECODE", "LEVEL")->orderBy("PROGRAMMECODE")->orderBy("LEVEL")->groupBy("PROGRAMMECODE")->paginate(500);
                 return view('courses.registrationReport')
                     ->with('program', $sys->getProgramList())
                     ->with('year', $sys->years())
-                    ->with("data",$data)
-                    ->with("sem",$sem)
-                    ->with("years",$year);
+                    ->with("data", $data)
+                    ->with("sem", $sem)
+                    ->with("years", $year);
             } else {
 
             }
-        }
-        else{
+        } else {
             return redirect("/dashboard");
         }
     }
-    // recover deleted grades
-    public function gradeRecovery(SystemController $sys,Request $request){
 
-        if ( @\Auth::user()->role== 'Lecturer' || @\Auth::user()->role== 'HOD' ||  @\Auth::user()->fund== '755991'||  @\Auth::user()->fund== '1201610' || @\Auth::user()->fund== '701088') {
+    // recover deleted grades
+    public function gradeRecovery(SystemController $sys, Request $request)
+    {
+
+        if (@\Auth::user()->role == 'Lecturer' || @\Auth::user()->role == 'HOD' || @\Auth::user()->fund == '755991' || @\Auth::user()->fund == '1201610' || @\Auth::user()->fund == '701088') {
 
             if ($request->isMethod("get")) {
 
                 return view('courses.recoverGrades')->with('year', $sys->years())
-                    ->with("course",$sys->getMountedCourseList())
-                    ->with("level",$sys->getLevelList())
+                    ->with("course", $sys->getMountedCourseList())
+                    ->with("level", $sys->getLevelList())
                     ->with('program', $sys->getProgramList());
 
 
             }
 
-        }
-        elseif( @\Auth::user()->department== 'Tpmid' || @\Auth::user()->department== 'Tptop' ){
+        } elseif (@\Auth::user()->department == 'Tpmid' || @\Auth::user()->department == 'Tptop') {
             return view('courses.recoverGrades')->with('year', $sys->years())
-                ->with("course",$sys->getCourseList())
-                ->with("level",$sys->getLevelList())
+                ->with("course", $sys->getCourseList())
+                ->with("level", $sys->getLevelList())
                 ->with('program', $sys->getProgramList());
 
-        }
-        else{
+        } else {
             return redirect("/dashboard");
         }
     }
-    public function ProcessGradeRecovery(SystemController $sys,Request $request){
+
+    public function ProcessGradeRecovery(SystemController $sys, Request $request)
+    {
 
         $this->validate($request, [
 
-            'level'=>'required',
-            'program'=>'required',
-            'semester'=>'required',
-            'year'=>'required',
+            'level' => 'required',
+            'program' => 'required',
+            'semester' => 'required',
+            'year' => 'required',
 
         ]);
 
-        $level=$request->input("level");
-        $course=$request->input("course");
-        $program=$request->input("program");
-        $year=$request->input("year");
-        $semester=$request->input("semester");
+        $level = $request->input("level");
+        $course = $request->input("course");
+        $program = $request->input("program");
+        $year = $request->input("year");
+        $semester = $request->input("semester");
 
-        if($course=="type course name here"){
-            $query= Models\DeletedGradesModel::where("level",$level)->where("sem",$semester)
-                ->where("year",$year)->whereHas('student', function($q)use ($program) {
-                    $q->whereHas('programme', function($q)use ($program) {
-                        $q->whereIn('PROGRAMMECODE',  array($program));
+        if ($course == "type course name here") {
+            $query = Models\DeletedGradesModel::where("level", $level)->where("sem", $semester)
+                ->where("year", $year)->whereHas('student', function ($q) use ($program) {
+                    $q->whereHas('programme', function ($q) use ($program) {
+                        $q->whereIn('PROGRAMMECODE', array($program));
                     });
-                }) ;
-        }
-        else{
-            $query= Models\DeletedGradesModel::where("level",$level)->where("sem",$semester)
-                ->where("year",$year)->where("code",$course)->whereHas('student', function($q)use ($program) {
-                    $q->whereHas('programme', function($q)use ($program) {
-                        $q->whereIn('PROGRAMMECODE',  array($program));
+                });
+        } else {
+            $query = Models\DeletedGradesModel::where("level", $level)->where("sem", $semester)
+                ->where("year", $year)->where("code", $course)->whereHas('student', function ($q) use ($program) {
+                    $q->whereHas('programme', function ($q) use ($program) {
+                        $q->whereIn('PROGRAMMECODE', array($program));
                     });
-                }) ;
+                });
 
         }
-        $data=$query->get();
+        $data = $query->get();
 
-        foreach($data as $row){
-            $result=new Models\AcademicRecordsModel();
-            $result->course=$row->course;
-            $result->code=$row->code;
-            $result->student=$row->student;
-            $result->indexno=$row->indexno;
-            $result->credits=$row->credits;
-            $result->quiz1=$row->quiz1;
-            $result->quiz2=$row->quiz2;
-            $result->quiz3=$row->quiz3;
-            $result->midSem1=$row->midSem1;
-            $result->exam=$row->exam;
-            $result->total=$row->total;
-            $result->grade=$row->grade;
-            $result->gpoint=$row->gpoint;
-            $result->year=$row->year;
-            $result->sem=$row->sem;
-            $result->level=$row->level;
-            $result->yrgp=$row->yrgp;
-            $result->groups=$row->groups;
-            $result->lecturer=$row->lecturer;
-            $result->resit=$row->resit;
-            $result->dateRegistered=$row->dateRegistered;
-            $result->createdAt=$row->createdAt;
-            $result->updates=$row->updates;
+        foreach ($data as $row) {
+            $result = new Models\AcademicRecordsModel();
+            $result->course = $row->course;
+            $result->code = $row->code;
+            $result->student = $row->student;
+            $result->indexno = $row->indexno;
+            $result->credits = $row->credits;
+            $result->quiz1 = $row->quiz1;
+            $result->quiz2 = $row->quiz2;
+            $result->quiz3 = $row->quiz3;
+            $result->midSem1 = $row->midSem1;
+            $result->exam = $row->exam;
+            $result->total = $row->total;
+            $result->grade = $row->grade;
+            $result->gpoint = $row->gpoint;
+            $result->year = $row->year;
+            $result->sem = $row->sem;
+            $result->level = $row->level;
+            $result->yrgp = $row->yrgp;
+            $result->groups = $row->groups;
+            $result->lecturer = $row->lecturer;
+            $result->resit = $row->resit;
+            $result->dateRegistered = $row->dateRegistered;
+            $result->createdAt = $row->createdAt;
+            $result->updates = $row->updates;
             $result->save();
 
 
@@ -1165,83 +1130,77 @@ if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop'){
         $query->delete();
 
 
-
-
-
-
     }
 
-    public function gradeModification(SystemController $sys,Request $request){
+    public function gradeModification(SystemController $sys, Request $request)
+    {
 
-        if ( @\Auth::user()->role== 'Lecturer' || @\Auth::user()->role== 'HOD' || @\Auth::user()->fund== '701088') {
+        if (@\Auth::user()->role == 'Lecturer' || @\Auth::user()->role == 'HOD' || @\Auth::user()->fund == '701088') {
 
             if ($request->isMethod("get")) {
 
                 return view('courses.deleteGrades')->with('year', $sys->years())
-                    ->with("course",$sys->getMountedCourseList())
-                    ->with("level",$sys->getLevelList())
+                    ->with("course", $sys->getMountedCourseList())
+                    ->with("level", $sys->getLevelList())
                     ->with('program', $sys->getProgramList());
 
 
             }
 
-        }
-        elseif(@\Auth::user()->role=='Admin' || @\Auth::user()->department=='top' || @\Auth::user()->department=='Tptop' ||  @\Auth::user()->department== 'Tpmid' || @\Auth::user()->department== 'Tptop'){
+        } elseif (@\Auth::user()->role == 'Admin' || @\Auth::user()->department == 'top' || @\Auth::user()->department == 'Tptop' || @\Auth::user()->department == 'Tpmid' || @\Auth::user()->department == 'Tptop') {
             return view('courses.deleteGrades')->with('year', $sys->years())
-                ->with("course",$sys->getMountedCourseList())
-                ->with("level",$sys->getLevelList())
+                ->with("course", $sys->getMountedCourseList())
+                ->with("level", $sys->getLevelList())
                 ->with('program', $sys->getProgramList());
 
-        }
-        else{
+        } else {
             return redirect("/dashboard");
         }
     }
 
-    public function ProcessGradeModification(SystemController $sys,Request $request){
+    public function ProcessGradeModification(SystemController $sys, Request $request)
+    {
 
         //dd($request);
         $this->validate($request, [
 
-            'level'=>'required',
-            'program'=>'required',
-            'semester'=>'required',
+            'level' => 'required',
+            'program' => 'required',
+            'semester' => 'required',
 
-            'year'=>'required',
+            'year' => 'required',
 
         ]);
 
-        $level=$request->input("level");
-        $course=$request->input("course");
-        $program=$request->input("program");
-        $year=$request->input("year");
-        $indexno=$request->input("indexno");
-        $semester=$request->input("semester");
+        $level = $request->input("level");
+        $course = $request->input("course");
+        $program = $request->input("program");
+        $year = $request->input("year");
+        $indexno = $request->input("indexno");
+        $semester = $request->input("semester");
 
-        if($course==""){
-            $query= Models\AcademicRecordsModel::where("level",$level)->where("sem",$semester)
-                ->where("year",$year)->whereHas('student', function($q)use ($program) {
-                    $q->whereHas('programme', function($q)use ($program) {
-                        $q->whereIn('PROGRAMMECODE',  array($program));
+        if ($course == "") {
+            $query = Models\AcademicRecordsModel::where("level", $level)->where("sem", $semester)
+                ->where("year", $year)->whereHas('student', function ($q) use ($program) {
+                    $q->whereHas('programme', function ($q) use ($program) {
+                        $q->whereIn('PROGRAMMECODE', array($program));
                     });
-                }) ;
-        }
-        elseif($course==""){
-            $query= Models\AcademicRecordsModel::where("level",$level)->where("sem",$semester)
-                ->where("year",$year)->where("code",$course)->whereHas('student', function($q)use ($program) {
-                    $q->whereHas('programme', function($q)use ($program) {
-                        $q->whereIn('PROGRAMMECODE',  array($program));
+                });
+        } elseif ($course == "") {
+            $query = Models\AcademicRecordsModel::where("level", $level)->where("sem", $semester)
+                ->where("year", $year)->where("code", $course)->whereHas('student', function ($q) use ($program) {
+                    $q->whereHas('programme', function ($q) use ($program) {
+                        $q->whereIn('PROGRAMMECODE', array($program));
                     });
-                }) ;
+                });
             $query->delete();
-        }
-        elseif($indexno!=""){
-            $query= Models\AcademicRecordsModel::where("level",$level)->where("sem",$semester)->where("indexno",$indexno)
-                ->where("year",$year)->where("code",$course)->whereHas('student', function($q)use ($program) {
-                    $q->whereHas('programme', function($q)use ($program) {
-                        $q->whereIn('PROGRAMMECODE',  array($program));
+        } elseif ($indexno != "") {
+            $query = Models\AcademicRecordsModel::where("level", $level)->where("sem", $semester)->where("indexno", $indexno)
+                ->where("year", $year)->where("code", $course)->whereHas('student', function ($q) use ($program) {
+                    $q->whereHas('programme', function ($q) use ($program) {
+                        $q->whereIn('PROGRAMMECODE', array($program));
                     });
-                }) ;
+                });
             $query->delete();
 
 
@@ -1279,14 +1238,12 @@ if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop'){
 //                        }
 
 
-
-
-
-        return redirect()->back()->with("success","Grades deleted successfully");
+        return redirect()->back()->with("success", "Grades deleted successfully");
     }
 
 
-    public function transcript(SystemController $sys,Request $request){
+    public function transcript(SystemController $sys, Request $request)
+    {
 
         if (@\Auth::user()->role == 'HOD' || @\Auth::user()->role == 'Support' || @\Auth::user()->role == 'Lecturer' || @\Auth::user()->role == 'Registrar' || @\Auth::user()->department == 'top' || @\Auth::user()->department == 'Rector' || @\Auth::user()->department == 'Tpmid' || @\Auth::user()->department == 'Tptop' || @\Auth::user()->role == 'Admin') {
 
@@ -1294,274 +1251,298 @@ if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop'){
 
                 return view('courses.showTranscript');
 
-            }
-            else{
+            } else {
 
-                $student=  explode(',',$request->input('q'));
-                $student=$student[0];
-
+                $student = explode(',', $request->input('q'));
+                $student = $student[0];
 
 
-                $sql=Models\StudentModel::where("INDEXNO",$student)->first();
+                $sql = Models\StudentModel::where("INDEXNO", $student)->first();
 
 
-                if($sql->PAID<=0.85*$sql->BILLS &&  @\Auth::user()->department != 'Tptop'){
-                return redirect("/dashboard")->with("error","Check fee payment");
+                if ($sql->PAID <= 0.85 * $sql->BILLS && @\Auth::user()->department != 'Tptop') {
+                    return redirect("/dashboard")->with("error", "Check fee payment");
                 }
                 //    return redirect("/transcript")->with("error","<span style='font-weight:bold;font-size:13px;'> $request->input('q') does not exist!</span>");
                 // }
                 // else{
 
-                $array=$sys->getSemYear();
-                $sem=$array[0]->SEMESTER;
-                $year=$array[0]->YEAR;
+                $array = $sys->getSemYear();
+                $sem = $array[0]->SEMESTER;
+                $year = $array[0]->YEAR;
 
 
-                $data=$this->transcriptHeader($sql, $sys)  ;
-                $record=$this->generateTranscript($sql->ID,$sys);
-                return view("courses.transcript")->with('grade',$record)->with("student",$data);
-
-
+                $data = $this->transcriptHeader($sql, $sys);
+                $record = $this->generateTranscript($sql->ID, $sys);
+                return view("courses.transcript")->with('grade', $record)->with("student", $data);
 
 
                 //}
-            
-            //else{
-            	
-            //}
+
+                //else{
+
+                //}
+
+            }
 
         }
-
     }
-}
-    public function transcriptHeader($student, SystemController $sys) {
+
+    public function transcriptHeader($student, SystemController $sys)
+    {
         ?>
         <div class="md-card" style="overflow-x: auto;" >
 
-            <div   class="uk-grid" data-uk-grid-margin>
+        <div>
+            <center><b>ACADEMIC TRANSCRIPT</b></center>
+            <hr>
 
-                <table  border="0" valign="top" cellspacing="0" align="left">
-                    <tr>
-                        <td>
-                            <table width="826px" style="margin-left:18px" height="133">
 
-                                <tr>
-                                    <td colspan="3" align='left'> <img src="<?php echo url('public/assets/img/academic.jpg')?>" style='width: 826px;height: auto;margin-bottom: 10px;'/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="uk-text-bold"style="padding-right: px;">INDEX NUMBER
-                                    </td> 
-                                    <td style=""><?php echo $student->INDEXNO;?>
-                                    </td>
-                                    <td rowspan="5" width="145" align="right">&nbsp;
-                                        <img style="width:130px;height: auto;margin-left: 8px;"
-                                            <?php
-                                                $pic = $student->INDEXNO;
-                                            ?>
-                                            src='<?php echo url("public/albums/students/$pic.JPG")?>' alt="  Affix student picture here"    />
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="uk-text-bold" style="">NAME
-                                    </td> 
-                                    <td><?php echo strtoupper($student->TITLE .' '.  $student->NAME)?>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="uk-text-bold"style="">GENDER</td> 
-                                    <td><?php echo strtoupper($student->SEX)?></td>
-                                </tr>
-                                <tr>
-                                    <td class="uk-text-bold">PROGRAMME</td> 
-                                    <td><?php echo strtoupper($student->program->PROGRAMME)?></td>
-                                </tr>
-                                <tr>
-                                    <td class="uk-text-bold" style="">COHORT</td>
-                                    <td><?php echo strtoupper($student->COHORT)?></td>
-                                </tr>
-                                <tr>
-                                    <td class="uk-text-bold" style="">DATE OF BIRTH</td> 
-                                    <td><?PHP echo  $student->DATEOFBIRTH ; ?></td>
-                                </tr>
+        </div>
+        <div>
 
-                                <tr>
-                                    <td class="uk-text-left" colspan="3">&nbsp;
-                                    </td>
-                                </tr>
-                            </table>
-            
-        
-        
+            <p style="margin-left: 23px;">Name: <?php echo strtoupper($student->TITLE . ' ' . $student->NAME) ?> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;STUDENT
+                ID: <?php echo $student->INDEXNO ?></p>
+            <p style="margin-left: 23px;">Programme: &nbsp;<?php echo strtoupper($student->program->PROGRAMME); ?> </p>
+            <hr>
+        </div>
+
 
         <?php
 
     }
-    public function generateTranscript($sql,  SystemController $sys){
-        $programObject=Models\StudentModel::where('ID',$sql)->select("PROGRAMMECODE")->get();
-        $program=$programObject[0]->PROGRAMMECODE;
+
+    public function generateTranscript($sql, SystemController $sys)
+    {
+        $programObject = Models\StudentModel::where('ID', $sql)->select("PROGRAMMECODE")->get();
+        $program = $programObject[0]->PROGRAMMECODE;
         //dd($program);
         $rsaProgram = $sys->getProgramResult($program);
 
-        $records=  Models\AcademicRecordsModel::where([['student','=',$sql],['grade','!=', 'E'],['grade','!=', 'IC'],['grade','!=', 'NC']])->groupBy("year")->groupBy("level")->orderBy("level")->get();
-
+        $records = Models\AcademicRecordsModel::where([['student', '=', $sql], ['grade', '!=', 'F'], ['grade', '!=', 'E'], ['grade', '!=', 'DNS']])->groupBy("year")->groupBy("level")->orderBy("level")->get();
 
 
         ?>
 
 
-        <table width='700px' style="text-align:left; margin-top:-2px; font-size: 16px" height="90" class=""  border="0">
-            <tr>
+        <table width='700px' style="text-align:left; margin-top:-2px; font-size: 16px;border-collapse: collapse;"
+               class="" border="0">
+        <tr>
 
-                <td  style=" " align="left">
-                    <?php
-                    $rsc = 0.0;
-                    $rsa = 0.0;
-                    $totrsa = 0.0;
-                    $noCourses = 0.0;
-                    $gpoint=0.0;
-                    $totcredit=0;
-                    $totgpoint=0.0;
-                    $gcredit=0;
-                    $b=0.0;
-                    $a=0;
+        <td style=" " align="left">
+        <?php
+        $rsc = 0.0;
+        $rsa = 0.0;
+        $totrsa = 0.0;
+        $noCourses = 0.0;
 
-                    foreach ($records as $row){
-                        for($i=1;$i<3;$i++){
-                            $query=  Models\AcademicRecordsModel::where("student",$sql)->where("year",$row->year)->where("sem",$i)->orderby("code")->orderby("resit")->get()->toArray();
+        $totcredit = 0;
+        $totgpoint = 0.0;
+        $gcredit = 0;
+        $b = 0.0;
+        $a = 0;
+        $totalC = 0;
+        $totcredit = 0;
+        $gpoint = 0.0;
+        foreach ($records as $row) {
+            for ($i = 1; $i < 3; $i++) {
+                $query = Models\AcademicRecordsModel::where("student", $sql)->where("year", $row->year)->where("sem", $i)->orderby("code")->orderby("resit")->get()->toArray();
+                $semester = "";
 
+                if (count($query) > 0) {
+                    if ($i == 1) {
+                        $semester = "FIRST SEMESTER";
+                    } else {
+                        $semester = "SECOND SEMESTER";
+                    }
 
-                            if(count($query)>0){
+                    echo "<div class='uk-text-bold uk-text-center' align='left' style='margin-left:18px'><u>LEVEL: " . $row->level . " - ";
 
-
-                                echo "<div class='uk-text-bold' align='left' style='margin-left:18px'>YEAR : ".$row->year.", ";
-                                echo " LEVEL :  " .$row->level.", ";
-                                echo " SEMESTER : ".$i." <hr/></div>";
-
-                                ?>
-
-                                <div class="uk-overflow-container">
-                                <table style="margin-left:18px"  border="0" width='826px'  class="uk-table uk-table-striped">
-                                    <thead >
-                                    <tr class="uk-text-bold" style="background-color:#1A337E;color:white;">
-                                        <td  width="86">Course Code</td>
-                                        <td  width="418">Course Name</td>
-                                        <td align='center' width="50">Credits</td>
-
-                                        <td align='center' width="50">Total Mark</td>
-
-                                        <td align='center' width="57">Grade</td>
-
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <?php
-                                    //$program=$student->program->PROGRAMME;
-
-                                    foreach ($query as $rs){
-
-
-                                    if($rs['grade']!="IC" and $rs['grade']!="E" and $rs['grade']!="NC"){
-
-                                    ?>
-                                    <tr>
-                                        <td <?php // if($rs['grade']=="E"|| $rs['grade']=="F"){ echo "style='display:none'";}?>> <?php $object=$sys->getCourseByCodeProgramObject($rs['code'],$program); $noCourses++; echo @$object[0]->COURSE_CODE; ?></td>
-                                        <td <?php // if($rs['grade']=="E"|| $rs['grade']=="F"){ echo "style='display:none'";}?>> <?php
-                                            if($rs['resit']=="yes"){
-                                                echo "<span style='color:red'>* </span>".@$object[0]->COURSE_NAME."<span style='color:red'> *</span>";}else{echo @$object[0]->COURSE_NAME;}?> </td>
-
-                                        <td align='center' <?php // if($rs['grade']=="E"|| $rs['grade']=="F"){ echo "style='display:none'";}?>><?php  @$gcredit+=@$rs['credits'];   $totcredit+=@$rs['credits'];@$a+=$totcredit; if($rs['credits']){ echo $rs['credits'];} else{echo "IC";};?></td>
-
-                                        <td align='center' <?php // if($rs['grade']=="E" || $rs['grade']=="F"){ echo "style='display:none'";}?>><?php  @$rsc+=@$rs['total']; if($rs['total']){ echo @$rs['total'];} else{echo "IC";}?></td>
-
-                                        <?php
-                                                if ($rsaProgram != 'RSA') {
-                                            
-                                            ?>
-                                        <td align='center' <?php // if($rs['grade']=="E" || $rs['grade']=="F"){ echo "style='display:none'";}?>><?php  if($rs['grade']){ echo @$rs['grade'];} else{echo "IC";}?></td>
-                                            <?php
-                                                }
-                                            ?>
-
-                                            <?php
-
-                                        }
-                                        }?>
-                                    </tr>
-
-
-                                    </tbody>
-
-                                    <?php
-
-                                    ?>
-                                </table>
-
-                                <table border="0" style="margin-left: 507px; padding: 2px">
-                                    <thead>
-                                        <th>&nbsp;&nbsp;</th>
-                                        <th>&nbsp;&nbsp;</th>
-
-                                        <th>Semester</th>
-                                        <th>Cummulative</th>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td></td>
-                                    <td>Credits Registered:</td>
-                                        <td>Total</td>
-                                        <td>Total</td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                    <td>Credits Obtained:</td>
-                                        <td>Total</td>
-                                        <td>Total</td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                    <td>Credits Calc:</td>
-                                        <td>Total</td>
-                                        <td>Total</td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                    <td>Weighted Marks:</td>
-                                        <td>Total</td>
-                                        <td>Total</td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td style="color:#418eff"> CWA:</td>
-                                        <td></td>
-                                        <td>Total</td>
-
-
-                                    </tr>
-                                    </tbody>
-                                </table>
-                                <div style="margin-left: 21px"><p>Courses Trailing: </p></div>
-                            <?php 
-
-                            }else{
-                                echo "<p class='uk-text-danger'  style=\"margin-left: 21px\">No results to display</p>";
-                                ?><?php }?>
-                            <p>&nbsp;</p>
-                            </div><?php }  }
+                    echo $semester . ",  ";
+                    echo $row->year . "  ACADEMIC YEAR </u></div>";
 
                     ?>
 
+                    <div class="uk-overflow-container">
+                    <table style="margin-left:18px ;border-collapse: collapse;width: 100%;
+    max-width: 100%;
+    margin-bottom: 20px;" border="0" class="gad uk-table uk-table-condensed uk-table-striped ">
+                        <thead>
+                        <tr class="uk-text-bold" style="background-color:#1A337E;color:white;">
+                            <td width="86">Course Code</td>
+                            <td width="418">Course Name</td>
+                            <td align='center' width="50">Credits</td>
 
-            </tr>
+                            <td align='center' width="50">Mark</td>
 
-        </table>
-    </td>
-        </tr>
+                            <td align='center' width="57">Grade</td>
 
-        </table>
-        </div></div>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?php
+                        //$program=$student->program->PROGRAMME;
 
-    <?php }
+                        foreach ($query as $rs){
+
+                        $totalC = $totalC + $rs['credits'];
+                        if ($rs['grade'] != "IC" and $rs['grade'] != "DNS"){
+                        $gpoint += $rs['credits'] * $rs['total'];
+                        ?>
+                        <tr>
+                            <td <?php // if($rs['grade']=="E"|| $rs['grade']=="F"){ echo "style='display:none'";}
+                            ?>> <?php $object = $sys->getCourseByCodeProgramObject($rs['code'], $program);
+                                $noCourses++;
+                                echo @$object[0]->COURSE_CODE; ?></td>
+                            <td <?php // if($rs['grade']=="E"|| $rs['grade']=="F"){ echo "style='display:none'";}
+                            ?>> <?php
+                                if ($rs['resit'] == "yes" || $rs['grade']=="F") {
+                                    echo "<span style='color:red'>* </span>" . @$object[0]->COURSE_NAME . "<span style='color:red'> *</span>";
+                                } else {
+                                    echo @$object[0]->COURSE_NAME;
+                                } ?> </td>
+
+                            <td align='center' <?php // if($rs['grade']=="E"|| $rs['grade']=="F"){ echo "style='display:none'";}
+                            ?>><?php @$gcredit += @$rs['credits'];
+                                $totcredit += @$rs['credits'];
+                                @$a += $totcredit;
+                                if ($rs['credits']) {
+                                    echo $rs['credits'];
+                                } else {
+                                    echo "IC";
+                                }; ?></td>
+
+                            <td align='center' <?php // if($rs['grade']=="E" || $rs['grade']=="F"){ echo "style='display:none'";}
+                            ?>><?php @$rsc += @$rs['total'];
+                                if ($rs['total']) {
+                                    echo @$rs['total'];
+                                } else {
+                                    echo "IC";
+                                } ?></td>
+
+                            <?php
+                            if ($rsaProgram != 'RSA') {
+
+                                ?>
+                                <td align='center' <?php // if($rs['grade']=="E" || $rs['grade']=="F"){ echo "style='display:none'";}?>><?php if ($rs['grade']) {
+                                        echo @$rs['grade'];
+                                    } else {
+                                        echo "IC";
+                                    } ?></td>
+                                <?php
+                            }
+                            ?>
+
+                            <?php
+
+
+                            ?>
+
+                            <?php
+                            }
+
+                      echo"  </tr>";
+
+                        ?>
+
+
+
+
+
+
+
+                        <?php
+                        }?>
+
+                        </tbody>
+
+
+
+                    </table>
+
+
+
+
+
+
+
+
+                    <?php
+                    ?>
+
+                    <table border="0" style="margin-left: 507px; padding: 2px">
+                        <thead>
+                        <th>&nbsp;&nbsp;</th>
+                        <th>&nbsp;&nbsp;</th>
+
+                        <th>Semester</th>
+                        <th>Cummulative</th>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td></td>
+                            <td>Credits Obtained:</td>
+
+                            <td><u><?php echo $sys->getSemesterCredit($rs['sem'], $rs['level'], $rs['year'], $rs['indexno']); ?></u></td>
+                            <td><u><?php echo $totalC; ?></u></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td>Grade Points:</td>
+                            <td><u><?php echo $sys->getSemesterGP($rs['sem'], $rs['level'], $rs['year'], $rs['indexno']); ?></u></td>
+
+                            <td><u><?php echo $gpoint; ?></u></td>
+                        </tr>
+
+                        <tr style="color:#418eff">
+                            <td></td>
+                            <td>CWA:</td>
+                            <td><u><?php echo $sys->getCWA($rs['sem'], $rs['level'], $rs['year'], $rs['indexno']); ?></u></td>
+                            <td><u><?php echo number_format(@($gpoint / $totalC), 3, '.', ','); ?></u></td>
+
+                        </tr>
+
+
+                        </tbody>
+                    </table>
+
+                    <?php
+
+                } else {
+                    echo "<p class='uk-text-danger'  style=\"margin-left: 21px\">No results to display</p>";
+                    ?><?php } ?>
+                <p>&nbsp;</p>
+                </div><?php
+                ?>
+
+            <?php
+                ?>
+
+
+
+                <?php
+            }
+            ?>
+
+            <?php
+        }
+
+                    $gpoint = 0.0;
+                    $totcredit = 0;
+                    $totalC = 0;
+                    $noCourses = 0;
+
+
+
+        echo "</tr>";
+
+        echo " </table>";
+
+        echo " </div>";
+
+    }
+
 
     /**
      * Display a list of all of the user's task.

@@ -2469,7 +2469,36 @@ class SystemController extends Controller
         return @$course;
 
     }
+    public function getSemesterGP( $sem, $level, $year, $indexno)
+    {
 
+        $total =  \DB::table('tpoly_academic_record')->where('sem', $sem)->where('level', $level)->where('year', $year)
+            ->where("indexno", $indexno)->select("credits","total")->get();
+
+        $mark=0.0;
+        foreach ($total as $row){
+            $mark+=$row->credits * $row->total;
+        }
+
+        return @$mark;
+
+    }
+
+    public function getSemesterCredit($sem, $level, $year, $indexno)
+    {
+        $total = \DB::table('tpoly_academic_record')->where('sem', $sem)->where('level', $level)->where('year', $year)
+            ->where("indexno", $indexno)
+            ->sum("credits");
+
+        return @$total;
+
+
+    }
+    public function getCWA( $sem, $level, $year, $indexno){
+        $credit=$this->getSemesterCredit( $sem, $level, $year, $indexno);
+        $gp=$this->getSemesterGP( $sem, $level, $year, $indexno);
+        return  number_format(@($gp/$credit), 3, '.', ',');
+    }
     public function getCourseByIDCode($code)
     {
 
