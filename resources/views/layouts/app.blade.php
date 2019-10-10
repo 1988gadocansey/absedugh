@@ -515,6 +515,90 @@
 
                     @endif
 
+                        @if( @Auth::user()->department=='Support' )
+
+                            <li data-uk-dropdown class="uk-hidden-small">
+
+
+                                <a href="#"><i
+                                            class="sidebar-menu-icon material-icons md-18">attach_file</i><span>Student Management</span></a>
+                                <div class="uk-dropdown uk-dropdown-scrollable">
+                                    <ul class="uk-nav uk-nav-dropdown">
+                                        <li><a href='{!! url("/add_students") !!}'>Add Students</a></li>
+                                        <li><a href='{!! url("/students") !!}'>Students</a></li>
+                                        <li><a href='{!! url("/nservice") !!}'>National Service</a></li>
+
+                                        <li><a href='{!! url("/search_password") !!}'>Search student password</a></li>
+
+
+                                        <li><a href='{!! url("/print/password") !!}'>Print Password Receipt</a></li>
+
+                                        <li><a href='{!! url("/student/resit") !!}'>Resit List</a></li>
+
+
+
+
+
+
+                                    </ul>
+                                </div>
+                            </li>
+
+                            <li data-uk-dropdown class="uk-hidden-small">
+
+
+                                <a href="#"><i class="sidebar-menu-icon material-icons md-18">view_list</i><span>Academics</span></a>
+                                <div class="uk-dropdown uk-dropdown-scrollable">
+                                    <ul class="uk-nav uk-nav-dropdown">
+
+                                        <li><a href='{!! url("/programmes") !!}'>View Programmes</a></li>
+                                        <li><a href='{!! url("staff") !!}'>View Staff</a></li>
+                                      
+                                        <li><a href='{!! url("/courses") !!}'>View Courses</a></li>
+
+                                        <li><a href='{!! url("/mounted_view") !!}'>View Mounted Courses</a></li>
+                                        <li><a href='{!! url("/download_regList") !!}'>Registered</a></li>
+                                        <li><a href='{!! url("/directory") !!}'>Staff Directory</a></li>
+
+
+                                    </ul>
+                                </div>
+                            </li>
+
+                            <li data-uk-dropdown class="uk-hidden-small">
+
+
+                                <a href="#"><i
+                                            class="sidebar-menu-icon material-icons md-18">attach_file</i><span>Data Management</span></a>
+                                <div class="uk-dropdown uk-dropdown-scrollable">
+                                    <ul class="uk-nav uk-nav-dropdown">
+
+
+                                        <li><a href='{!! url("/upload_students") !!}'>Upload bulk Student data</a></li>
+                                        <li><a href='{!! url("/index/upload") !!}'>Upload Index Number</a></li>
+
+                                        <li><a href='{!! url("/upload/courses") !!}'>Upload Bulk Courses</a></li>
+
+                                        <li><a href='{!! url("/resit") !!}'>Upload Resit</a></li>
+                                        <li><a href='{!! url("/getStaffCSV") !!}'>Upload Staff Data</a></li>
+
+
+
+
+
+
+
+                                    </ul>
+                                </div>
+                            </li>
+
+
+
+
+
+
+                        @endif
+
                     @if( @Auth::user()->department=='Tpmid' )
 
                         <li data-uk-dropdown class="uk-hidden-small">
@@ -687,11 +771,15 @@
 
                                     <li><a href='{!! url("/create_grade") !!}'>Create Grading System</a></li>
                                     <li><a href='{!! url("/classes/create") !!}'>Create Classing System</a></li>
-                                    <li><a href='{!! url("/registered_courses") !!}'>Enter Semester Marks</a></li>
+                                    {{--<li><a href='{!! url("/registered_courses") !!}'>Enter Semester Marks</a></li>--}}
                                     <li><a href='{!! url("/create_programme") !!}'>Add Programmes</a></li>
                                     <li><a href='{!! url("/groups/create") !!}'>Create Class Groups</a></li>
                                     <li><a href='{!! url("/create_course") !!}'>Add Courses</a></li>
                                     <li><a href='{!! url("/mount_course") !!}'>Mount Courses</a></li>
+                                    <li><a href='{!! url("/download_registered") !!}'>Download Excel Sheet</a></li>
+                                    <li><a href='{!! url("/upload_marks") !!}'>Upload Semester Marks</a></li>
+                                    <li><a href='{!! url("/legacy") !!}'>Upload Old Results</a></li>
+                                    <li><a href='{!! url("/view/edit") !!}'>View / Edit Results</a></li>
                                     <li><a href='{!! url("/system/registration/batch") !!}'>Bulk Registration</a></li>
 
 
@@ -951,6 +1039,7 @@
                                 <ul class="uk-nav uk-nav-dropdown">
                                     <li><a href='{!! url("/download_registered") !!}'>Download Excel Sheet</a></li>
                                     <li><a href='{!! url("/upload_marks") !!}'>Upload Semester Marks</a></li>
+                                    <li><a href='{!! url("/legacy") !!}'>Upload Old Results</a></li>
                                     <li><a href='{!! url("/view/edit") !!}'>View / Edit Results</a></li>
 
                                 </ul>

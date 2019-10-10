@@ -2930,7 +2930,7 @@ class CourseController extends Controller
                 ));
                 $sheet->prependRow(1, array(' '.' '.' '.' '.' '.$fac3
                 ));
-                $sheet->prependRow(1, array(' '.' '.' '.' '.' TAKORADI TECHNICAL UNIVERSITY'
+                $sheet->prependRow(1, array(' '.' '.' '.' '.' ACCRA BUSINESS COLLEGE'
                 ));
 
                 //$sheet->getHeaderFooter()->setOddHeader('&C&HPlease treat this document as confidential!');
@@ -3422,7 +3422,7 @@ class CourseController extends Controller
                 ));
                 $sheet->prependRow(1, array(' '.' '.' '.' '.' '.$fac3
                 ));
-                $sheet->prependRow(1, array(' '.' '.' '.' '.' TAKORADI TECHNICAL UNIVERSITY'.' ('.$current_time.')'
+                $sheet->prependRow(1, array(' '.' '.' '.' '.' ACCRA BUSINESS COLLEGE'.' ('.$current_time.')'
                 ));
 
                
@@ -3615,7 +3615,7 @@ class CourseController extends Controller
                 ));
                 $sheet->prependRow(1, array(' '.' '.' '.' '.' '.$fac3
                 ));
-                $sheet->prependRow(1, array(' '.' '.' '.' '.' TAKORADI TECHNICAL UNIVERSITY - '.$year2
+                $sheet->prependRow(1, array(' '.' '.' '.' '.' ACCRA BUSINESS COLLEGE - '.$year2
                 ));
 
                
@@ -4006,27 +4006,25 @@ class CourseController extends Controller
        // dd($resultb);
 
         $currentResultsArray1 = explode(',',$currentResultsArray);
-        $year = $currentResultsArray1[0];
+
         $sem = $currentResultsArray1[1];
 
             return view('courses.markUpload')->with('programme', $programme)
-                ->with('courses',$course)->with('level', $sys->getLevelList())->with('year',$year)->with('sem',$sem);
+                ->with('courses',$course)->with('level', $sys->getLevelList())->with('year',$sys->years())->with('sem',$sem);
         }
         else{
             throw new HttpException(Response::HTTP_UNAUTHORIZED, 'This action is unauthorized.');
         }
     }
     public function showFileUploadRegistered(SystemController $sys){
-        if(@\Auth::user()->role=='Lecturer'){
+
             $programme=$sys->getProgramList5();
             $course=$sys->getMountedCourseList3();
 
             return view('courses.downloadRegistered')->with('programme', $programme)->with('courses',$course)
                 ->with('level', $sys->getLevelList())->with('year',$sys->years());
-        }
-        else{
-            throw new HttpException(Response::HTTP_UNAUTHORIZED, 'This action is unauthorized.');
-        }
+
+
     }
 
     public function showFileUploadRegList(SystemController $sys){
@@ -4310,7 +4308,7 @@ class CourseController extends Controller
                 //$level = $request->input('level');
                 $levelsent = $request->input("level");
                 $combine = $request->input("combine");
-                $level = $levelsent.$combine;
+                $level = $levelsent;
                 if ($level == "100MT") {
                    $level = "500MT";
                 }

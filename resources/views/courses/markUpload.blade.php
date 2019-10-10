@@ -39,61 +39,55 @@
                <div class="uk-grid" data-uk-grid-margin>                            
                                   <div class="uk-width-medium-1-6">
                                     <div class="uk-form-row">
-                                        <label class="">Level</label>
+                                        <label class="">Semester</label>
                                         <p></p>
-                   <!-- {{ Form::select('sem', array(''=>'select semester',$sem=>$sem), null, ["required"=>"required",'class' => 'md-input label-fixed','v-model'=>'semester','v-form-ctrl'=>'','v-select'=>'']) }} -->
-                                            <select name="level" id="level" required>
-                                                <option value="" disabled selected>Select Level</option>
-                                                <option value="100">Level 100</option>
-                                                <option value="200">Level 200</option>
-                                                <option value="300">Level 300</option>
-                                                <option value="400">Level 400</option>
-                                             </select>
+
+                                        <select name="sem" id="sem" required>
+                                            <option value="" disabled selected>Select Semester</option>
+                                            <option value="1">Semester 1</option>
+                                            <option value="2">Semester 2</option>
+                                            <option value="3">Semester 3</option>
+
+                                        </select>
+
+
+
                                     </div>
                                   </div>
+
+                   <div class="uk-width-medium-1-6">
+                       <div class="uk-form-row">
+                           <label class="">Level</label>
+                           <p></p>
+                            <select name="level" id="level" required>
+                               <option value="" disabled selected>Select Level</option>
+                               <option value="100">Level 100</option>
+                               <option value="200">Level 200</option>
+                               <option value="300">Level 300</option>
+                               <option value="400">Level 400</option>
+                               <option value="MBA">MBA</option>
+                           </select>
+                       </div>
+                   </div>
+
+
+
+
                                   <div class="uk-width-medium-1-3">
-                                    <div class="uk-form-row">
-                                      <table align="left">
-                                                <tr><td><label>Masters</label><br/><p></p>
-                                                &nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="combine" name="combine" value="MT" required>
-                                                </td>
-                                                <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                                                <td><label>Btech (4yrs)</label><br/><p></p>
-                                                &nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="combine" name="combine" value="BT">
-                                                </td>
-                                                <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                                                <td><label>Btech top up</label><br/><p></p>
-                                                &nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="combine" name="combine" value="BTT">
-                                                </td>
-                                                <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                                                <td><label>HND</label><br/><p></p>
-                                                <input type="radio" id="combine" name="combine" value="H">
-                                                </td>
-                                                <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                                                <td><label>Diploma</label><br/><p></p>
-                                                &nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="combine" name="combine" value="NT">
-                                                </td>
-                                                </tr>
-                                                
-                                            </table>
-                                        <!-- <label>Academic year</label>
-                                        <p></p> -->
-                     <!-- {{ Form::select('year', array(''=>'select year',$year=>$year), null, ["required"=>"required",'class' => 'md-input label-fixed','v-model'=>'year','v-form-ctrl'=>'','v-select'=>'']) }} -->
-                                    </div>
+
+                                        <label>Academic year</label>
+                                        <p></p>
+                                      <select name="year" id="year" required>
+                                          <option value="" disabled selected>Select academic year</option>
+                                          <option value="2018/2019">2018/2019</option>
+                                          <option value="2019/2020">2019/2020</option>
+                                          <option value="2020/2021">2020/2021</option>
+                                          <option value="2021/2022">2021/2022</option>
+                                          <option value="2022/2023">2022/2023</option>
+                                      </select>
+
+
                                   </div>
-                                
-                           <!-- <div class="uk-width-medium-1-4">
-                                <label>Level</label>
-                                <p></p>
-                               {!! Form::select('level', 
-                                ($level ), 
-                                  old("level",""),
-                                    ['class' => 'md-input parent','required'=>"required",'placeholder'=>'select level'] )  !!}
-                     
-                            </div> -->
-                            
-                            
-                        
                         
                             <div class="uk-width-medium-1-6">
                             <div class="uk-form-row">

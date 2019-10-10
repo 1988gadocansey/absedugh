@@ -52,46 +52,16 @@
                                         <div class="uk-form-row">  
                                             <label>Level</label>
                                             <p></p>
-                                            <!-- {!! Form::select('level',
-                                            ($level ),
-                                            old("level",""),
-                                             ['class' => 'md-input parent','required'=>"required",'placeholder'=>'select level'] )  !!} -->
-                                             <select name="level" id="level" required>
+                                            <select name="level" id="level" required>
                                                 <option value="" disabled selected>Select Level</option>
                                                 <option value="100">Level 100</option>
                                                 <option value="200">Level 200</option>
                                                 <option value="300">Level 300</option>
                                                 <option value="400">Level 400</option>
-                                             </select>
+                                                <option value="MBA">MBA</option>
+                                            </select>
 
                                         </div>
-                                    </div>
-                                    <div class="uk-width-medium-1-2">
-                                        <div class="uk-form-row">        
-                                            <table align="left">
-                                                <tr><td><label>Masters</label><br/><p></p>
-                                                &nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="combine" name="combine" value="MT" required>
-                                                </td>
-                                                <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                                                <td><label>Btech (4yrs)</label><br/><p></p>
-                                                &nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="combine" name="combine" value="BT">
-                                                </td>
-                                                <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                                                <td><label>Btech top up</label><br/><p></p>
-                                                &nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="combine" name="combine" value="BTT">
-                                                </td>
-                                                <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                                                <td><label>HND</label><br/><p></p>
-                                                <input type="radio" id="combine" name="combine" value="H">
-                                                </td>
-                                                <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-                                                <td><label>Diploma</label><br/><p></p>
-                                                &nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" id="combine" name="combine" value="NT">
-                                                </td>
-                                                </tr>
-                                                
-                                            </table>
-                                        </div>    
                                     </div>
 
                                 
@@ -126,6 +96,18 @@
 
                                         </div>
                                     </div>
+
+                            <div class="uk-width-medium-1-2">
+                                <div class="uk-form-row">
+                                    <label>Academic Year</label>
+                                    <p></p>
+                                    {!! Form::select('year',
+                                 (['' => 'select year'] +$year ),
+                                   old("year",""),
+                                     ['class' => 'md-input parent','required'=>"required",'placeholder'=>'select year'] )  !!}
+
+                                </div>
+                            </div>
                         </div>
                         <p></p>
                         <table align="center">

@@ -293,7 +293,6 @@ class PasswordController extends Controller
      public function reset(Request $request, SystemController $sys)
 
     {
-      if ($sys->getUserLevel((@\Auth::user()->department),"create_staff") == '1' || $sys->getUserLevel((@\Auth::user()->role),"create_staff") == '1') {
 
          $this->validate($request, [
 
@@ -371,7 +370,7 @@ class PasswordController extends Controller
 
        
 
-    }
+
   }
 
     // show form for edit resource

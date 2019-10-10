@@ -110,7 +110,7 @@
             <div class="uk-grid uk-grid-width-small-1-2 uk-grid-width-large-1-3 uk-grid-width-xlarge-1-5 uk-text-center uk-sortable sortable-handler" id="dashboard_sortable_cards" data-uk-sortable data-uk-grid-margin>
               @if(@Auth::user()->department=='Planning' || @Auth::user()->role=='HOD' || @Auth::user()->department=='top' || @Auth::user()->department=='Rector' || @Auth::user()->role=='Support')        
                 <div>
-                    <a target="_" href='{{url("http://records.ttuportal.com/course_registration")}}'>  
+                    <a target="_" href='{{url("http://23.92.25.212/portal/course_registration")}}'>
                     <div class="md-card md-card-hover md-card-overlay">
                         <div class="md-card-content">
                             <img src="{{url('public/assets/img/dashboard/registration.png')}}"/>
@@ -170,7 +170,7 @@
                 </div>
                       @endif
                  
-                    @if(@Auth::user()->role=='Lecturer' ||  @Auth::user()->role=='HOD')
+                    @if(@Auth::user()->role=='Lecturer' ||  @Auth::user()->role=='HOD' ||  @Auth::user()->role=='rector')
                 <div>
                     <a  href='{{url("/upload_marks")}}'>  
                     <div class="md-card md-card-hover md-card-overlay">
@@ -213,7 +213,7 @@
                     </a>
                 </div>
                     @endif
-                 @if( @Auth::user()->department=='top' ||  @Auth::user()->role=='HOD' || @Auth::user()->department=='Rector' || @Auth::user()->department=='Tpmid' || @Auth::user()->department=='Tptop' || @Auth::user()->department=='Tptop2' || @Auth::user()->department=='Tptop3' || @Auth::user()->department=='Tptop4' || @Auth::user()->department=='Tptop5' || @Auth::user()->department=='Tptop6' || @Auth::user()->role=='Support')
+                 @if( @Auth::user()->department=='top' ||  @Auth::user()->role=='HOD' || @Auth::user()->department=='Rector' || @Auth::user()->department=='Tpmid' || @Auth::user()->department=='Tptop' || @Auth::user()->department=='Tptop2' || @Auth::user()->department=='Tptop3' || @Auth::user()->department=='Tptop4' || @Auth::user()->department=='Tptop5' || @Auth::user()->department=='Tptop6')
                 
                 <div>
                     <a  href='{{url("/mounted_view")}}'>  
@@ -234,7 +234,7 @@
                     </a>
                 </div>
                  @endif
-                 @if( @Auth::user()->department=='top' ||  @Auth::user()->role=='HOD' || @Auth::user()->department=='Rector' || @Auth::user()->department=='Tpmid' || @Auth::user()->department=='Tptop' || @Auth::user()->department=='Tptop2' || @Auth::user()->department=='Tptop3' || @Auth::user()->department=='Tptop4' || @Auth::user()->department=='Tptop5' || @Auth::user()->department=='Tptop6' || @Auth::user()->department=='Planning' || @Auth::user()->role=='Support')
+                 @if( @Auth::user()->department=='top' ||  @Auth::user()->role=='HOD' || @Auth::user()->department=='Rector' || @Auth::user()->department=='Tpmid' || @Auth::user()->department=='Tptop' || @Auth::user()->department=='Tptop2' || @Auth::user()->department=='Tptop3' || @Auth::user()->department=='Tptop4' || @Auth::user()->department=='Tptop5' || @Auth::user()->department=='Tptop6' || @Auth::user()->department=='Planning' )
                 
                 <div>
                     <a  href='{{url("/download_results")}}'>  
@@ -318,7 +318,7 @@
                   
                    
                 @endif
-                
+                  @if( @Auth::user()->role=='Lecturer'  || @Auth::user()->role=='registrar'|| @Auth::user()->role=='admin')
                 <div>
                     <a  href='{{url("/transcript")}}'>  
                     <div class="md-card md-card-hover md-card-overlay">
@@ -337,6 +337,7 @@
                     </div>
                     </a>
                 </div>
+                  @endif
                  
                 
                    @if( @Auth::user()->department=='top')  

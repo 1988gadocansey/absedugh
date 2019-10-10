@@ -109,22 +109,13 @@ class StudentController extends Controller
         }
 
         if (@\Auth::user()->department=="FSupport") {
-            $student = StudentModel::where('PROGRAMMECODE', '!=', '')->whereHas('programme', function($q) {
-                $q->whereHas('departments', function($q) {
-                    $q->whereIn('FACCODE', array(@\Auth::user()->department));
-                });
-            }) ;
+            $student = StudentModel::where("STATUS","In school");
         }
         elseif (@\Auth::user()->department=="Finance") {
             $student = StudentModel::where("STATUS","In school");
         }
         elseif (@\Auth::user()->role=="Support") {
-            $departmentArray=explode(",",@\Auth::user()->department);
-            $student = StudentModel::where('PROGRAMMECODE', '!=', '')->whereHas('programme', function($q)use($departmentArray) {
-                $q->whereHas('departments', function($q)use($departmentArray) {
-                    $q->whereIn('DEPTCODE',  $departmentArray);
-                });
-            }) ;
+            $student = StudentModel::where("STATUS","In school");
         }
         else{
             $student = StudentModel::query()->where("STATUS",$status);

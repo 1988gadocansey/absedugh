@@ -149,12 +149,8 @@ class HomeController extends Controller
         //$resultsem = $currentResultsArray1[1];
 
         if (@\Auth::user()->role=="Support") {
-            $departmentArray=explode(",",@\Auth::user()->department);
-            $studentDetail =Models\StudentModel::where('STATUS','In school')->whereHas('programme', function($q)use($departmentArray) {
-                $q->whereHas('departments', function($q)use($departmentArray) {
-                    $q->whereIn('DEPTCODE',  $departmentArray);
-                });
-            })->sum("BILL_OWING") ;
+            $studentDetail=Models\StudentModel::query()->where('STATUS','In school')->sum("BILL_OWING");
+
         }
         else{
 
@@ -163,12 +159,7 @@ class HomeController extends Controller
 
 
         if (@\Auth::user()->role=="Support") {
-            $departmentArray=explode(",",@\Auth::user()->department);
-            $total =Models\StudentModel::where('STATUS','In school')->whereHas('programme', function($q)use($departmentArray) {
-                $q->whereHas('departments', function($q)use($departmentArray) {
-                    $q->whereIn('DEPTCODE',  $departmentArray);
-                });
-            })->count("ID");
+            $total=@Models\StudentModel::query()->where('STATUS','In school')->count("ID");
         }
         else{
 
@@ -177,12 +168,8 @@ class HomeController extends Controller
 
 
     if (@\Auth::user()->role=="Support") {
-            $departmentArray=explode(",",@\Auth::user()->department);
-            $totalRegistered =Models\StudentModel::where('REGISTERED','1')->where('STATUS','In school')->whereHas('programme', function($q)use($departmentArray) {
-                $q->whereHas('departments', function($q)use($departmentArray) {
-                    $q->whereIn('DEPTCODE',  $departmentArray);
-                });
-            })->count();
+        $totalRegistered =Models\StudentModel::query()->where('REGISTERED','1')->where('STATUS','In school')
+            ->count();
         }
         else{
 

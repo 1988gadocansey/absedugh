@@ -338,61 +338,34 @@ class SystemController extends Controller
 
     public function getProgramByIDList()
     {
-        if (@\Auth::user()->department == 'top' || @\Auth::user()->department == 'Tptop' || @\Auth::user()->role == 'FO') {
 
-            $program = \DB::table('tpoly_programme')->orderBy("PROGRAMME")
-                ->lists('PROGRAMME', 'ID');
-            return $program;
-        } else {
             // $user_department= @\Auth::user()->department;
             $program = \DB::table('tpoly_programme')->orderBy("PROGRAMME")
                 ->lists('PROGRAMME', 'ID');
             return $program;
-        }
+
 
     }
 
     public function getDepartmentByIDList()
     {
 
-        if (@\Auth::user()->role == 'FSupport') {
-            $user_department = @\Auth::user()->department;
-            $department = \DB::table('tpoly_department')->where('FACCODE', $user_department)->orderBy("DEPARTMENT")
-                ->lists('DEPARTMENT', 'ID');
-            return $department;
-        } elseif (@\Auth::user()->role == 'Support') {
-            $user_department = @\Auth::user()->department;
-            $department = \DB::table('tpoly_department')->where('DEPTCODE', $user_department)
-                ->lists('DEPARTMENT', 'ID');
-            return $department;
-        } else {
+
             $department = \DB::table('tpoly_department')->orderBy("DEPARTMENT")
                 ->lists('DEPARTMENT', 'ID');
             return $department;
-        }
+
 
 
     }
 
     public function getDepartmentList()
     {
-        if (@\Auth::user()->role == 'FSupport') {
-            $department = \DB::table('tpoly_department')->where('FACCODE', @\Auth::user()->department)->orderBy("DEPARTMENT")
-                ->lists('DEPARTMENT', 'DEPTCODE');
-            return $department;
-        } elseif (@\Auth::user()->role == 'Support' || @\Auth::user()->role == 'HOD' || @\Auth::user()->role == 'Lecturer') {
-            $department = \DB::table('tpoly_department')->where('DEPTCODE', @\Auth::user()->department)->orderBy("DEPARTMENT")
-                ->lists('DEPARTMENT', 'DEPTCODE');
-            return $department;
-        } elseif (@\Auth::user()->department == 'LA') {
+
             $department = \DB::table('tpoly_department')->orderBy("DEPARTMENT")
                 ->lists('DEPARTMENT', 'DEPTCODE');
             return $department;
-        } else {
-            $department = \DB::table('tpoly_department')->orderBy("DEPARTMENT")
-                ->lists('DEPARTMENT', 'DEPTCODE');
-            return $department;
-        }
+
     }
 
     public function getGradeSystemIDList()
@@ -940,29 +913,11 @@ class SystemController extends Controller
     // this is purposely for select box
     public function getProgramList()
     {
-        $departmentArray = explode(",", @\Auth::user()->department);
-        if (@\Auth::user()->department == 'btech') {
-            $program = \DB::table('tpoly_programme')->where('TYPE', 'BTECH')->orWhere('TYPE', 'MTECH')->orderby("PROGRAMME")
-                ->lists('PROGRAMME', 'PROGRAMMECODE');
-            return $program;
-        } elseif (@\Auth::user()->role == 'FSupport') {
-            $user_school = @\Auth::user()->department;
-            $program = \DB::table('users')->join('tpoly_faculty', 'users.department', '=', 'tpoly_faculty.FACCODE')->join('tpoly_department', 'tpoly_faculty.FACCODE', '=', 'tpoly_department.FACCODE')->join('tpoly_programme', 'tpoly_department.DEPTCODE', '=', 'tpoly_programme.DEPTCODE')->where('users.department', $user_school)->orderby("tpoly_programme.PROGRAMME")->groupby("tpoly_programme.PROGRAMME")->lists('tpoly_programme.PROGRAMME', 'tpoly_programme.PROGRAMMECODE');
-            return $program;
 
-            //SELECT e.PROGRAMMECODE FROM users a join tpoly_faculty c on a.department = c.FACCODE join tpoly_department d on c.FACCODE = d.FACCODE join tpoly_programme e on d.DEPTCODE = e.DEPTCODE WHERE a.department = 'SAA' GROUP by e.PROGRAMMECODE
-
-
-        } elseif (@\Auth::user()->role == 'Support') {
-            // $user_department= @\Auth::user()->department;
-            $program = \DB::table('tpoly_programme')->whereIn('DEPTCODE', $departmentArray)->orderby("PROGRAMME")
-                ->lists('PROGRAMME', 'PROGRAMMECODE');
-            return $program;
-        } else {
             $program = \DB::table('tpoly_programme')->orderby("PROGRAMME")
                 ->lists('PROGRAMME', 'PROGRAMMECODE');
             return $program;
-        }
+
 
     }
 
@@ -970,24 +925,11 @@ class SystemController extends Controller
     // this is purposely for select box
     public function getProgramList5()
     {
-        $departmentArray = explode(",", @\Auth::user()->department);
 
-        if (@\Auth::user()->role == 'FSupport') {
-            $user_school = @\Auth::user()->department;
-            $program = \DB::table('tpoly_programme')->join('tpoly_department', 'tpoly_department.DEPTCODE', '=', 'tpoly_programme.DEPTCODE')->where('tpoly_department.FACCODE', $user_school)->orderby("tpoly_programme.PROGRAMME")->lists('tpoly_programme.PROGRAMME', 'tpoly_programme.PROGRAMMECODE');
-            return $program;
-
-
-        } elseif (@\Auth::user()->role == 'Support') {
-            // $user_department= @\Auth::user()->department;
             $program = \DB::table('tpoly_programme')->orderby("PROGRAMME")
                 ->lists('PROGRAMME', 'PROGRAMMECODE');
             return $program;
-        } else {
-            $program = \DB::table('tpoly_programme')->orderby("PROGRAMME")
-                ->lists('PROGRAMME', 'PROGRAMMECODE');
-            return $program;
-        }
+
 
     }
 
@@ -1021,7 +963,7 @@ class SystemController extends Controller
             }
 
         } else {
-            for ($i = 2019; $i <= 3030; $i++) {
+            for ($i = 2010; $i <= 3030; $i++) {
                 $year = $i - 1 . "/" . $i;
                 $years[$year] = $year;
             }
