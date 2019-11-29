@@ -156,6 +156,8 @@ Route::group(['middleware' => ['web']], function () {
     Route::get('/edit_student/{id}/id', 'StudentController@edit');
     Route::post('/edit_student/{id}/id', 'StudentController@update');
 
+    Route::delete('/student/delete', 'StudentController@destroy');
+
     // routes for learning
     Route::get('autocomplete', 'SearchController@index');
     Route::get('clone', function () {

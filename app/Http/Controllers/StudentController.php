@@ -151,7 +151,7 @@ class StudentController extends Controller
 
         if ($request->has('search') && trim($request->input('search')) != "") {
             // dd($request);
-            $student->where($request->input('by'), "LIKE", "%" . $request->input("search", "") . "%");
+            $student->where("INDEXNO", "LIKE", "%" . $request->input("search", "") . "%")->orWhere("NAME", "LIKE", "%" . $request->input("search", "") . "%");;
         }
         if ($request->has('program') && trim($request->input('program')) != "") {
             $student->where("PROGRAMMECODE", $request->input("program", ""));
@@ -1239,9 +1239,17 @@ class StudentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        $query=Models\StudentModel::where("id",$request->id)->delete();
+        if($query){
+            return redirect('/students')->with('success','Student deleted successfully');
+
+        }
+        else{
+            return redirect('/students')->with('error','Error deleting student');
+
+        }
     }
 
     public function sendOwingSMS(Request $request, SystemController $sys) {

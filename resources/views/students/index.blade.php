@@ -161,14 +161,7 @@
                             </div>
                         </div>
                         @if(@\Auth::user()->role=='Dean' || @\Auth::user()->department=="Tpmid" || @\Auth::user()->department=="Tptop" || @\Auth::user()->department=="Tptop2"|| @\Auth::user()->department=="Tptop3"|| @\Auth::user()->department=="Tptop4"|| @\Auth::user()->department=="Tptop5"|| @\Auth::user()->department=="Tptop6"|| @\Auth::user()->department=="Finance" || @\Auth::user()->department=="Rector" || @\Auth::user()->role=="Rector" || @\Auth::user()->department=="Registrar" || @\Auth::user()->department=="Admissions" ||  @\Auth::user()->department=="Planning"  || @\Auth::user()->role=="Accountant" || @\Auth::user()->department == 'Examination' || @\Auth::user()->role == 'Admin' || @\Auth::user()->department == 'top')
-                            <div class="uk-width-medium-1-5">
-                                <div class="uk-margin-small-top">
-                                    {!! Form::select('hall',
-                                    (['' => 'Search by Halls'] +$halls  ),
-                                    old("hall",""),
-                                    ['class' => 'md-input parent','id'=>"parent"] )  !!}
-                                </div>
-                            </div>
+
                             <div class="uk-width-medium-1-5">
                                 <div class="uk-margin-small-top">
                                     {!! Form::select('nationality',
@@ -229,48 +222,16 @@
 
                             </div>
                         </div>
-                        <div class="uk-width-medium-1-5">
-                            <div class="uk-margin-small-top">
 
-                                {!!  Form::select('qa', array('1'=>'Students who have access their lecturers','0' => 'Students yet to access'), null, ['placeholder' => 'Quality Assurance Status','id'=>'parent','class'=>'md-input parent'],old("qa","")); !!}
 
-                            </div>
-                        </div>
-                        @if(@\Auth::user()->department=='LA')
-                        <div class="uk-width-medium-1-5">
-                            <div class="uk-margin-small-top">
 
-                                {!!  Form::select('as', array('1'=>'Students who filled assumption of duty','0' => 'Students yet to fill assumption'), null, ['placeholder' => 'Assumption of duty status','id'=>'parent','class'=>'md-input parent'],old("as","")); !!}
-
-                            </div>
-                        </div>
-                        <div class="uk-width-medium-1-5">
-                            <div class="uk-margin-small-top">
-
-                                {!!  Form::select('la', array('1'=>'Printed attachment letter','0' => 'Students yet to print letter'), null, ['placeholder' => 'Industrial Attachment Letter','id'=>'parent','class'=>'md-input parent'],old("la","")); !!}
-
-                            </div>
-                        </div>
-
-                        @endif
-                        <div class="uk-width-medium-1-5">
-                            <div class="uk-margin-small-top">
-
-                                {!!  Form::select('by', array('INDEXNO'=>'Search by Index Number','STNO'=>'Search by Admission Number','NAME'=>'Search by Name','required'=>''), null, ['placeholder' => 'select search type','class'=>'md-input'], old("","")); !!}
-                            </div>
-                        </div>
                         <div class="uk-width-medium-1-5">
                             <div class="uk-margin-small-top">
                                 <input type="text" style=" " required="" name="search" class="md-input"
                                     placeholder="search student by index number or name">
                             </div>
                         </div>
-                        <div class="uk-width-medium-1-5">
-                            <div class="uk-margin-small-top">
-                                <input type="text" style=" " required="" name="pay" class="md-input"
-                                    placeholder="search student by payment">
-                            </div>
-                        </div>
+
 
 
                     </div>
@@ -305,7 +266,6 @@
                             <th data-priority="6">NAME</th>
                             <th>PHOTO</th>
                             <th>INDEX N<u>O</u></th>
-                            <th>STUDENT N<u>O</u></th>
 
 
                             <th>PROGRAM</th>
@@ -329,11 +289,7 @@
                                 <th>PASSWORD</th>
                             @endif
                             <th>YEAR GROUP</th>
-                            @if( @\Auth::user()->department=="LA")
-                                <th>ATTACHMENT FORM</th>
-                                <th>ASSUMPTION OF DUTY</th>
-                                @endif
-                            <th>QUALITY ASSURANCE</th>
+
 
 
                             <th>STATUS</th>
@@ -375,7 +331,7 @@
 
                 </td>
                 <td> {{ @$row->INDEXNO }}</td>
-                <td> {{ @$row->STNO }}</td>
+
 
                 <td>{!! strtoupper(@$row->program->PROGRAMME) !!}</td>
                 <td> {{ strtoupper(@$row->levels->slug) }}</td>
@@ -398,45 +354,24 @@
                     <td> {{ @$sys->getStudentPassword(@$row->INDEXNO) }}</td>
                 @endif
                 <td> {{ @$row->GRADUATING_GROUP }}</td>
-               @if( @\Auth::user()->department=="LA")
-                <td>
-                    @if($row->LIAISON=='1')
-                        Form filled
-                    @else
-                        Form pending
-                    @endif
 
 
-                </td>
-                    <td>
-                        @if($row->ASSUMPTION_DUTY=='1')
-                            Assumed duty
-                        @else
-                           Assumption of duty pending
-                        @endif
-
-
-                    </td>
-                @endif
-                <td>
-                    @if($row->QUALITY_ASSURANCE=='1')
-                        Yes
-                    @else
-                        No
-                    @endif
-
-                </td>
 
 
                 <td> {{ strtoupper(@$row->STATUS) }}</td>
-                @if( @\Auth::user()->department=="Tptop"  || @\Auth::user()->department=="Tptop2"|| @\Auth::user()->department=="Tptop3"|| @\Auth::user()->department=="Tptop4"|| @\Auth::user()->department=="Tptop5"|| @\Auth::user()->department=="Tpmid")
 
                     <td>
-                        <a href='{{url("edit_student/$row->ID/id")}}'>Edit</a>
-                        <a onclick="return MM_openBrWindow('{{url("/student_show/$row->ID/id")}}', 'mark', 'width=800,height=500')">View</a>
 
+                        <a  class="md-btn  md-btn-success md-btn-small" onclick="return MM_openBrWindow('{{url("/student_show/$row->ID/id")}}', 'mark', 'width=800,height=500')">View</a>
+
+                        {!!Form::open(['action' =>['StudentController@destroy', 'id'=>$row->ID], 'method' => 'DELETE','name'=>'c' ,'style' => 'display: inline;'])  !!}
+
+                        <a href='{{url("edit_student/$row->ID/id")}}' class="md-btn  md-btn-primary md-btn-small   md-btn-wave-light waves-effect waves-button waves-light" >Edit</a>
+                        <button type="submit" onclick="return confirm('Are you sure you want to delete   {{$row->NAME}}')" class="md-btn  md-btn-danger md-btn-small   md-btn-wave-light waves-effect waves-button waves-light" ><i  class="sidebar-menu-icon material-icons md-18">delete</i></button>
+
+                        {!! Form::close() !!}
                     </td>
-                    @endif
+
 
                     </tr>
                     @endforeach
