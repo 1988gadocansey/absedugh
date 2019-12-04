@@ -169,7 +169,7 @@ class FormController extends Controller
             ->with("data",$query);
          }
          else{
-               return redirect("upload/photo")->with("error", " <span style='font-weight:bold;font-size:13px;'>Whoops $applicant upload your photo</span> ");
+               return redirect("upload/photo")->with("error", " <span style='font-weight:bold;font-size:13px;'>Whoops kk upload your photo</span> ");
           
          }
           

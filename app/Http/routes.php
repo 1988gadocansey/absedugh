@@ -216,6 +216,7 @@ Route::group(['middleware' => ['web']], function () {
          'getIndex' => 'view_payments',
 
      ]);*/
+
     Route::get('/view_payments', 'PaymentController@payments');
     Route::get('/view_payments_master', 'FeeController@masterLedger');
     // this route will process both get and post so am using route match
@@ -353,8 +354,15 @@ Route::group(['middleware' => ['web']], function () {
 
 
     Route::get('/view_payments_master', 'FeeController@masterLedger');
-    Route::get('/createproduct', "PaymentProductController@createPaymentItem");
-    Route::post('/createproduct', "PaymentTransactonsController@savePaymentItem");
+
+
+    Route::get('/payment/items/create', 'PaymentProductController@createPaymentItem');
+    Route::post('payment_items_save', 'PaymentProductController@save_product')->name("save_item");
+    Route::get('/payment/items/index', 'PaymentProductController@view_products');
+    Route::delete('/item_delete', 'PaymentProductController@destroy');
+
+    Route::get('/viewproduct/{id}', "PaymentProductController@view_product");
+    Route::post('/viewproduct/{id}', "PaymentProductController@update_product");
     // system settings
 
     Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');

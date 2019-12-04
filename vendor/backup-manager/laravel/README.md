@@ -1,4 +1,4 @@
-# Laravel Driver for the Database Backup Manager 1.3.1
+# Laravel Driver for the Database Backup Manager
 
 This package pulls in the framework agnostic [Backup Manager](https://github.com/backup-manager/backup-manager) and provides seamless integration with **Laravel**.
 
@@ -88,6 +88,12 @@ php artisan vendor:publish --provider="BackupManager\Laravel\Laravel5ServiceProv
 ```
 
 The Backup Manager will make use of Laravel's database configuration. But, it won't know about any connections that might be tied to other environments, so it can be best to just list multiple connections in the `config/database.php` file.
+
+We can also add extra parameters on our backup manager commands by configuring extra params on `.env` file:
+
+```
+BACKUP_MANAGER_EXTRA_PARAMS="--column-statistics=0 --max-allowed-packet"
+```
 
 #### Lumen Configuration
 

@@ -11,7 +11,17 @@ class PaymentProductController extends Controller {
 
 	public $assets_load_list = array("Bill Payment" => "loadcustomers", "eVoucher" => "loadevouchers", "eTicket" => "loadetickets");
 	public $assets_view_list = array("Bill Payment" => "viewbillassets", "eVoucher" => "viewevoucherassets", "eTicket" => "vieweticketassets");
+    public function __construct()
 
+    {
+
+        $this->middleware('auth');
+
+
+
+
+
+    }
     
     
     public function show_query() {
@@ -80,13 +90,15 @@ class PaymentProductController extends Controller {
 
 	public function view_products(Request $request) {
 
+
 		$query = Models\PaymentProduct::query();
 		$query = $this->add_params_to_product_search($request, $query);
+
 
 		$paymentproducts = $query->orderBy("purpose", "asc")
                 ->orderBy("payment_name", "asc")->paginate(50);
 		$request->flash();
-		return view('payments.viewpaymentproducts')->with("paymentproducts", $paymentproducts)->with("assets_load_list", $this->assets_load_list)->with("assets_view_list", $this->assets_view_list)->with("search_url", "viewbillpayment");
+		return view('ePayments.viewpaymentproducts')->with("paymentproducts", $paymentproducts)->with("assets_load_list", $this->assets_load_list)->with("assets_view_list", $this->assets_view_list)->with("search_url", "viewbillpayment");
 	}
 
 	public function view_evouchers(Request $request) {
@@ -104,12 +116,12 @@ class PaymentProductController extends Controller {
 	 * @param  Request  $request
 	 * @return Response
 	 */
-	
 
-	public function view_evoucher_assets(Request $request, $product_id) {		
-	
+
+	public function view_evoucher_assets(Request $request, $product_id) {
+
         $query = Models\Evouchers::where("product_id", $product_id);
- 
+
 		$query = $this->add_params_to_serials_assets_search($request, $query);
         //add serial to query since etickets have serial and pin
         $query->orWhere(function($query)use($request){
@@ -119,31 +131,31 @@ class PaymentProductController extends Controller {
 		$paymentproducts = $query->orderBy("date_sold", "desc")->orderBy("receiptno", "asc")
                             ->with("product_info")->paginate(50);
 
-		$request->flash();        
-        
+		$request->flash();
+
 		return view('payments.evoucherassets')->with("paymentproducts", $paymentproducts)
                 ->with("product_id",$product_id);
 	}
-    
-    
+
+
     public function view_eticket_assets(Request $request, $product_id) {
-        
+
 		$query = Models\Etickets::where("product_id", $product_id);
-         
-		$query = $this->add_params_to_serials_assets_search($request, $query);        
+
+		$query = $this->add_params_to_serials_assets_search($request, $query);
 
 		$paymentproducts = $query->orderBy("date_sold", "desc")->orderBy("receiptno", "asc")->with("product_info")->paginate(50);
 
-		$request->flash();        
-        
+		$request->flash();
+
 		return view('payments.eticketassets')->with("paymentproducts", $paymentproducts)->with("product_id",$product_id);
 	}
-    
-    
+
+
      public function view_billpayment_assets(Request $request, $product_id) {
-        
+
 		$query = Models\BillCustomers::where("product_id", $product_id);
-         
+
 //		if ($request->has('date1')) {
 //			$query->where("date_sold", ">=", $request["date1"]);
 //		}
@@ -156,19 +168,19 @@ class PaymentProductController extends Controller {
 			$query->where(function ($query) use ($search) {
 				$query->orWhere("indexno", "like", "%$search%");
 				$query->orWhere("program", "like", "%$search%");
-				$query->orWhere("level", "like", "%$search%");				
+				$query->orWhere("level", "like", "%$search%");
 				$query->orWhere("name", "like", "%$search%");
-				$query->orWhere("phone", "like", "%$search%");				
+				$query->orWhere("phone", "like", "%$search%");
 			});
 		}
 
 		$paymentproducts = $query->orderBy("lastpaid", "desc")->orderBy("name", "asc")->with("product_info")->paginate(50);
 
-		$request->flash();        
-        
+		$request->flash();
+
 		return view('payments.billpaymentassets')->with("paymentproducts", $paymentproducts)->with("product_id",$product_id);
 	}
-    
+
 
 	public function createPaymentItem(Request $request) {
 		//$purposes = Models\Purpose::lists("purpose", "purpose");
@@ -177,7 +189,7 @@ class PaymentProductController extends Controller {
 
 	}
 
-	public function save_product(Requests\PaymentProductRequest $request) {
+	public function save_product(Request $request) {
 		// $paymentproduct = new \stdClass;
 		$paymentproduct = new Models\PaymentProduct();
 
@@ -191,25 +203,26 @@ class PaymentProductController extends Controller {
 		$paymentproduct->default_value = $request["default_value"];
 		$paymentproduct->payment_period = $request["payment_period"];
         $paymentproduct->cot = $request["cot"];
+        $paymentproduct->createdBy = \Auth::user()->id;
 		$paymentproduct->usage_instruction = $request["usage_instruction"];
 
 		if (!$paymentproduct->save()) {
 			return redirect("createproduct")->withErrors()->withInput()->with("errors", array("Error!Unable to save payment product"));
 		}
 
-		return redirect("viewproduct/" . $paymentproduct->id)->with("messages", array("Successfully saved Payment Product, $paymentproduct->payment_name"));
+		return redirect("/payment/items/index")->with("success",  "Successfully saved Payment Product");
 
 	}
-    
+
     public function view_product(Request $request, $id) {
 		$paymentproduct = Models\PaymentProduct::where("id", $id)->firstOrFail();
-		$purposes = Models\Purpose::lists("purpose", "purpose");
+		#$purposes = Models\Purpose::lists("purpose", "purpose");
 
-		return view('payments.paymentproductform')->with("paymentproduct", $paymentproduct)->with("purposes", $purposes);
+		return view('ePayments.paymentproductform')->with("paymentproduct", $paymentproduct);
 
 	}
     
-    public function update_product(Requests\PaymentProductRequest $request,$id) {
+    public function update_product(Request $request,$id) {
 		// $paymentproduct = new \stdClass;
 //		$paymentproduct = new Models\PaymentProduct();
         $paymentproduct = Models\PaymentProduct::where("id", $id)->firstOrFail();
@@ -233,6 +246,18 @@ class PaymentProductController extends Controller {
         return redirect("viewproduct/" . $paymentproduct->id)->with("messages", array("Successfully updated Payment Product, $paymentproduct->payment_name"));
 
 	}
+
+    public function destroy(Request $request)
+    {
+        //dd($request->input("id"));
+
+
+        Models\PaymentProduct::where('id',$request->input("id"))->delete();
+
+        return redirect("/payment/items/index")->with("success",  "Successfully deleted Payment Product");
+
+
+    }
 
 }
 

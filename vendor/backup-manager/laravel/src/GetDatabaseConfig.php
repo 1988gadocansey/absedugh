@@ -38,6 +38,7 @@ trait GetDatabaseConfig
                 'database' => $connection['database'],
                 'ignoreTables' => $connection['driver'] === 'mysql' && isset($connection['ignoreTables'])
                     ? $connection['ignoreTables'] : null,
+                'extraParams' => config('backup-manager.command-extra-params'),
             ];
         }, $connections);
         return new Config($mapped);

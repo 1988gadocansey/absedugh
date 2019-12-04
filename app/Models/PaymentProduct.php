@@ -15,6 +15,6 @@ class PaymentProduct extends Model
    //      return $this->hasOne('App\Models\College', "ccode","college");
    //  }
 
-
+    public $timestamps = false;
 }
 

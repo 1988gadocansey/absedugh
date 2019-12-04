@@ -22,7 +22,7 @@
                         <div  class=" uk-margin-bottom-remove" >
                             
                             <img src='{{url("public/assets/img/logo.png")}}' style="float:left;width:200px;height: auto; margin-top: -20;"/>
-                            <h3>Directorate of Finance - {!! $transaction->FEE_TYPE !!}  Receipt</h3></div>
+                            <h3>Finance Department - {!! $transaction->FEE_TYPE !!}  Receipt</h3></div>
                               <P></P>
                               <span class="uk-text-bold">Total academic year fees GHC{!!  @$student->BILLS!!}</span>
                          
@@ -84,7 +84,7 @@
 
                                 </div>&nbsp;&nbsp;&nbsp;&nbsp;</strong></td>
               <td colspan="3" align="center">&nbsp;
-                <div style="width:90%">Goto records.ttuportal.com and register for the semester <br/><br/>Your Username is <b>{!! @$student->INDEXNO!!}</b> And your Password is <b>{!! @$sys->getStudentPassword(@$student->INDEXNO)!!}</b></div></div></td>
+                <div style="width:90%">Goto http://23.92.25.212/portal/ and register for the semester <br/><br/>Your Username is <b>{!! @$student->INDEXNO!!}</b> And your Password is <b>{!! @$sys->getStudentPassword(@$student->INDEXNO)!!}</b></div></div></td>
             </tr>
            
             <?php  \Session::forget('students');?>

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php declare (strict_types = 1);
 
 /**
  * @license Apache 2.0
@@ -54,7 +54,7 @@ abstract class AbstractAnnotation implements JsonSerializable
      *   'required' => 'boolean', // true or false
      *   'tags' => '[string]', // array containing strings
      *   'in' => ["query", "header", "path", "formData", "body"] // must be one on these
-     *   'oneOf' => ['OpenApi\Annotation\Schema'] //array of schema objects
+     *   'oneOf' => [Schema::class] // array of schema objects
      *
      * @var array
      */
@@ -63,9 +63,9 @@ abstract class AbstractAnnotation implements JsonSerializable
     /**
      * Declarative mapping of Annotation types to properties.
      * Examples:
-     *   'OpenApi\Annotation\Info' => 'info', // Set @OA\Info annotation as the info property.
-     *   'OpenApi\Annotation\Parameter' => ['parameters'],  // Append @OA\Parameter annotations the parameters array.
-     *   'OpenApi\Annotation\PathItem' => ['paths', 'path'],  // Append @OA\PathItem annotations the paths array and use path as key.
+     *   Info::clas => 'info', // Set @OA\Info annotation as the info property.
+     *   Parameter::clas => ['parameters'],  // Append @OA\Parameter annotations the parameters array.
+     *   PathItem::clas => ['paths', 'path'],  // Append @OA\PathItem annotations the paths array and use path as key.
      *
      * @var array
      */
@@ -233,11 +233,14 @@ abstract class AbstractAnnotation implements JsonSerializable
      *
      * @return string
      */
-    public function toYaml()
+    public function toYaml($flags = null)
     {
-        return Yaml::dump(json_decode($this->toJson(0)), 10, 2, Yaml::DUMP_OBJECT_AS_MAP ^ Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE);
+        if ($flags === null) {
+            $flags = Yaml::DUMP_OBJECT_AS_MAP ^ Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE;
+        }
+        return Yaml::dump(json_decode($this->toJson(0)), 10, 2, $flags);
     }
-    
+
     /**
      * Generate the documentation in YAML format.
      *
@@ -400,7 +403,7 @@ abstract class AbstractAnnotation implements JsonSerializable
                 try {
                     $parents[0]->ref($this->ref);
                 } catch (Exception $exception) {
-                    Logger::notice($exception->getMessage().' for '.$this->identity().' in '.$this->_context);
+                    Logger::notice($exception->getMessage() . ' for ' . $this->identity() . ' in ' . $this->_context);
                 }
             }
         } else {
@@ -472,7 +475,7 @@ abstract class AbstractAnnotation implements JsonSerializable
             if ($value === null || is_scalar($value) || in_array($field, $blacklist)) {
                 continue;
             }
-            $ref = $baseRef !== '' ? $baseRef.'/'.urlencode((string)$field) : urlencode((string)$field);
+            $ref = $baseRef !== '' ? $baseRef . '/' . urlencode((string)$field) : urlencode((string)$field);
             if (is_object($value)) {
                 if (method_exists($value, 'validate')) {
                     if (!$value->validate($parents, $skip, $ref)) {

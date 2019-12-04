@@ -213,6 +213,7 @@
                                       <th>BANK</th>
                                       
                                     <th>AMOUNT</th>
+                                    <th>PAYMENT TYPE</th>
                                       <th>RECEIPT</th>
                                       
                                       <th>BANK DATE</th>
@@ -237,6 +238,7 @@
                                             <td> {{ @$row->bank->NAME }}</td>
                                             
                                                <td> {{ @$row->AMOUNT }}</td>
+                                                <td> School Fees</td>
                                             <td> {{ @$row->RECEIPTNO }}</td>
                                            
                                             <td> {{ date('d-M-y',@strtotime($row->BANK_DATE) )}}</td>

@@ -30,6 +30,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/jlapp/swaggervel" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/khill/lavacharts" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/knplabs/knp-snappy" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/kylekatarnls/update-helper" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/landish/pagination" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/laracasts/flash" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/laravel/framework" />

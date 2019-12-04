@@ -9,6 +9,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\FeeModel;
+use App\Models;
 
 use App\Models\FeePaymentModel;
 
@@ -192,7 +193,7 @@ class PaymentController extends Controller
 
 
 
-         
+         $items=Models\PaymentProduct::all();
 
 
 
@@ -319,6 +320,7 @@ class PaymentController extends Controller
                         ->with('bank', $control->banks())
 
                         ->with('users', $sys->getUsers())
+                        ->with('items', $items)
 
                         ->with('total', $totals);
 

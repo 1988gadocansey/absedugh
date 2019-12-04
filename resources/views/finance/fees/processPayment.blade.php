@@ -32,7 +32,8 @@
     <h4 class="heading_b uk-margin-bottom">Fee Payments</h4>
 
     <h4 class="uk-text-bold uk-text-danger">Allow pop ups on your browser please!</h4>
-
+    <p class="uk-text-primary uk-text-bold uk-text-small">Hotlines 0505284060, 0246091283</p>
+    
     <hr>
 
     <form id='form' method="POST" action="{{ url('processPayment') }}" accept-charset="utf-8"  name="applicationForm"  v-form>
@@ -45,7 +46,7 @@
                     <div class="md-card-content">
                         <div class="uk-overflow-container">
                             <table>
-                                <tr>
+                              {{--  <tr>
                                     <td  align=""> <div  align="right" class="uk-text-success">Update Level/Year</div></td>
                                     <td>
 
@@ -54,21 +55,6 @@
 
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td  align=""> <div  align="right" class=" ">Payment Type</div></td>
-                                    <td>
-                                        <select name="payment_detail" required="" class="md-input" v-form-ctrl='' v-model='payment_detail' v-select=''>
-                                            <option>Select payment type</option>
-                                            <option value="Transcript">Transcript</option>
-
-
-                                        </select>
-                                        <p class="uk-text-danger uk-text-small"  v-if="applicationForm.payment_detail.$error.required" >Payment type is required</p>
-
-
-                                    </td>
-                                </tr>
-
 
                                 <tr>
                                     <td  align=""> <div  align="right" class="uk-text-success">Amount Paying GHC</div></td>
@@ -79,14 +65,75 @@
 
                                     </td>
                                 </tr>
+--}}
+                                <tr>
+                                    <td  align=""> <div  align="right" class="uk-text-primary">Previous owing (if any) GHC</div></td>
+                                    <td>
+                                        <input type="text" value= "{{ $data[0]->BALANCE}}" disabled="" readonly="readonly"  name="prev-owing"   class="md-input">
+
+
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td  align=""> <div  align="right" class="uk-text-primary">Current fees GHC</div></td>
+
+                                    <td>  <input type="text" 
+                                        @if($data[0]->STATUS=="Alumni")
+                                                 value=   "0"
+                                                @else
+                                                   value= {{ @$currentFees}}
+                                                @endif
+                                         disabled="" readonly="readonly"   name="currentfees"   class="md-input">
+
+
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td  align=""> <div  align="right" class="uk-text-primary">Total bill GHC</div></td>
+                                    <td>
+                                        <input type="text" @if($data[0]->STATUS=="Alumni")
+                                                 value=   "{{$data[0]->BALANCE}}"
+                                                @else
+                                                   value= "{{@$currentFees + $data[0]->BALANCE}}"
+                                                @endif 
+                                                   name="totalbill2" id="totalbill2" readonly="readonly" disabled="" class="md-input">
+                                        <input type="hidden" id="totalbill" onkeyup="recalculateSum();" name="totalbill" value="{{@$currentFees + $data[0]->BALANCE}}"/>
+
+
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td  align=""> <div  align="right" class="uk-text-primary">Total amount paid GHC</div></td>
+                                    <td>
+                                        <input type="text" value= "{{@$financeSum}}" disabled="" readonly="readonly"  name="financesum2"  id="financesum2" class="md-input">
+                                        <input type="hidden" id="financesum" onkeyup="recalculateSum();" name="financesum" value="{{@$financeSum}}"/>
+
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td align=""> <div  align="right" class="uk-text-primary">Balance GHC</div></td>
+                                    <td>
+                                        <input type="text" value= "{{$data[0]->BILL_OWING}}"    name="owebill2" id="owebill2" readonly="readonly" disabled="" class="md-input">
+                                       
 
 
 
+                                    </td>
+                                </tr>
+
+                            {{--    <tr>
+                                    <td align=""> <div  align="right" class="uk-text-primary">Balance GHC</div></td>
+                                    <td>
+                                        <input type="text"  disabled="" name="amount_left"  id="amount_left" onload="recalculateSum();" onkeyup="recalculateSum();" readonly="readonly"   class="md-input">
 
 
 
-
-
+                                    </td>
+                                </tr>
                                 <tr>
                                     <td  align=""> <div  align="right" >Date of Payment at bank</div></td>
                                     <td>
@@ -113,7 +160,7 @@
                                 </tr>
 
                                 <tr>
-                                    <td  align=""> <div  align="right" class=" ">Payment Method</div></td>
+                                    <td  align=""> <div  align="right" class=" ">Payment Type</div></td>
                                     <td>
                                         <select name="payment_detail" required="" class="md-input" v-form-ctrl='' v-model='payment_detail' v-select=''>
                                             <option>Select payment type</option>
@@ -142,14 +189,14 @@
 
 
                                     </td>
-                                </tr>
+                                </tr>  --}}
                             </table>
                             <p></p>
 
                             <center>
 
-                                  <button  v-show="applicationForm.$valid" type="submit" class="md-btn md-btn-primary"><i class="fa fa-save" ></i>Submit</button>
-
+                                {{--   <button  v-show="applicationForm.$valid" type="submit" class="md-btn md-btn-primary"><i class="fa fa-save" ></i>Submit</button>
+                             --}}
 
                             </center>
                         </div>
@@ -282,7 +329,7 @@
 
                                     <tr align="">
                                          
-                                        <td> {{ $finance->perPage()*($finance->currentPage()-1)+($index+1) }} </td>
+                                        <td> {{ @$finance->perPage()*(@$finance->currentPage()-1)+($index+1) }} </td>
                                         <td> {{ strtoupper($data[0]->NAME) }}</td>
 
                                         <td> {{ strtoupper(@$row->BANK_DATE) }}</td>
@@ -294,14 +341,14 @@
                                                       <td>
                                                   
                                                       <a onclick="return MM_openBrWindow('{{url("printreceipt/" . trim(@$row->RECEIPTNO))}}', 'mark', 'width=800,height=500')" ><i title='Click to print receipt of this payment .. please allow popups on browser' class="md-icon material-icons">book</i></a> 
-
+                           {{-- 
                                                  {!!Form::open(['action' =>['FeeController@destroyPayment', 'id'=>$row->ID], 'method' => 'DELETE','name'=>'myform' ,'style' => 'display: inline;'])  !!}
 
                                                     <button type="submit" onclick="return confirm('Are you sure you want to delete this payment??')" class="md-btn  md-btn-danger md-btn-small   md-btn-wave-light waves-effect waves-button waves-light" ><i  class="sidebar-menu-icon material-icons md-18">delete</i></button>
                                                         <input type='hidden'   value='{{$row->ID}}'/>  
                                                      {!! Form::close() !!}
 
-
+                                                 --}}
                                             </td>   
                                     </tr>
                                     @endforeach

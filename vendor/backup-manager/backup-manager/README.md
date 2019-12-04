@@ -1,4 +1,4 @@
-# Database Backup Manager 1.2
+# Database Backup Manager
 
 [![Latest Stable Version](https://poser.pugx.org/backup-manager/backup-manager/version.png)](https://packagist.org/packages/backup-manager/backup-manager)
 [![License](https://poser.pugx.org/backup-manager/backup-manager/license.png)](https://packagist.org/packages/backup-manager/backup-manager)
@@ -27,10 +27,6 @@ This package provides a framework-agnostic database backup manager for dumping t
 - [Contribution Guidelines](#contribution-guidelines)
 - [Maintainers](#maintainers)
 - [License](#license)
-
-### Stability Notice
-
-It's stable enough, you'll need to understand permissions.
 
 ### Quick and Dirty
 
@@ -137,6 +133,27 @@ It's stable enough, you'll need to understand permissions.
     'timeout' => 10,
     'privateKey' => '',
 ],
+'flysystem' => [
+    'type' => 'Flysystem',
+    'name => 's3_backup',
+    //'prefix' => 'upload',
+],
+'doSpaces' => [
+  'type' => 'AwsS3',
+  'key' => '',
+  'secret' => '',
+  'region' => '',
+  'bucket' => '',
+  'root' => '',
+  'endpoint' => '',
+],
+'webdav' => [
+    'type' => 'Webdav',
+    'baseUri' => 'http://myserver.com',
+    'userName' => '',
+    'password' => '',
+    'prefix' => '',
+],
 ```
 
 **Backup to / restore from any configured database.**
@@ -199,6 +216,9 @@ composer require league/flysystem-rackspace
 
 # to support sftp
 composer require league/flysystem-sftp
+
+# to support webdav (supported by owncloud nad many other)
+composer require league/flysystem-webdav
 ```
 
 ### Usage
@@ -208,6 +228,7 @@ Once installed, the package must be bootstrapped (initial configuration) before 
 We've provided a native PHP example [here](https://github.com/backup-manager/backup-manager/tree/master/examples).
 
 The required bootstrapping can [be found in the example here](https://github.com/backup-manager/backup-manager/blob/master/examples/standalone/bootstrap.php).
+
 
 ### Contribution Guidelines
 

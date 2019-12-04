@@ -1465,14 +1465,9 @@ class StudentController extends Controller
                         //dd($data);
                         //freshers
                         //dd($item->studentId);
-                        $indexno=$item->studentid;
-                        if(substr($indexno,0,1)==7){
-                            $indexno="0".$indexno;
-                        }
-
-                        else {
-                            $indexno =   $indexno;
-                        }
+                         $indexno=$item->studentid;
+                            
+                        
 
                         $oldStudent = Models\StudentModel::where("STNO", $indexno)->orWhere("INDEXNO", $indexno)->first();
                         //dd($oldStudent);
@@ -1493,7 +1488,7 @@ class StudentController extends Controller
                                 $details = "Part payment";
                             }
 
-                            $date =date("Y-m-d",strtotime($item->paymentdate)); 
+                            $date =date("Y-m-d",strtotime($item->date)); 
 //dd($date);
                             $checker=Models\FeePaymentModel::where("STUDENT",$stuID)->where("YEAR",$year)->where("AMOUNT",$item->amount)->where("BANK_DATE",$date)->where("FEE_TYPE",$item->type)->get();
                             //dd( $checker);
@@ -1509,7 +1504,7 @@ class StudentController extends Controller
                                 $feeLedger->CHECKER = rand();
                                 $feeLedger->LEVEL = $level;
                                 $feeLedger->RECIEPIENT = $item->reciepient;
-                                $feeLedger->BANK = $item->accountnumber;
+                                $feeLedger->BANK = $item->account;
                                 if(empty($item->transaction)){
                                     $feeLedger->TRANSACTION_ID = rand();
                                 }
@@ -1537,19 +1532,22 @@ class StudentController extends Controller
                                     }
                                     $sys->updateReceipt();
                                 }
+                                   
 
                             }
                             else{
 
                                 Models\FeePaymentModel::where("STUDENT",$stuID)->where("YEAR",$year)->where("AMOUNT",$item->amount)->where("BANK_DATE",$date)->where("FEE_TYPE",$item->type)->update(array("AMOUNT"=>$item->amount));
+                                
 
                             }
-
 
                         }
 
 
                     }
+                    return redirect('/view_payments')->with('success','Payments uploaded successfully');
+ 
                 }
 
 

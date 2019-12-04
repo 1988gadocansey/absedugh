@@ -35,7 +35,7 @@ class StaticAnalyser
                 $GLOBALS['openapi_opcache_warning'] = true;
                 $status = opcache_get_status();
                 $config = opcache_get_configuration();
-                if ($status['opcache_enabled'] && $config['directives']['opcache.save_comments'] == false) {
+                if (is_array($status) && $status['opcache_enabled'] && $config['directives']['opcache.save_comments'] == false) {
                     Logger::warning("php.ini \"opcache.save_comments = 0\" interferes with extracting annotations.\n[LINK] http://php.net/manual/en/opcache.configuration.php#ini.opcache.save-comments");
                 }
             }
@@ -117,11 +117,11 @@ class StaticAnalyser
                     $analysis->addClassDefinition($classDefinition);
                 }
                 $classDefinition = [
-                    'class'      => $token[1],
-                    'extends'    => null,
+                    'class' => $token[1],
+                    'extends' => null,
                     'properties' => [],
-                    'methods'    => [],
-                    'context'    => $schemaContext,
+                    'methods' => [],
+                    'context' => $schemaContext,
                 ];
                 // @todo detect end-of-class and reset $schemaContext
                 $token = $this->nextToken($tokens, $parseContext);
@@ -144,10 +144,10 @@ class StaticAnalyser
                     $analysis->addTraitDefinition($traitDefinition);
                 }
                 $traitDefinition = [
-                    'trait'      => $token[1],
+                    'trait' => $token[1],
                     'properties' => [],
-                    'methods'    => [],
-                    'context'    => $schemaContext,
+                    'methods' => [],
+                    'context' => $schemaContext,
                 ];
                 if ($comment) {
                     $schemaContext->line = $line;
@@ -162,8 +162,8 @@ class StaticAnalyser
                     $propertyContext = new Context(
                         [
                             'property' => substr($token[1], 1),
-                            'static'   => true,
-                            'line'     => $line,
+                            'static' => true,
+                            'line' => $line,
                         ],
                         $schemaContext
                     );
@@ -190,7 +190,7 @@ class StaticAnalyser
                     $propertyContext = new Context(
                         [
                             'property' => substr($token[1], 1),
-                            'line'     => $line,
+                            'line' => $line,
                         ],
                         $schemaContext
                     );
@@ -210,7 +210,7 @@ class StaticAnalyser
                         $methodContext = new Context(
                             [
                                 'method' => $token[1],
-                                'line'   => $line,
+                                'line' => $line,
                             ],
                             $schemaContext
                         );
@@ -233,7 +233,7 @@ class StaticAnalyser
                     $methodContext = new Context(
                         [
                             'method' => $token[1],
-                            'line'   => $line,
+                            'line' => $line,
                         ],
                         $schemaContext
                     );
@@ -326,17 +326,19 @@ class StaticAnalyser
     {
         while (true) {
             $token = next($tokens);
-            if ($token[0] === T_WHITESPACE) {
-                continue;
-            }
-            if ($token[0] === T_COMMENT) {
-                $pos = strpos($token[1], '@OA\\');
-                if ($pos) {
-                    $line = $context->line ? $context->line + $token[2] : $token[2];
-                    $commentContext = new Context(['line' => $line], $context);
-                    Logger::notice('Annotations are only parsed inside `/**` DocBlocks, skipping ' . $commentContext);
+            if (is_array($token)) {
+                if ($token[0] === T_WHITESPACE) {
+                    continue;
                 }
-                continue;
+                if ($token[0] === T_COMMENT) {
+                    $pos = strpos($token[1], '@OA\\');
+                    if ($pos) {
+                        $line           = $context->line ? $context->line + $token[2] : $token[2];
+                        $commentContext = new Context(['line' => $line], $context);
+                        Logger::notice('Annotations are only parsed inside `/**` DocBlocks, skipping ' . $commentContext);
+                    }
+                    continue;
+                }
             }
 
             return $token;

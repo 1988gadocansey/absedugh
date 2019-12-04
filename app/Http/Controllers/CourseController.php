@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Excel;
 
-class CourseController extends Controller
+class CourseControllers extends Controller
 {
 
     /**
@@ -2911,7 +2911,7 @@ class CourseController extends Controller
                     //$sheet->setCellValue('E'.$k.'','0');
                     //$sheet->setCellValue('F'.$k.'','0');
                     $sheet->setCellValue('H'.$k.'','=IF(SUM(D'.$k.':G'.$k.') > 0,SUM(D'.$k.':G'.$k.'),"")');
-                    $sheet->setCellValue('I'.$k.'','=IF(H'.$k.'>100,"",IF(H'.$k.'>=84.95,"A+",IF(H'.$k.'>=79.95,"A",IF(H'.$k.'>=74.95,"B+",IF(H'.$k.'>=69.95,"B",IF(H'.$k.'>=64.95,"C+",IF(H'.$k.'>=59.95,"C",IF(H'.$k.'>=54.95,"D+",IF(H'.$k.'>=49.95,"D",IF(H'.$k.'>=1,"F",""))))))))))');
+                    $sheet->setCellValue('I'.$k.'','=IF(H'.$k.'>1001,"",IF(H'.$k.'>=8411.95,"A+",IF(H'.$k.'>=70,"A",IF(H'.$k.'>=60,"B",IF(H'.$k.'>=6999.95,"B",IF(H'.$k.'>=50,"C",IF(H'.$k.'>=1,"F",IF(H'.$k.'>=54111.95,"D+",IF(H'.$k.'>=4911111.95,"D",IF(H'.$k.'>=112121,"F",""))))))))))');
 
 
                 }
@@ -4702,6 +4702,204 @@ class CourseController extends Controller
             // throw new HttpException(Response::HTTP_UNAUTHORIZED, 'This action is unauthorized.');
 
             return redirect("/dashboard");
+        }
+    }
+    public function downloadAttendExcel(Request $request, SystemController $sys )
+
+    {
+
+        if ($sys->getUserLevel((@\Auth::user()->department),"exam_dpt") == '1' || $sys->getUserLevel((@\Auth::user()->role),"exam_dpt") == '1') {
+
+
+            $this->validate($request, [
+
+
+                'course' => 'required',
+                //'sem' => 'required',
+                // 'year' => 'required',
+                'level' => 'required',
+            ]);
+
+
+            $kojoSense = 0;
+            $array = $sys->getSemYear();
+            $year2 = $array[0]->YEAR;
+            $sem = $array[0]->SEMESTER;
+
+            $level = $request->input("level");
+            //$program = $request->input("program");
+            $program = $request->input("course");
+
+            $programme2 = \DB::table('tpoly_programme')->where('PROGRAMMECODE',$program)->first();
+            $programme = $programme2->PROGRAMME;
+            $dpt1 = $programme2->DEPTCODE;
+            $dpt2 = \DB::table('tpoly_department')->where('DEPTCODE',$dpt1)->first();
+            $dpt3 = $dpt2->DEPARTMENT;
+            $fac1 = $dpt2->FACCODE;
+            $fac2 = \DB::table('tpoly_faculty')->where('FACCODE',$fac1)->first();
+            $fac3 = $fac2->FACULTY;
+            //$courcec = \DB::table('tpoly_courses')->where('COURSE_CODE',$course)->first();
+            //$courced = $courcec->COURSE_NAME;
+
+
+
+
+            $data = Models\StudentModel::where("PROGRAMMECODE",$program)
+                ->where("LEVEL",$level)
+                ->where("STATUS","In school")
+                //->where("REGISTERED",1)
+                ->orderBy("INDEXNO")
+                //->set('SET @rownr=0'))//->orderBy("REGISTERED", "DESC")
+                ->select('INDEXNO as INDEX_NO', 'NAME', 'BILL_OWING as OWING')
+                ->get();
+
+            $kojoSense = count($data)+1;
+
+            return Excel::create($level.'_'.$programme, function ($excel) use ($data,$program,$level,$programme,$kojoSense,$dpt3,$fac3,$year2,$sem){
+
+                $excel->sheet($program, function ($sheet) use ($data,$kojoSense,$program,$level,$programme,$dpt3,$fac3,$year2,$sem) {
+                    $sheet->setWidth(array(
+                        'A'     =>  5,
+                        'B'     =>  15,
+                        'C'     =>  40,
+                        'D'     =>  8,
+                        'E'     =>  10,
+                        'F'     =>  30,
+                    ));
+
+                    $sheet->prependRow(1, array('prepended', 'prepended'));
+                    //$sheet->prependRow(1, array('assignment', 'quiz', 'midsem', 'exam', 'total'));
+
+                    $sheet->fromArray($data, Null, 'B1', true);
+                    $sheet->setBorder('A1:F'.$kojoSense.'', 'thin');
+                    //$sheet->setCellsValue('C2:F'.$kojoSense.'','0');
+                    //$sheet->cells('C2:C5', function($cells) {
+
+                    $sheet->setCellValue('A1','SN');
+                    $sheet->setCellValue('E1','SERIAL NO');
+                    $sheet->setCellValue('F1','SIGN');
+                    for($k=1;$k<$kojoSense;$k++){
+                        $kID = $k;
+                        $kIdCount = $kID + 1;
+                        $sheet->setCellValue('A'.$kIdCount.'',$k);
+
+
+
+                    }
+                    if ($sem == 1) {
+                        $semWords = 'FIRST';
+                    } elseif ($sem == 2) {
+                        $semWords = 'SECOND';
+                    } else {
+                        $semWords = 'THIRD';
+                    }
+
+
+
+
+                    $current_time = \Carbon\Carbon::now()->toDateTimeString();
+                    // $sheet->setCellValue('A2',$current_time);
+
+                    $cheat = 25+$k;
+                    $cheat2 = $cheat + 3;
+                    $cheat3 = $cheat2 + 1;
+
+                    $sheet->prependRow(1, array(' '.' '.' '.''
+                    ));
+                    $sheet->prependRow(1, array(' '.' '.' '.' '.' END OF '.$semWords.' SEMESTER EXAMINATION '.$year2.' ACADEMIC YEAR - ATTENDANCE REGISTER'
+                    ));
+                    $sheet->prependRow(1, array(' '.' '.' '.' '.' '.$programme
+                    ));
+                    $sheet->prependRow(1, array(' '.' '.' '.' '.' '.$dpt3.' DEPARTMENT'
+                    ));
+                    $sheet->prependRow(1, array(' '.' '.' '.' '.' '.$fac3
+                    ));
+                    $sheet->prependRow(1, array(' '.' '.' '.' '.' TAKORADI TECHNICAL UNIVERSITY'.' ('.$current_time.')'
+                    ));
+
+
+
+                    $sheet->cells('A7:F7', function($cells) {
+
+                        // manipulate the cell
+                        $cells->setAlignment('center');
+                        $cells->setFont(array(
+                            'size'       => '10',
+                            'bold'       =>  true
+                        ));
+
+                    });
+
+                    for($lisa=1;$lisa<6;$lisa++){
+                        $sheet->mergeCells('A'.$lisa.':F'.$lisa);
+
+
+                        //$sheet->cell('A'.$lisa, function($cell) {
+
+
+                        //$sheet->mergeCells('J2':'K2');
+
+                    }
+
+                    $sheet->cells('A1:A5', function($cells) {
+
+                        // manipulate the cell
+                        $cells->setAlignment('center');
+                        $cells->setFont(array(
+                            'size'       => '10',
+                            'bold'       =>  true
+                        ));
+
+                    });
+
+                    $sheet->cells('A1:F6', function($cells) {
+
+                        $cells->setBackground('#ffffff');
+                    });
+
+                    $kojoSenseSel = $kojoSense + 6;
+                    $sheet->cells('A8:B'.$kojoSenseSel, function($cells) {
+
+                        // manipulate the cell
+                        $cells->setAlignment('center');
+                        //$cells->setFont(array(
+                        //'size'       => '12',
+                        //'bold'       =>  true
+                        //));
+
+                    });
+
+                    $kojoSenseSel = $kojoSense + 6;
+                    $sheet->cells('A8:D'.$kojoSenseSel, function($cells) {
+
+                        // manipulate the cell
+                        //$cells->setAlignment('center');
+                        $cells->setFont(array(
+                            'size'       => '10'
+                            //'bold'       =>  true
+                        ));
+
+                    });
+
+
+
+                    $sheet->setHeight(array(
+                        '1'     =>  20,
+                        '2'     =>  20,
+                        '3'     =>  20,
+                        '4'     =>  20,
+                        '5'     =>  20
+
+                    ));
+
+
+                    //$sheet->setFreeze('A8');
+//});
+                });
+
+            })->download('xlsx');
+
+
         }
     }
 

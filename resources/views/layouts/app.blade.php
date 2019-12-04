@@ -284,7 +284,8 @@
                 @if( @Auth::user()->department=='Finance' || @Auth::user()->department=='top')
 
                     <li data-uk-dropdown class="uk-hidden-small">
-                        <a href="#"> <i class="sidebar-menu-icon material-icons">people</i><span>Student Management</span></a>
+                        <a href="#"> <i
+                                    class="sidebar-menu-icon material-icons">people</i><span>Student Management</span></a>
                         <div class="uk-dropdown uk-dropdown-scrollable">
                             <ul class="uk-nav uk-nav-dropdown">
 
@@ -296,22 +297,28 @@
                         </div>
                     </li>
                     <li data-uk-dropdown class="uk-hidden-small">
-                        <a href="#"> <i class="sidebar-menu-icon material-icons">attach_file</i><span>Finance Management</span></a>
+                        <a href="#"> <i
+                                    class="sidebar-menu-icon material-icons">attach_file</i><span>Finance Management</span></a>
                         <div class="uk-dropdown uk-dropdown-scrollable">
                             <ul class="uk-nav uk-nav-dropdown">
-
-                                <li><a href='{!! url("pay_fees") !!}'>Pay Fees</a></li>
+                                <li><a href='{!! url("/payment/items/create") !!}'>Create Payment Items</a></li>
+                                <li><a href='{!! url("/payment/items/index") !!}'>View Payment Items</a></li>
+                                {{--   <li><a href='{!! url("pay_fees") !!}'>Pay Fees</a></li>--}}
                                 <li><a href='{!! url("pay_fees_penalty") !!}'>Late Registration payment</a></li>
 
                                 <li><a href='{!! url("banks") !!}'>View Banks</a></li>
                                 <li><a href='{!! url("/upload/fees") !!}'>Bank Fees Upload</a></li>
-                                <li><a href='{!! url("/finance/reports/fees") !!}'>View Fees</a></li>
 
                                 <li><a href='{!! url("/print/receipt") !!}'>Print Fee Receipt</a></li>
                                 <li><a href='{!! url("/print/password") !!}'>Print Password Receipt</a></li>
                                 <li><a href='{!! url("view_payments") !!}'>Payments Ledger</a></li>
 
-                                <li><a href='{!! url("view_payments_master") !!}'>Payments (sum)</a></li>
+
+                                <li><a href='{!! url("/attendanceSheet") !!}'>Exam Attendance Sheet</a></li>
+
+                                <li><a href='{!! url("/finance/protocol") !!}'>Protocols/Policies</a></li>
+                                <li><a href='{!! url("owing_paid") !!}'>Owing reports</a></li>
+                                <li><a href='{!! url("owing_excel") !!}'>Owing Excel</a></li>
 
                             </ul>
                         </div>
@@ -324,8 +331,7 @@
                         <div class="uk-dropdown uk-dropdown-scrollable">
                             <ul class="uk-nav uk-nav-dropdown">
                                 <li><a href='{!! url("/report/registration") !!}'>Registration</a></li>
-                                <li><a href='{!! url("owing_excel") !!}'>Owing Excel</a></li>
-                                    <li><a href='{!! url("paid_excel") !!}'>Paid Excel</a></li>
+
 
                                 <li><a href='{!! url("/view_payments_master") !!}'>Fee Payment by Students Report</a>
                                 </li>
@@ -376,7 +382,6 @@
                                 </li>
 
 
-
                             </ul>
                         </div>
                     </li>
@@ -387,7 +392,7 @@
                         <a href="#"><i class="sidebar-menu-icon material-icons md-18">view_list</i><span>View</span></a>
                         <div class="uk-dropdown uk-dropdown-scrollable">
                             <ul class="uk-nav uk-nav-dropdown">
-                                  <li><a href='{!! url("/programmes") !!}'>View Programmes</a></li>
+                                <li><a href='{!! url("/programmes") !!}'>View Programmes</a></li>
                                 <li><a href='{!! url("/students") !!}'>View Students</a></li>
                                 <li><a href='{!! url("/finance/reports/fees/") !!}'>View Fees</a></li>
                                 <li><a href='{!! url("/systems/sms") !!}'>View sms sent</a></li>
@@ -447,7 +452,7 @@
                         </div>
                     </li>
                 @else
-                    @if(@Auth::user()->department=='Planning' )  
+                    @if(@Auth::user()->department=='Planning' )
                         @if(@Auth::user()->department!='LA')
                             <li data-uk-dropdown class="uk-hidden-small">
 
@@ -461,12 +466,12 @@
                                         <li><a href='{!! url("/attendanceSheet") !!}'>Exam Attendance Sheet</a></li>
                                         <li><a href='{!! url("/student/resit") !!}'>Resit List</a></li>
                                         <li><a href='{!! url("/download_id_cards") !!}'>ID Card List</a></li>
-                                     @if(@Auth::user()->role=='Academic')
-                                        
-                                        <li><a href='{!! url("/finance/status") !!}'>Update Status / Level</a></li>
-                                    <li><a href='{!! url("/finance/chapro") !!}'>Update Program</a></li>
-                                    @endif
-                                    
+                                        @if(@Auth::user()->role=='Academic')
+
+                                            <li><a href='{!! url("/finance/status") !!}'>Update Status / Level</a></li>
+                                            <li><a href='{!! url("/finance/chapro") !!}'>Update Program</a></li>
+                                        @endif
+
                                     </ul>
                                 </div>
                             </li>
@@ -515,89 +520,81 @@
 
                     @endif
 
-                        @if( @Auth::user()->department=='Support' )
+                    @if( @Auth::user()->department=='Support' )
 
-                            <li data-uk-dropdown class="uk-hidden-small">
-
-
-                                <a href="#"><i
-                                            class="sidebar-menu-icon material-icons md-18">attach_file</i><span>Student Management</span></a>
-                                <div class="uk-dropdown uk-dropdown-scrollable">
-                                    <ul class="uk-nav uk-nav-dropdown">
-                                        <li><a href='{!! url("/add_students") !!}'>Add Students</a></li>
-                                        <li><a href='{!! url("/students") !!}'>Students</a></li>
-                                        <li><a href='{!! url("/nservice") !!}'>National Service</a></li>
-
-                                        <li><a href='{!! url("/search_password") !!}'>Search student password</a></li>
+                        <li data-uk-dropdown class="uk-hidden-small">
 
 
-                                        <li><a href='{!! url("/print/password") !!}'>Print Password Receipt</a></li>
+                            <a href="#"><i
+                                        class="sidebar-menu-icon material-icons md-18">attach_file</i><span>Student Management</span></a>
+                            <div class="uk-dropdown uk-dropdown-scrollable">
+                                <ul class="uk-nav uk-nav-dropdown">
+                                    <li><a href='{!! url("/add_students") !!}'>Add Students</a></li>
+                                    <li><a href='{!! url("/students") !!}'>Students</a></li>
+                                    <li><a href='{!! url("/nservice") !!}'>National Service</a></li>
 
-                                        <li><a href='{!! url("/student/resit") !!}'>Resit List</a></li>
-
-
-
-
-
-
-                                    </ul>
-                                </div>
-                            </li>
-
-                            <li data-uk-dropdown class="uk-hidden-small">
+                                    <li><a href='{!! url("/search_password") !!}'>Search student password</a></li>
 
 
-                                <a href="#"><i class="sidebar-menu-icon material-icons md-18">view_list</i><span>Academics</span></a>
-                                <div class="uk-dropdown uk-dropdown-scrollable">
-                                    <ul class="uk-nav uk-nav-dropdown">
+                                    <li><a href='{!! url("/print/password") !!}'>Print Password Receipt</a></li>
 
-                                        <li><a href='{!! url("/programmes") !!}'>View Programmes</a></li>
-                                        <li><a href='{!! url("staff") !!}'>View Staff</a></li>
-                                      
-                                        <li><a href='{!! url("/courses") !!}'>View Courses</a></li>
-
-                                        <li><a href='{!! url("/mounted_view") !!}'>View Mounted Courses</a></li>
-                                        <li><a href='{!! url("/download_regList") !!}'>Registered</a></li>
-                                        <li><a href='{!! url("/directory") !!}'>Staff Directory</a></li>
+                                    <li><a href='{!! url("/student/resit") !!}'>Resit List</a></li>
 
 
-                                    </ul>
-                                </div>
-                            </li>
+                                </ul>
+                            </div>
+                        </li>
 
-                            <li data-uk-dropdown class="uk-hidden-small">
-
-
-                                <a href="#"><i
-                                            class="sidebar-menu-icon material-icons md-18">attach_file</i><span>Data Management</span></a>
-                                <div class="uk-dropdown uk-dropdown-scrollable">
-                                    <ul class="uk-nav uk-nav-dropdown">
+                        <li data-uk-dropdown class="uk-hidden-small">
 
 
-                                        <li><a href='{!! url("/upload_students") !!}'>Upload bulk Student data</a></li>
-                                        <li><a href='{!! url("/index/upload") !!}'>Upload Index Number</a></li>
+                            <a href="#"><i
+                                        class="sidebar-menu-icon material-icons md-18">view_list</i><span>Academics</span></a>
+                            <div class="uk-dropdown uk-dropdown-scrollable">
+                                <ul class="uk-nav uk-nav-dropdown">
 
-                                        <li><a href='{!! url("/upload/courses") !!}'>Upload Bulk Courses</a></li>
+                                    <li><a href='{!! url("/programmes") !!}'>View Programmes</a></li>
+                                    <li><a href='{!! url("staff") !!}'>View Staff</a></li>
 
-                                        <li><a href='{!! url("/resit") !!}'>Upload Resit</a></li>
-                                        <li><a href='{!! url("/getStaffCSV") !!}'>Upload Staff Data</a></li>
+                                    <li><a href='{!! url("/courses") !!}'>View Courses</a></li>
+
+                                    <li><a href='{!! url("/mounted_view") !!}'>View Mounted Courses</a></li>
+                                    <li><a href='{!! url("/download_regList") !!}'>Registered</a></li>
+                                    <li><a href='{!! url("/directory") !!}'>Staff Directory</a></li>
 
 
+                                </ul>
+                            </div>
+                        </li>
+
+                        <li data-uk-dropdown class="uk-hidden-small">
 
 
+                            <a href="#"><i
+                                        class="sidebar-menu-icon material-icons md-18">attach_file</i><span>Data Management</span></a>
+                            <div class="uk-dropdown uk-dropdown-scrollable">
+                                <ul class="uk-nav uk-nav-dropdown">
 
 
+                                    <li><a href='{!! url("/upload_students") !!}'>Upload bulk Student data</a></li>
+                                    <li><a href='{!! url("/index/upload") !!}'>Upload Index Number</a></li>
 
-                                    </ul>
-                                </div>
-                            </li>
+                                    <li><a href='{!! url("/upload/courses") !!}'>Upload Bulk Courses</a></li>
+
+                                    <li><a href='{!! url("/resit") !!}'>Upload Resit</a></li>
+                                    <li><a href='{!! url("/getStaffCSV") !!}'>Upload Staff Data</a></li>
+
+
+                                </ul>
+                            </div>
+                        </li>
 
 
 
 
 
 
-                        @endif
+                    @endif
 
                     @if( @Auth::user()->department=='Tpmid' )
 
@@ -612,10 +609,10 @@
                                     <li><a href='{!! url("/nservice") !!}'>National Service</a></li>
                                     <li><a href='{!! url("/transcript") !!}' target="_blank">Results</a></li>
                                     <li><a href='{!! url("/search_password") !!}'>Search student password</a></li>
-                                    
+
 
                                     <li><a href='{!! url("/print/password") !!}'>Print Password Receipt</a></li>
-                                    
+
                                     <li><a href='{!! url("/student/resit") !!}'>Resit List</a></li>
 
 
@@ -754,12 +751,13 @@
                         <li data-uk-dropdown class="uk-hidden-small">
 
 
-                            <a href="#"><i class="sidebar-menu-icon material-icons md-18">view_list</i><span>Academics</span></a>
+                            <a href="#"><i
+                                        class="sidebar-menu-icon material-icons md-18">view_list</i><span>Academics</span></a>
                             <div class="uk-dropdown uk-dropdown-scrollable">
                                 <ul class="uk-nav uk-nav-dropdown">
                                     <li><a href='{!! url("/transcript") !!}' target="_blank">Results</a></li>
                                     {{--<li><a href='{!! url("/transcriptOrig") !!}' target="_blank">Transcript</a></li>--}}
-                                  {{----}}
+                                    {{----}}
                                     <li><a href='{!! url("/programmes") !!}'>View Programmes</a></li>
 
                                     <li><a href='{!! url("/grade_system") !!}'>View Grading Systems</a></li>
@@ -783,580 +781,575 @@
                                     <li><a href='{!! url("/system/registration/batch") !!}'>Bulk Registration</a></li>
 
 
+                                </ul>
+                            </div>
+                        </li>
+                        @if( @Auth::user()->fund!="ABS041565")
+                            <li data-uk-dropdown class="uk-hidden-small">
+
+
+                                <a href="#"><i
+                                            class="sidebar-menu-icon material-icons md-18">attach_money</i><span>Finance</span></a>
+                                <div class="uk-dropdown uk-dropdown-scrollable">
+                                    <ul class="uk-nav uk-nav-dropdown">
+
+                                        <li><a href='{!! url("/finance/reports/fees/") !!}'>View Fees</a></li>
+                                        <li><a href='{!! url("pay_fees") !!}'>Pay Fees</a></li>
+                                        <li><a href='{!! url("/finance/upload") !!}'>Finance Fee Upload</a></li>
+                                        <li><a href='{!! url("/upload/fees") !!}'>Bank Fees Upload</a></li>
+                                        <li><a href='{!! url("banks") !!}'>View Banks</a></li>
+                                        <li><a href='{!! url("view_payments") !!}'>Payments Ledger</a></li>
+
+                                        <li><a href='{!! url("view_payments_master") !!}'>Payments (sum)</a></li>
+                                        <li><a href='{!! url("/attendanceSheet") !!}'>Exam Attendance Sheet</a></li>
+                                        <li><a href='{!! url("/print/receipt") !!}'>Print Fee Receipt</a></li>
+                                        <li><a href='{!! url("/print/password") !!}'>Print Password Receipt</a></li>
+
+
+                                    </ul>
+                                </div>
+                            </li>
+
+                        @endif
+
+
+
+                        <li data-uk-dropdown class="uk-hidden-small">
+
+
+                            <a href="#"><i
+                                        class="sidebar-menu-icon material-icons md-18">file_upload</i><span>Data Upload</span></a>
+                            <div class="uk-dropdown uk-dropdown-scrollable">
+                                <ul class="uk-nav uk-nav-dropdown">
+                                    <li><a href='{!! url("/upload_students") !!}'>Upload bulk Student data</a></li>
+                                    <li><a href='{!! url("/index/upload") !!}'>Upload Index Number</a></li>
+                                    <li><a href='{!! url("/upload_marks") !!}'>Upload Semester Marks</a></li>
+                                    <li><a href='{!! url("/upload/courses") !!}'>Upload Bulk Courses</a></li>
+                                    <li><a href='{!! url("/upload/mounted") !!}'>Upload Bulk Mounted Courses</a></li>
+                                    <li><a href='{!! url("/legacy") !!}'>Upload Old Results</a></li>
+                                    <li><a href='{!! url("/finance/upload") !!}'>Finance Fee Upload</a></li>
+
+                                    <li><a href='{!! url("/resit") !!}'>Upload Resit</a></li>
+                                    <li><a href='{!! url("/getStaffCSV") !!}'>Upload Staff Data</a></li>
+
 
                                 </ul>
                             </div>
                         </li>
-                            @if( @Auth::user()->fund!="ABS041565")
+
+
+
+                        <li data-uk-dropdown class="uk-hidden-small">
+                            <a href="#"> <i
+                                        class="sidebar-menu-icon material-icons">view_headline</i><span>Reports</span></a>
+                            <div class="uk-dropdown uk-dropdown-scrollable">
+                                <ul class="uk-nav uk-nav-dropdown">
+                                    <li><a href='{!! url("/report/registration") !!}'>Registration</a></li>
+
+                                    <li><a href='{!! url("/view_payments_master") !!}'>Fee Payment by Students
+                                            Report</a></li>
+                                    <li><a href='{!! url("/finance/reports/programs") !!}'>Fee Payment by Programs
+                                            Report</a></li>
+                                    <li><a href='{!! url("/owing_paid") !!}'>Fees Owings By Students Reports</a></li>
+                                    <li><a href='{!! url("/finance/reports/programs") !!}'>Fees Owings By Programs
+                                            Reports</a></li>
+                                    <li><a href='{!! url("/finance/reports/ledger/student") !!}'>Print Student
+                                            Ledger</a></li>
+
+                                    <li><a href='{!! url("view_payments") !!}'>Payments Ledger</a></li>
+                                    <li><a href='{!! url("/report/registration") !!}'>Registration</a></li>
+
+
+                                    <li><a href='{!! url("/broadsheet/noticeboard") !!}'>GPA Academic Board</a></li>
+
+
+                                </ul>
+                            </div>
+                        </li>
+
+                        <li data-uk-dropdown class="uk-hidden-small">
+                            <a href="#"> <span class="menu_icon"><i
+                                            class="material-icons">users</i></span><span>Staff Management</span></a>
+                            <div class="uk-dropdown uk-dropdown-scrollable">
+                                <ul class="uk-nav uk-nav-dropdown">
+                                    <li><a href='{!! url("/add_staff") !!}'>Add Staff</a></li>
+
+                                    <li><a href='{!! url("/search_password") !!}'>Search student passwords</a></li>
+                                    <li><a href='{!! url("staff") !!}'>View Staff</a></li>
+
+                                    <li><a href='{!! url("/power_users") !!}'>View Users</a></li>
+                                    <li><a href='{!! url("/updatePassword") !!}'>Reset Staff Password</a></li>
+
+                                </ul>
+                            </div>
+                        </li>
+
+
+                    @endif
+
+
+
+
+
+
+
+
+                    @if( @Auth::user()->role=='HOD' )
+
                         <li data-uk-dropdown class="uk-hidden-small">
 
 
-                                                       <a href="#"><i
-                                                                   class="sidebar-menu-icon material-icons md-18">attach_money</i><span>Finance</span></a>
-                                                       <div class="uk-dropdown uk-dropdown-scrollable">
-                                                           <ul class="uk-nav uk-nav-dropdown">
+                            <a href="#"><i
+                                        class="sidebar-menu-icon material-icons md-18">attach_file</i><span>File</span></a>
+                            <div class="uk-dropdown uk-dropdown-scrollable">
+                                <ul class="uk-nav uk-nav-dropdown">
+                                    <li><a href='{!! url("/students") !!}'>Students</a></li>
+                                    <li><a href='{!! url("/download_regList") !!}'>Registered</a></li>
+                                    <li><a href='{!! url("/student/resit") !!}'>Resit List</a></li>
+                                </ul>
+                            </div>
+                        </li>
 
-                                                               <li><a href='{!! url("/finance/reports/fees/") !!}'>View Fees</a></li>
-                                                               <li><a href='{!! url("pay_fees") !!}'>Pay Fees</a></li>
-                                                               <li><a href='{!! url("/finance/upload") !!}'>Finance Fee Upload</a></li>
-                                                               <li><a href='{!! url("/upload/fees") !!}'>Bank Fees Upload</a></li>
-                                                               <li><a href='{!! url("banks") !!}'>View Banks</a></li>
-                                                               <li><a href='{!! url("view_payments") !!}'>Payments Ledger</a></li>
+                        <li data-uk-dropdown class="uk-hidden-small">
 
-                                                               <li><a href='{!! url("view_payments_master") !!}'>Payments (sum)</a></li>
-                                                               <li><a href='{!! url("owing_paid") !!}'>Owing reports</a></li>
 
-                                                               <li><a href='{!! url("owing_excel") !!}'>Owing Excel</a></li>
-                                                               <li><a href='{!! url("paid_excel") !!}'>Paid Excel</a></li>
-                                                               <li><a href='{!! url("/print/receipt") !!}'>Print Fee Receipt</a></li>
-                                                               <li><a href='{!! url("/print/password") !!}'>Print Password Receipt</a></li>
+                            <a href="#"><i class="sidebar-menu-icon material-icons md-18">view_list</i><span>View</span></a>
+                            <div class="uk-dropdown uk-dropdown-scrollable">
+                                <ul class="uk-nav uk-nav-dropdown">
+                                    <li><a href='{!! url("/transcript") !!}' target="_blank">Results</a></li>
+                                    <li><a href='{!! url("/programmes") !!}'>View Programmes</a></li>
+                                    <li><a href='{!! url("staff") !!}'>View Staff</a></li>
+                                    <li><a href='{!! url("/grade_system") !!}'>View Grading Systems</a></li>
+                                    <li><a href='{!! url("/classes/view") !!}'>View Classing System</a></li>
+                                    <li><a href='{!! url("/groups/view") !!}'>View Class Groups</a></li>
+                                    <li><a href='{!! url("/courses") !!}'>View Courses</a></li>
+                                    <li><a href='{!! url("/mounted_view") !!}'>View Mounted Courses</a></li>
+                                    <li><a href='{!! url("/power_users") !!}'>View Users</a></li>
 
 
+                                </ul>
+                            </div>
+                        </li>
 
-                                                           </ul>
-                                                       </div>
-                                                   </li>
 
-                            @endif
+                        <li data-uk-dropdown class="uk-hidden-small">
 
 
+                            <a href="#"><i
+                                        class="sidebar-menu-icon material-icons md-18">attach_money</i><span>Finance</span></a>
+                            <div class="uk-dropdown uk-dropdown-scrollable">
+                                <ul class="uk-nav uk-nav-dropdown">
+                                    <li><a href='{!! url("fee_summary") !!}'>Fee Summary</a></li>
+                                    <li><a href='{!! url("view_fees") !!}'>View Fees</a></li>
 
-                                                   <li data-uk-dropdown class="uk-hidden-small">
+                                </ul>
+                            </div>
+                        </li>
 
+                        <li data-uk-dropdown class="uk-hidden-small">
 
-                                                       <a href="#"><i
-                                                                   class="sidebar-menu-icon material-icons md-18">file_upload</i><span>Data Upload</span></a>
-                                                       <div class="uk-dropdown uk-dropdown-scrollable">
-                                                           <ul class="uk-nav uk-nav-dropdown">
-                                                               <li><a href='{!! url("/upload_students") !!}'>Upload bulk Student data</a></li>
-                                                               <li><a href='{!! url("/index/upload") !!}'>Upload Index Number</a></li>
-                                                               <li><a href='{!! url("/upload_marks") !!}'>Upload Semester Marks</a></li>
-                                                               <li><a href='{!! url("/upload/courses") !!}'>Upload Bulk Courses</a></li>
-                                                               <li><a href='{!! url("/upload/mounted") !!}'>Upload Bulk Mounted Courses</a></li>
-                                                               <li><a href='{!! url("/legacy") !!}'>Upload Old Results</a></li>
-                                                               <li><a href='{!! url("/finance/upload") !!}'>Finance Fee Upload</a></li>
 
-                                                               <li><a href='{!! url("/resit") !!}'>Upload Resit</a></li>
-                                                               <li><a href='{!! url("/getStaffCSV") !!}'>Upload Staff Data</a></li>
+                            <a href="#"><i
+                                        class="sidebar-menu-icon material-icons md-18">view_headline</i><span>Reports</span></a>
+                            <div class="uk-dropdown uk-dropdown-scrollable">
+                                <ul class="uk-nav uk-nav-dropdown">
+                                    <li><a href='{!! url("/transcript") !!}' target="_blank">Results</a></li>
+                                    <li><a href='{!! url("/report/registration") !!}'>Registration</a></li>
 
 
-                                                           </ul>
-                                                       </div>
-                                                   </li>
+                                    <li><a href='{!! url("/broadsheet/noticeboard") !!}'>GPA Academic Board</a></li>
 
 
+                                </ul>
+                            </div>
+                        </li>
 
-                                                   <li data-uk-dropdown class="uk-hidden-small">
-                                                       <a href="#"> <i
-                                                                   class="sidebar-menu-icon material-icons">view_headline</i><span>Reports</span></a>
-                                                       <div class="uk-dropdown uk-dropdown-scrollable">
-                                                           <ul class="uk-nav uk-nav-dropdown">
-                                                               <li><a href='{!! url("/report/registration") !!}'>Registration</a></li>
+                        <li data-uk-dropdown class="uk-hidden-small">
 
-                                                               <li><a href='{!! url("/view_payments_master") !!}'>Fee Payment by Students
-                                                                       Report</a></li>
-                                                               <li><a href='{!! url("/finance/reports/programs") !!}'>Fee Payment by Programs
-                                                                       Report</a></li>
-                                                               <li><a href='{!! url("/owing_paid") !!}'>Fees Owings By Students Reports</a></li>
-                                                               <li><a href='{!! url("/finance/reports/programs") !!}'>Fees Owings By Programs
-                                                                       Reports</a></li>
-                                                               <li><a href='{!! url("/finance/reports/ledger/student") !!}'>Print Student
-                                                                       Ledger</a></li>
 
-                                                               <li><a href='{!! url("view_payments") !!}'>Payments Ledger</a></li>
-                                                               <li><a href='{!! url("/report/registration") !!}'>Registration</a></li>
+                            <a href="#"><i class="sidebar-menu-icon material-icons md-18">phone</i><span>Results</span></a>
+                            <div class="uk-dropdown uk-dropdown-scrollable">
+                                <ul class="uk-nav uk-nav-dropdown">
 
 
-                                                               <li><a href='{!! url("/broadsheet/noticeboard") !!}'>GPA Academic Board</a></li>
+                                </ul>
+                            </div>
+                        </li>
 
 
-                                                           </ul>
-                                                       </div>
-                                                   </li>
+                    @endif
 
-                                                   <li data-uk-dropdown class="uk-hidden-small">
-                                                       <a href="#"> <span class="menu_icon"><i
-                                                                       class="material-icons">users</i></span><span>Staff Management</span></a>
-                                                       <div class="uk-dropdown uk-dropdown-scrollable">
-                                                           <ul class="uk-nav uk-nav-dropdown">
-                                                               <li><a href='{!! url("/add_staff") !!}'>Add Staff</a></li>
+                    @if( @Auth::user()->role=='Lecturer' )
 
-                                                               <li><a href='{!! url("/search_password") !!}'>Search student passwords</a></li>
-                                                               <li><a href='{!! url("staff") !!}'>View Staff</a></li>
 
-                                                               <li><a href='{!! url("/power_users") !!}'>View Users</a></li>
-                                                               <li><a href='{!! url("/updatePassword") !!}'>Reset Staff Password</a></li>
 
-                                                           </ul>
-                                                       </div>
-                                                   </li>
+                        <li data-uk-dropdown class="uk-hidden-small">
 
 
-                                               @endif
+                            <a href="#"><i class="sidebar-menu-icon material-icons md-18">view_list</i><span>View</span></a>
+                            <div class="uk-dropdown uk-dropdown-scrollable">
+                                <ul class="uk-nav uk-nav-dropdown">
+                                    <li><a href='{!! url("/students") !!}'>Students</a></li>
+                                    <li><a href='{!! url("/programmes") !!}'>View Programmes</a></li>
+                                    <li><a href='{!! url("staff") !!}'>View Staff</a></li>
+                                    <li><a href='{!! url("/grade_system") !!}'>View Grading Systems</a></li>
+                                    <li><a href='{!! url("/mounted_view") !!}'>View Mounted Courses</a></li>
 
+                                </ul>
+                            </div>
+                        </li>
 
 
+                        <li data-uk-dropdown class="uk-hidden-small">
 
 
+                            <a href="#"><i
+                                        class="sidebar-menu-icon material-icons md-18">view_headline</i><span>Reports</span></a>
+                            <div class="uk-dropdown uk-dropdown-scrollable">
+                                <ul class="uk-nav uk-nav-dropdown">
+                                    <li><a href='{!! url("/transcript") !!}' target="_blank">Results</a></li>
 
+                                    <li><a href='{!! url("/download_regList") !!}'>Registered</a></li>
+                                    <li><a href='{!! url("/download_results") !!}'>Excel</a></li>
+                                    <li><a href='{!! url("/student/resit") !!}'>Resit List</a></li>
+                                </ul>
+                            </div>
+                        </li>
 
 
-                                               @if( @Auth::user()->role=='HOD' )
+                        <li data-uk-dropdown class="uk-hidden-small">
 
-                                                   <li data-uk-dropdown class="uk-hidden-small">
 
+                            <a href="#"><i class="sidebar-menu-icon material-icons md-18">phone</i><span>Results</span></a>
+                            <div class="uk-dropdown uk-dropdown-scrollable">
+                                <ul class="uk-nav uk-nav-dropdown">
+                                    <li><a href='{!! url("/download_registered") !!}'>Download Excel Sheet</a></li>
+                                    <li><a href='{!! url("/upload_marks") !!}'>Upload Semester Marks</a></li>
+                                    <li><a href='{!! url("/legacy") !!}'>Upload Old Results</a></li>
+                                    <li><a href='{!! url("/view/edit") !!}'>View / Edit Results</a></li>
 
-                                                       <a href="#"><i
-                                                                   class="sidebar-menu-icon material-icons md-18">attach_file</i><span>File</span></a>
-                                                       <div class="uk-dropdown uk-dropdown-scrollable">
-                                                           <ul class="uk-nav uk-nav-dropdown">
-                                                               <li><a href='{!! url("/students") !!}'>Students</a></li>
-                                                               <li><a href='{!! url("/download_regList") !!}'>Registered</a></li>
-                                                               <li><a href='{!! url("/student/resit") !!}'>Resit List</a></li>
-                                                           </ul>
-                                                       </div>
-                                                   </li>
+                                </ul>
+                            </div>
+                        </li>
 
-                                                   <li data-uk-dropdown class="uk-hidden-small">
 
+                    @endif
 
-                                                       <a href="#"><i class="sidebar-menu-icon material-icons md-18">view_list</i><span>View</span></a>
-                                                       <div class="uk-dropdown uk-dropdown-scrollable">
-                                                           <ul class="uk-nav uk-nav-dropdown">
-                                                               <li><a href='{!! url("/transcript") !!}' target="_blank">Results</a></li>
-                                                               <li><a href='{!! url("/programmes") !!}'>View Programmes</a></li>
-                                                               <li><a href='{!! url("staff") !!}'>View Staff</a></li>
-                                                               <li><a href='{!! url("/grade_system") !!}'>View Grading Systems</a></li>
-                                                               <li><a href='{!! url("/classes/view") !!}'>View Classing System</a></li>
-                                                               <li><a href='{!! url("/groups/view") !!}'>View Class Groups</a></li>
-                                                               <li><a href='{!! url("/courses") !!}'>View Courses</a></li>
-                                                               <li><a href='{!! url("/mounted_view") !!}'>View Mounted Courses</a></li>
-                                                               <li><a href='{!! url("/power_users") !!}'>View Users</a></li>
 
 
-                                                           </ul>
-                                                       </div>
-                                                   </li>
 
+                @endif
 
-                                                   <li data-uk-dropdown class="uk-hidden-small">
 
+                <li data-uk-dropdown class="uk-hidden-small">
+                    <a href="#"> <span class="menu_icon"><i
+                                    class="material-icons">lock</i></span><span>My Account</span></a>
+                    <div class="uk-dropdown uk-dropdown-scrollable">
+                        <ul class="uk-nav uk-nav-dropdown">
 
-                                                       <a href="#"><i
-                                                                   class="sidebar-menu-icon material-icons md-18">attach_money</i><span>Finance</span></a>
-                                                       <div class="uk-dropdown uk-dropdown-scrollable">
-                                                           <ul class="uk-nav uk-nav-dropdown">
-                                                               <li><a href='{!! url("fee_summary") !!}'>Fee Summary</a></li>
-                                                               <li><a href='{!! url("view_fees") !!}'>View Fees</a></li>
 
-                                                           </ul>
-                                                       </div>
-                                                   </li>
+                            <li><a href='{!! url("/updateProfile") !!}'>Change Phone no</a></li>
+                            <li><a href='{!! url("/change_password") !!}'>Change Password</a></li>
+                            <li><a href='{!! url("/logout") !!}'>Logout</a></li>
 
-                                                   <li data-uk-dropdown class="uk-hidden-small">
-
-
-                                                       <a href="#"><i
-                                                                   class="sidebar-menu-icon material-icons md-18">view_headline</i><span>Reports</span></a>
-                                                       <div class="uk-dropdown uk-dropdown-scrollable">
-                                                           <ul class="uk-nav uk-nav-dropdown">
-                                                               <li><a href='{!! url("/transcript") !!}' target="_blank">Results</a></li>
-                                                               <li><a href='{!! url("/report/registration") !!}'>Registration</a></li>
-
-
-                                                               <li><a href='{!! url("/broadsheet/noticeboard") !!}'>GPA Academic Board</a></li>
-
-
-                                                           </ul>
-                                                       </div>
-                                                   </li>
-
-                                                   <li data-uk-dropdown class="uk-hidden-small">
-
-
-                                                       <a href="#"><i class="sidebar-menu-icon material-icons md-18">phone</i><span>Results</span></a>
-                                                       <div class="uk-dropdown uk-dropdown-scrollable">
-                                                           <ul class="uk-nav uk-nav-dropdown">
-
-
-
-                                                           </ul>
-                                                       </div>
-                                                   </li>
-
-
-                                               @endif
-
-                                               @if( @Auth::user()->role=='Lecturer' )
-
-
-
-                                                   <li data-uk-dropdown class="uk-hidden-small">
-
-
-                                                       <a href="#"><i class="sidebar-menu-icon material-icons md-18">view_list</i><span>View</span></a>
-                                                       <div class="uk-dropdown uk-dropdown-scrollable">
-                                                           <ul class="uk-nav uk-nav-dropdown">
-                                                               <li><a href='{!! url("/students") !!}'>Students</a></li>
-                                                               <li><a href='{!! url("/programmes") !!}'>View Programmes</a></li>
-                                                               <li><a href='{!! url("staff") !!}'>View Staff</a></li>
-                                                               <li><a href='{!! url("/grade_system") !!}'>View Grading Systems</a></li>
-                                                               <li><a href='{!! url("/mounted_view") !!}'>View Mounted Courses</a></li>
-
-                                                           </ul>
-                                                       </div>
-                                                   </li>
-
-
-                                                       <li data-uk-dropdown class="uk-hidden-small">
-
-
-                                                           <a href="#"><i class="sidebar-menu-icon material-icons md-18">view_headline</i><span>Reports</span></a>
-                                                           <div class="uk-dropdown uk-dropdown-scrollable">
-                                                               <ul class="uk-nav uk-nav-dropdown">
-                                                                   <li><a href='{!! url("/transcript") !!}' target="_blank">Results</a></li>
-
-                                                                   <li><a href='{!! url("/download_regList") !!}'>Registered</a></li>
-                                                                   <li><a href='{!! url("/download_results") !!}'>Excel</a></li>
-                                                                   <li><a href='{!! url("/student/resit") !!}'>Resit List</a></li>
-                                                               </ul>
-                                                           </div>
-                                                       </li>
-
-
-                                                   <li data-uk-dropdown class="uk-hidden-small">
-
-
-                                                       <a href="#"><i class="sidebar-menu-icon material-icons md-18">phone</i><span>Results</span></a>
-                                                       <div class="uk-dropdown uk-dropdown-scrollable">
-                                                           <ul class="uk-nav uk-nav-dropdown">
-                                                               <li><a href='{!! url("/download_registered") !!}'>Download Excel Sheet</a></li>
-                                                               <li><a href='{!! url("/upload_marks") !!}'>Upload Semester Marks</a></li>
-                                                               <li><a href='{!! url("/legacy") !!}'>Upload Old Results</a></li>
-                                                               <li><a href='{!! url("/view/edit") !!}'>View / Edit Results</a></li>
-
-                                                           </ul>
-                                                       </div>
-                                                   </li>
-
-
-                                               @endif
-
-
-
-
-                           @endif
-
-
-                                                     <li data-uk-dropdown class="uk-hidden-small">
-                                                   <a href="#"> <span class="menu_icon"><i
-                                                                   class="material-icons">lock</i></span><span>My Account</span></a>
-                                                   <div class="uk-dropdown uk-dropdown-scrollable">
-                                                       <ul class="uk-nav uk-nav-dropdown">
-
-
-                                                           <li><a href='{!! url("/updateProfile") !!}'>Change Phone no</a></li>
-                                                           <li><a href='{!! url("/change_password") !!}'>Change Password</a></li>
-                                                           <li><a href='{!! url("/logout") !!}'>Logout</a></li>
-
-
-                                                       </ul>
-                                                   </div>
-                                               </li>
-
-
-                                       </ul>
-
-                           @endif
-
-                               </div>
-                           </div>
-
-                           <div id="page_content">
-                               <div id="page_content_inner">
-
-
-                                   @yield('content')
-
-
-                               </div>
-                           </div>
-                           <br/>
-                           <!--    <div class="footer uk-text-small"><center><?php date("Y");?> All Rights Reserved | Takoradi Technical University - Powered by Tpconnect (<span class="uk-text-primary uk-text-bold uk-text-small">Hotlines 0505284060 (Gad), 0246091283 (Kojo),0276363053 (Timo)</span>)-->
-                           </center></div>
-
-
-                           <script src="{!! url('public/assets/js/common.min.js') !!}"></script>
-                           <script src="{!! url('public/assets/js/dropify.min.js') !!}"></script>
-                           <script src="{!! url('public/assets/js/file_input.min.js') !!}"></script>
-                           <!-- uikit functions -->
-                           <script src="{!! url('public/assets/js/uikit_custom.min.js') !!}"></script>
-
-                           <!-- altair common functions/helpers -->
-                           <script src="{!! url('public/assets/js/altair_admin_common.min.js') !!}"></script>
-                           <script src="{!! url('public/assets/js/uikit/uikit.min.js') !!}"></script>
-                           @if(Request::url()==url('/groups/create'))
-                               <script src="{!! url('public/assets/js/custom/wizard_steps.min.js') !!}"></script>
-                               <script src="{!! url('public/assets/js/pages/forms_wizard.min.js') !!}"></script>
-                           @endif
-                           <script src="{!! url('public/assets/js/vue.min.js') !!}"></script>
-                           <script src="{!! url('public/assets/js/vue-form.min.js') !!}"></script>
-                           <script src="{!! url('public/assets/js/jquery-ui.min.js') !!}"></script>
-                           <script src="{!! url('public/assets/tableexport/tableExport.js') !!}"></script>
-                           <script src="{!! url('public/assets/tableexport/jquery.base64.js') !!}"></script>
-
-                           <script src="{!! url('public/assets/tableexport/html2canvas.js') !!}"></script>
-
-                           <script src="{!! url('public/assets/tableexport/jspdf/libs/sprintf.js') !!}"></script>
-
-                           <script src="{!! url('public/assets/tableexport/jspdf/jspdf.js') !!}"></script>
-                           <script src="{!! url('public/assets/tableexport/jspdf/libs/base64.js') !!}"></script>
-                           <script src="{!! url('public/datatables/js/jquery.dataTables.min.js') !!}"></script>
-
-                           <script src="{!! url('public/datatables/js/dataTables.uikit.min.js') !!}"></script>
-                           <script src="{!! url('public/datatables/js/plugins_datatables.min.js') !!}"></script>
-                           <script src="{!! url('public/datatables/js/datatables_uikit.min.js') !!}"></script>
-                           <script src="{!! url('public/assets/js/numscroller.js') !!}"></script>
-
-                           <script>
-                               $(function () {
-                                   if (isHighDensity) {
-                                       // enable hires images
-                                       altair_helpers.retina_images();
-                                   }
-                                   if (Modernizr.touch) {
-                                       // fastClick (touch devices)
-                                       FastClick.attach(document.body);
-                                   }
-                               });
-                               $window.load(function () {
-                                   // ie fixes
-                                   altair_helpers.ie_fix();
-                               });
-                           </script>
-                           <div id="style_switcher">
-                               <div id="style_switcher_toggle"><i class="material-icons">&#xE8B8;</i></div>
-                               <div class="uk-margin-medium-bottom">
-                                   <h4 class="heading_c uk-margin-bottom">Colors</h4>
-                                   <ul class="switcher_app_themes" id="theme_switcher">
-                                       <li class="app_style_default active_theme" data-app-theme="">
-                                           <span class="app_color_main"></span>
-                                           <span class="app_color_accent"></span>
-                                       </li>
-                                       <li class="switcher_theme_a" data-app-theme="app_theme_a">
-                                           <span class="app_color_main"></span>
-                                           <span class="app_color_accent"></span>
-                                       </li>
-                                       <li class="switcher_theme_b" data-app-theme="app_theme_b">
-                                           <span class="app_color_main"></span>
-                                           <span class="app_color_accent"></span>
-                                       </li>
-                                       <li class="switcher_theme_c" data-app-theme="app_theme_c">
-                                           <span class="app_color_main"></span>
-                                           <span class="app_color_accent"></span>
-                                       </li>
-                                       <li class="switcher_theme_d" data-app-theme="app_theme_d">
-                                           <span class="app_color_main"></span>
-                                           <span class="app_color_accent"></span>
-                                       </li>
-                                       <li class="switcher_theme_e" data-app-theme="app_theme_e">
-                                           <span class="app_color_main"></span>
-                                           <span class="app_color_accent"></span>
-                                       </li>
-                                       <li class="switcher_theme_f" data-app-theme="app_theme_f">
-                                           <span class="app_color_main"></span>
-                                           <span class="app_color_accent"></span>
-                                       </li>
-                                       <li class="switcher_theme_g" data-app-theme="app_theme_g">
-                                           <span class="app_color_main"></span>
-                                           <span class="app_color_accent"></span>
-                                       </li>
-                                       <li class="switcher_theme_h" data-app-theme="app_theme_h">
-                                           <span class="app_color_main"></span>
-                                           <span class="app_color_accent"></span>
-                                       </li>
-                                       <li class="switcher_theme_i" data-app-theme="app_theme_i">
-                                           <span class="app_color_main"></span>
-                                           <span class="app_color_accent"></span>
-                                       </li>
-                                   </ul>
-                               </div>
-                               <div class="uk-visible-large uk-margin-medium-bottom">
-                                   <h4 class="heading_c">Sidebar</h4>
-                                   <p>
-                                       <input type="checkbox" name="style_sidebar_mini" id="style_sidebar_mini" data-md-icheck/>
-                                       <label for="style_sidebar_mini" class="inline-label">Mini Sidebar</label>
-                                   </p>
-                               </div>
-                               <div class="uk-visible-large uk-margin-medium-bottom">
-                                   <h4 class="heading_c">Layout</h4>
-                                   <p>
-                                       <input type="checkbox" name="style_layout_boxed" id="style_layout_boxed" data-md-icheck/>
-                                       <label for="style_layout_boxed" class="inline-label">Boxed layout</label>
-                                   </p>
-                               </div>
-                               <div class="uk-visible-large">
-                                   <h4 class="heading_c">Main menu accordion</h4>
-                                   <p>
-                                       <input type="checkbox" name="accordion_mode_main_menu" id="accordion_mode_main_menu" data-md-icheck/>
-                                       <label for="accordion_mode_main_menu" class="inline-label">Accordion mode</label>
-                                   </p>
-                               </div>
-                           </div>
-
-                           <script>
-                               $(function () {
-                                   var $switcher = $('#style_switcher'),
-                                       $switcher_toggle = $('#style_switcher_toggle'),
-                                       $theme_switcher = $('#theme_switcher'),
-                                       $mini_sidebar_toggle = $('#style_sidebar_mini'),
-                                       $boxed_layout_toggle = $('#style_layout_boxed'),
-                                       $accordion_mode_toggle = $('#accordion_mode_main_menu'),
-                                       $body = $('body');
-
-
-                                   $switcher_toggle.click(function (e) {
-                                       e.preventDefault();
-                                       $switcher.toggleClass('switcher_active');
-                                   });
-
-                                   $theme_switcher.children('li').click(function (e) {
-                                       e.preventDefault();
-                                       var $this = $(this),
-                                           this_theme = $this.attr('data-app-theme');
-
-                                       $theme_switcher.children('li').removeClass('active_theme');
-                                       $(this).addClass('active_theme');
-                                       $body
-                                           .removeClass('app_theme_a app_theme_b app_theme_c app_theme_d app_theme_e app_theme_f app_theme_g app_theme_h app_theme_i')
-                                           .addClass(this_theme);
-
-                                       if (this_theme == '') {
-                                           localStorage.removeItem('altair_theme');
-                                       } else {
-                                           localStorage.setItem("altair_theme", this_theme);
-                                       }
-
-                                   });
-
-                                   // hide style switcher
-                                   $document.on('click keyup', function (e) {
-                                       if ($switcher.hasClass('switcher_active')) {
-                                           if (
-                                               ( !$(e.target).closest($switcher).length )
-                                               || ( e.keyCode == 27 )
-                                           ) {
-                                               $switcher.removeClass('switcher_active');
-                                           }
-                                       }
-                                   });
-
-                                   // get theme from local storage
-                                   if (localStorage.getItem("altair_theme") !== null) {
-                                       $theme_switcher.children('li[data-app-theme=' + localStorage.getItem("altair_theme") + ']').click();
-                                   }
-
-
-                                   // toggle mini sidebar
-
-                                   // change input's state to checked if mini sidebar is active
-                                   if ((localStorage.getItem("altair_sidebar_mini") !== null && localStorage.getItem("altair_sidebar_mini") == '1') || $body.hasClass('sidebar_mini')) {
-                                       $mini_sidebar_toggle.iCheck('check');
-                                   }
-
-                                   $mini_sidebar_toggle
-                                       .on('ifChecked', function (event) {
-                                           $switcher.removeClass('switcher_active');
-                                           localStorage.setItem("altair_sidebar_mini", '1');
-                                           location.reload(true);
-                                       })
-                                       .on('ifUnchecked', function (event) {
-                                           $switcher.removeClass('switcher_active');
-                                           localStorage.removeItem('altair_sidebar_mini');
-                                           location.reload(true);
-                                       });
-
-
-                                   // toggle boxed layout
-
-                                   if ((localStorage.getItem("altair_layout") !== null && localStorage.getItem("altair_layout") == 'boxed') || $body.hasClass('boxed_layout')) {
-                                       $boxed_layout_toggle.iCheck('check');
-                                       $body.addClass('boxed_layout');
-                                       $(window).resize();
-                                   }
-
-                                   $boxed_layout_toggle
-                                       .on('ifChecked', function (event) {
-                                           $switcher.removeClass('switcher_active');
-                                           localStorage.setItem("altair_layout", 'boxed');
-                                           location.reload(true);
-                                       })
-                                       .on('ifUnchecked', function (event) {
-                                           $switcher.removeClass('switcher_active');
-                                           localStorage.removeItem('altair_layout');
-                                           location.reload(true);
-                                       });
-
-                                   // main menu accordion mode
-                                   if ($sidebar_main.hasClass('accordion_mode')) {
-                                       $accordion_mode_toggle.iCheck('check');
-                                   }
-
-                                   $accordion_mode_toggle
-                                       .on('ifChecked', function () {
-                                           $sidebar_main.addClass('accordion_mode');
-                                       })
-                                       .on('ifUnchecked', function () {
-                                           $sidebar_main.removeClass('accordion_mode');
-                                       });
-
-
-                               });
-                           </script>
-                           @yield('js')
-
-                           <script type="text/javascript">
-                               $.ajaxSetup({
-                                   headers: {'X-CSRF-Token': $('meta[name=_token]').attr('content')}
-                               });    </script>
-
-                           <script src="{!! url('public/assets/js/jquery.form.js') !!}"></script>
-                           <script src="{!! url('public/assets/js/jquery.validate.min.js') !!}"></script>
-
-                           <script language="javascript" type="text/javascript">
-                               $(document).ready(function () {
-                                   $('.saves').on('click', function (e) {
-
-
-                                       var name = $(this).closest('tr').find('.name').val();
-                                       var program = $(this).closest('tr').find('.program').val();
-                                       var level = $(this).closest('tr').find('.level').val();
-
-                                       //alert(hall);
-                                       UIkit.modal.confirm("Are you sure you want to add this group "
-                                           , function () {
-                                               modal = UIkit.modal.blockUI("<div class='uk-text-center'>Creating Group <br/><img class='uk-thumbnail uk-margin-top' src='{!! url('public/assets/img/spinners/spinner.gif')  !!}' /></div>");
-                                               //setTimeout(function(){ modal.hide() }, 500) })()
-                                               $.ajax({
-
-                                                   type: "POST",
-                                                   url: "admit",
-                                                   data: {applicant: student, program: program, hall: hall, admit: admit}, //your form data to post goes
-                                                   dataType: "html",
-                                               }).done(function (data) {
-                                                   modal.hide();
-
-                                                   UIkit.modal.alert("Group created successfully");
-                                                   // $("#ts_pager_filter").load(window.location + " #ts_pager_filter");
-                                                   // console.log(data);
-                                                   location.reload();
-                           //        return (function(modal){ modal = UIkit.modal.blockUI("<div class='uk-text-center'>Processing Transcript Order<br/><img class='uk-thumbnail uk-margin-top' src='{!! url('public/assets/img/spinners/spinner.gif')  !!}' /></div>"); setTimeout(function(){ modal.hide() }, 500) })();
-                                               });
-                                           }
-                                       );
-                                   });
-
-                               });
+
+                        </ul>
+                    </div>
+                </li>
+
+
+            </ul>
+
+        @endif
+
+    </div>
+</div>
+
+<div id="page_content">
+    <div id="page_content_inner">
+
+
+        @yield('content')
+
+
+    </div>
+</div>
+<br/>
+<!--    <div class="footer uk-text-small"><center><?php date("Y");?> All Rights Reserved | Takoradi Technical University - Powered by Tpconnect (<span class="uk-text-primary uk-text-bold uk-text-small">Hotlines 0505284060 (Gad), 0246091283 (Kojo),0276363053 (Timo)</span>)-->
+</center></div>
+
+
+<script src="{!! url('public/assets/js/common.min.js') !!}"></script>
+<script src="{!! url('public/assets/js/dropify.min.js') !!}"></script>
+<script src="{!! url('public/assets/js/file_input.min.js') !!}"></script>
+<!-- uikit functions -->
+<script src="{!! url('public/assets/js/uikit_custom.min.js') !!}"></script>
+
+<!-- altair common functions/helpers -->
+<script src="{!! url('public/assets/js/altair_admin_common.min.js') !!}"></script>
+<script src="{!! url('public/assets/js/uikit/uikit.min.js') !!}"></script>
+@if(Request::url()==url('/groups/create'))
+    <script src="{!! url('public/assets/js/custom/wizard_steps.min.js') !!}"></script>
+    <script src="{!! url('public/assets/js/pages/forms_wizard.min.js') !!}"></script>
+@endif
+<script src="{!! url('public/assets/js/vue.min.js') !!}"></script>
+<script src="{!! url('public/assets/js/vue-form.min.js') !!}"></script>
+<script src="{!! url('public/assets/js/jquery-ui.min.js') !!}"></script>
+<script src="{!! url('public/assets/tableexport/tableExport.js') !!}"></script>
+<script src="{!! url('public/assets/tableexport/jquery.base64.js') !!}"></script>
+
+<script src="{!! url('public/assets/tableexport/html2canvas.js') !!}"></script>
+
+<script src="{!! url('public/assets/tableexport/jspdf/libs/sprintf.js') !!}"></script>
+
+<script src="{!! url('public/assets/tableexport/jspdf/jspdf.js') !!}"></script>
+<script src="{!! url('public/assets/tableexport/jspdf/libs/base64.js') !!}"></script>
+<script src="{!! url('public/datatables/js/jquery.dataTables.min.js') !!}"></script>
+
+<script src="{!! url('public/datatables/js/dataTables.uikit.min.js') !!}"></script>
+<script src="{!! url('public/datatables/js/plugins_datatables.min.js') !!}"></script>
+<script src="{!! url('public/datatables/js/datatables_uikit.min.js') !!}"></script>
+<script src="{!! url('public/assets/js/numscroller.js') !!}"></script>
+
+<script>
+    $(function () {
+        if (isHighDensity) {
+            // enable hires images
+            altair_helpers.retina_images();
+        }
+        if (Modernizr.touch) {
+            // fastClick (touch devices)
+            FastClick.attach(document.body);
+        }
+    });
+    $window.load(function () {
+        // ie fixes
+        altair_helpers.ie_fix();
+    });
+</script>
+<div id="style_switcher">
+    <div id="style_switcher_toggle"><i class="material-icons">&#xE8B8;</i></div>
+    <div class="uk-margin-medium-bottom">
+        <h4 class="heading_c uk-margin-bottom">Colors</h4>
+        <ul class="switcher_app_themes" id="theme_switcher">
+            <li class="app_style_default active_theme" data-app-theme="">
+                <span class="app_color_main"></span>
+                <span class="app_color_accent"></span>
+            </li>
+            <li class="switcher_theme_a" data-app-theme="app_theme_a">
+                <span class="app_color_main"></span>
+                <span class="app_color_accent"></span>
+            </li>
+            <li class="switcher_theme_b" data-app-theme="app_theme_b">
+                <span class="app_color_main"></span>
+                <span class="app_color_accent"></span>
+            </li>
+            <li class="switcher_theme_c" data-app-theme="app_theme_c">
+                <span class="app_color_main"></span>
+                <span class="app_color_accent"></span>
+            </li>
+            <li class="switcher_theme_d" data-app-theme="app_theme_d">
+                <span class="app_color_main"></span>
+                <span class="app_color_accent"></span>
+            </li>
+            <li class="switcher_theme_e" data-app-theme="app_theme_e">
+                <span class="app_color_main"></span>
+                <span class="app_color_accent"></span>
+            </li>
+            <li class="switcher_theme_f" data-app-theme="app_theme_f">
+                <span class="app_color_main"></span>
+                <span class="app_color_accent"></span>
+            </li>
+            <li class="switcher_theme_g" data-app-theme="app_theme_g">
+                <span class="app_color_main"></span>
+                <span class="app_color_accent"></span>
+            </li>
+            <li class="switcher_theme_h" data-app-theme="app_theme_h">
+                <span class="app_color_main"></span>
+                <span class="app_color_accent"></span>
+            </li>
+            <li class="switcher_theme_i" data-app-theme="app_theme_i">
+                <span class="app_color_main"></span>
+                <span class="app_color_accent"></span>
+            </li>
+        </ul>
+    </div>
+    <div class="uk-visible-large uk-margin-medium-bottom">
+        <h4 class="heading_c">Sidebar</h4>
+        <p>
+            <input type="checkbox" name="style_sidebar_mini" id="style_sidebar_mini" data-md-icheck/>
+            <label for="style_sidebar_mini" class="inline-label">Mini Sidebar</label>
+        </p>
+    </div>
+    <div class="uk-visible-large uk-margin-medium-bottom">
+        <h4 class="heading_c">Layout</h4>
+        <p>
+            <input type="checkbox" name="style_layout_boxed" id="style_layout_boxed" data-md-icheck/>
+            <label for="style_layout_boxed" class="inline-label">Boxed layout</label>
+        </p>
+    </div>
+    <div class="uk-visible-large">
+        <h4 class="heading_c">Main menu accordion</h4>
+        <p>
+            <input type="checkbox" name="accordion_mode_main_menu" id="accordion_mode_main_menu" data-md-icheck/>
+            <label for="accordion_mode_main_menu" class="inline-label">Accordion mode</label>
+        </p>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        var $switcher = $('#style_switcher'),
+            $switcher_toggle = $('#style_switcher_toggle'),
+            $theme_switcher = $('#theme_switcher'),
+            $mini_sidebar_toggle = $('#style_sidebar_mini'),
+            $boxed_layout_toggle = $('#style_layout_boxed'),
+            $accordion_mode_toggle = $('#accordion_mode_main_menu'),
+            $body = $('body');
+
+
+        $switcher_toggle.click(function (e) {
+            e.preventDefault();
+            $switcher.toggleClass('switcher_active');
+        });
+
+        $theme_switcher.children('li').click(function (e) {
+            e.preventDefault();
+            var $this = $(this),
+                this_theme = $this.attr('data-app-theme');
+
+            $theme_switcher.children('li').removeClass('active_theme');
+            $(this).addClass('active_theme');
+            $body
+                .removeClass('app_theme_a app_theme_b app_theme_c app_theme_d app_theme_e app_theme_f app_theme_g app_theme_h app_theme_i')
+                .addClass(this_theme);
+
+            if (this_theme == '') {
+                localStorage.removeItem('altair_theme');
+            } else {
+                localStorage.setItem("altair_theme", this_theme);
+            }
+
+        });
+
+        // hide style switcher
+        $document.on('click keyup', function (e) {
+            if ($switcher.hasClass('switcher_active')) {
+                if (
+                    (!$(e.target).closest($switcher).length)
+                    || (e.keyCode == 27)
+                ) {
+                    $switcher.removeClass('switcher_active');
+                }
+            }
+        });
+
+        // get theme from local storage
+        if (localStorage.getItem("altair_theme") !== null) {
+            $theme_switcher.children('li[data-app-theme=' + localStorage.getItem("altair_theme") + ']').click();
+        }
+
+
+        // toggle mini sidebar
+
+        // change input's state to checked if mini sidebar is active
+        if ((localStorage.getItem("altair_sidebar_mini") !== null && localStorage.getItem("altair_sidebar_mini") == '1') || $body.hasClass('sidebar_mini')) {
+            $mini_sidebar_toggle.iCheck('check');
+        }
+
+        $mini_sidebar_toggle
+            .on('ifChecked', function (event) {
+                $switcher.removeClass('switcher_active');
+                localStorage.setItem("altair_sidebar_mini", '1');
+                location.reload(true);
+            })
+            .on('ifUnchecked', function (event) {
+                $switcher.removeClass('switcher_active');
+                localStorage.removeItem('altair_sidebar_mini');
+                location.reload(true);
+            });
+
+
+        // toggle boxed layout
+
+        if ((localStorage.getItem("altair_layout") !== null && localStorage.getItem("altair_layout") == 'boxed') || $body.hasClass('boxed_layout')) {
+            $boxed_layout_toggle.iCheck('check');
+            $body.addClass('boxed_layout');
+            $(window).resize();
+        }
+
+        $boxed_layout_toggle
+            .on('ifChecked', function (event) {
+                $switcher.removeClass('switcher_active');
+                localStorage.setItem("altair_layout", 'boxed');
+                location.reload(true);
+            })
+            .on('ifUnchecked', function (event) {
+                $switcher.removeClass('switcher_active');
+                localStorage.removeItem('altair_layout');
+                location.reload(true);
+            });
+
+        // main menu accordion mode
+        if ($sidebar_main.hasClass('accordion_mode')) {
+            $accordion_mode_toggle.iCheck('check');
+        }
+
+        $accordion_mode_toggle
+            .on('ifChecked', function () {
+                $sidebar_main.addClass('accordion_mode');
+            })
+            .on('ifUnchecked', function () {
+                $sidebar_main.removeClass('accordion_mode');
+            });
+
+
+    });
+</script>
+@yield('js')
+
+<script type="text/javascript">
+    $.ajaxSetup({
+        headers: {'X-CSRF-Token': $('meta[name=_token]').attr('content')}
+    });    </script>
+
+<script src="{!! url('public/assets/js/jquery.form.js') !!}"></script>
+<script src="{!! url('public/assets/js/jquery.validate.min.js') !!}"></script>
+
+<script language="javascript" type="text/javascript">
+    $(document).ready(function () {
+        $('.saves').on('click', function (e) {
+
+
+            var name = $(this).closest('tr').find('.name').val();
+            var program = $(this).closest('tr').find('.program').val();
+            var level = $(this).closest('tr').find('.level').val();
+
+            //alert(hall);
+            UIkit.modal.confirm("Are you sure you want to add this group "
+                , function () {
+                    modal = UIkit.modal.blockUI("<div class='uk-text-center'>Creating Group <br/><img class='uk-thumbnail uk-margin-top' src='{!! url('public/assets/img/spinners/spinner.gif')  !!}' /></div>");
+                    //setTimeout(function(){ modal.hide() }, 500) })()
+                    $.ajax({
+
+                        type: "POST",
+                        url: "admit",
+                        data: {applicant: student, program: program, hall: hall, admit: admit}, //your form data to post goes
+                        dataType: "html",
+                    }).done(function (data) {
+                        modal.hide();
+
+                        UIkit.modal.alert("Group created successfully");
+                        // $("#ts_pager_filter").load(window.location + " #ts_pager_filter");
+                        // console.log(data);
+                        location.reload();
+                        //        return (function(modal){ modal = UIkit.modal.blockUI("<div class='uk-text-center'>Processing Transcript Order<br/><img class='uk-thumbnail uk-margin-top' src='{!! url('public/assets/img/spinners/spinner.gif')  !!}' /></div>"); setTimeout(function(){ modal.hide() }, 500) })();
+                    });
+                }
+            );
+        });
+
+    });
 
     function printDiv(divID) {
         //Get the HTML of div
