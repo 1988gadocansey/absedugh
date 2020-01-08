@@ -114,6 +114,7 @@ class StudentController extends Controller
         elseif (@\Auth::user()->department=="Finance") {
             $student = StudentModel::where("STATUS","In school");
         }
+
         elseif (@\Auth::user()->role=="Support") {
             $student = StudentModel::where("STATUS","In school");
         }
@@ -153,8 +154,12 @@ class StudentController extends Controller
             // dd($request);
             $student->where("INDEXNO", "LIKE", "%" . $request->input("search", "") . "%")->orWhere("NAME", "LIKE", "%" . $request->input("search", "") . "%");;
         }
+
         if ($request->has('program') && trim($request->input('program')) != "") {
             $student->where("PROGRAMMECODE", $request->input("program", ""));
+        }
+        if ($request->has('cohort') && trim($request->input('cohort')) != "") {
+            $student->where("cohort", $request->input("cohort", ""));
         }
         if ($request->has('level') && trim($request->input('level')) != "") {
             $student->where("LEVEL", $request->input("level", ""));
@@ -234,7 +239,7 @@ class StudentController extends Controller
 
         \Session::put('students', $data);
         return view('students.index')->with("data", $data)
-            ->with('year', $sys->years())
+            ->with('year', $this->cohortGroup())
             ->with('nationality', $sys->getCountry())
             ->with('halls', $sys->getHalls())
             ->with('level', $sys->getLevelList())
@@ -246,7 +251,11 @@ class StudentController extends Controller
             ->with('type', $sys->getProgrammeTypes());
 
     }
-
+    public function cohortGroup(){
+        $data= \DB::table('tpoly_students')->groupBy("COHORT")
+            ->lists('COHORT', 'COHORT');
+        return $data;
+    }
 
     public function nservice(Request $request, SystemController $sys) {
 
@@ -976,6 +985,7 @@ class StudentController extends Controller
                 $balance= $value->balance;
                 $fname= $value->fname;
                 $lname= $value->surname;
+                $cohort= $value->cohort;
                 $phone= $value->telephone;
                 $password=$sys->generatePassword();
                 $name = $value->name;
@@ -1000,6 +1010,7 @@ class StudentController extends Controller
                         $student->LEVEL = $level;
                         $student->YEAR = $level;
                         $student->SEX = $gender;
+                        $student->COHORT = $cohort;
                         $student->NAME = $name;
                         $student->FIRSTNAME= $fname;
                         $student->EMAIL= $email;
@@ -1022,7 +1033,7 @@ class StudentController extends Controller
                         ]);
                     } else {
 
-                        StudentModel::where('INDEXNO', $indexno)->update(array("STNO"=>$stno,"ADDRESS"=>$address,"LEVEL" => @$level, "YEAR" => $level, "PROGRAMMECODE" => $program, "SYSUPDATE" => "1", "STATUS" => 'In school', "NAME" => $name, "GRADUATING_GROUP" => $group,  "BILL_OWING" => $balance));
+                        StudentModel::where('INDEXNO', $indexno)->update(array("STNO"=>$stno,"ADDRESS"=>$address,"LEVEL" => @$level, "YEAR" => $level, "PROGRAMMECODE" => $program, "SYSUPDATE" => "1", "STATUS" => 'In school', "NAME" => $name, "COHORT" => $cohort,  "BILL_OWING" => $balance));
 
                     }
                 } else {

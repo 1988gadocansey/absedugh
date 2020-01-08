@@ -472,51 +472,15 @@ class APIController extends Controller
             $data = @Models\StudentModel::where("INDEXNO", $student)->orWhere("STNO", $student)->select("INDEXNO", "STNO", "NAME", "PROGRAMMECODE", "LEVEL", "BILLS", "STATUS")->first();
 
 
-            if (empty($data)) {
-
-                //return response()->json(array('data'=>"Student with index number $student does not exist."));
-                $json = json_decode(file_get_contents("http://45.33.4.164/admissions/applicant/$student"), true, JSON_PRETTY_PRINT);
-
-                $a[] = (array)$json;
-
-                /*foreach ($a as $i) {
-                    $data["admission_number"] = $i["application_number"];
-                    $data["name"] = $i["name"];
-                    $data["programme"] = $i["programme"];
-                    $data["fees"] = $i["fees"];
-                    $data["hall"] = $i["hall"];
-                    $data["type"] = "Newly admited applicant";
-                }*/
-
-                foreach ($a as $i) {
-                    $data["INDEXNO"] = $i["application_number"];
-                    $data["STNO"] = $i["application_number"];
-                    $data["NAME"] = $i["name"];
-                    $data["PROGRAMMECODE"] = $i["programme"];
-                    //$data["PROGRAMME"] = $sys->getProgram($i["application_number"]);
-                    //$data["PASSWORD"] = $sys->getStudentPassword($i["application_number"]);
-                    $data["LEVEL"] = '100';
-                    $data["BILLS"] = $i["fees"];
-                    $data["STATUS"] = "Applicant";
-
-                }
-
+            return response()->json(array('data' => $data));
 
             }
 
-            if(!empty($data)) {
 
-                return response()->json(array('data' => $data));
-
-            }
             else{
                 return response("No data found", 401);
             }
 
-        }
-        else{
-            return response("Unauthorized access detected!", 401);
-        }
 
 
     }

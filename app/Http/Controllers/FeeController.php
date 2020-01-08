@@ -231,7 +231,7 @@ foreach($programSelect as $row){
                  $sheet->prependRow(1, array(' '.$programName));
                 $sheet->prependRow(1, array(' '.' DEPARTMENT OF '.$departmentName));
                 $sheet->prependRow(1, array(' '.$facultyName ));
-                $sheet->prependRow(1, array(' '.' TAKORADI TECHNICAL UNIVERSITY'
+                $sheet->prependRow(1, array(' '.' ACCRA BUSINESS SCHOOL'
                 ));
 
                 $sheet->mergeCells('A1:G1');
@@ -259,7 +259,7 @@ foreach($programSelect as $row){
 
 
 
-    public function showOwing_excel(SystemController $sys){
+    public function showOwing_excel(Request $request,SystemController $sys){
         
             $faculty=$sys->getSchoolList();
             
@@ -401,7 +401,7 @@ foreach($programSelect as $row){
                  $sheet->prependRow(1, array(' '.$programName));
                 $sheet->prependRow(1, array(' '.' DEPARTMENT OF '.$departmentName));
                 $sheet->prependRow(1, array(' '.$facultyName ));
-                $sheet->prependRow(1, array(' '.' TAKORADI TECHNICAL UNIVERSITY'
+                $sheet->prependRow(1, array(' '.' ACCRA BUSINESS SCHOOL'
                 ));
 
                 $sheet->mergeCells('A1:G1');
@@ -515,6 +515,539 @@ foreach($programSelect as $row){
             ->with('total', $totals);
 
     }
+
+    public function showpaid_all_excel(SystemController $sys){
+
+        $faculty=$sys->getSchoolList();
+
+        return view('students.paid_all_excel')->with('faculty', $faculty)
+            ->with('level', $sys->getLevelList())->with('year',$sys->years());
+
+
+    }
+
+    public function paid_all_excel(Request $request, SystemController $sys )
+
+    {
+
+
+        set_time_limit(200000000);
+        ini_set('memory_limit', '512M');
+        $this->validate($request, [
+
+
+            'faculty' => 'required',
+            // 'sem' => 'required',
+            // 'year' => 'required',
+            // 'year' => 'required',
+        ]);
+
+        $faculty = $request->input("faculty");
+
+        $arraycc = $sys->getSemYear();
+        $yearcc = $arraycc[0]->YEAR;
+        $grad = $arraycc[0]->GRAD;
+        //$yearcc = '2017/2018';
+
+        $currentResultsArray=$arraycc[0]->RESULT_DATE;
+
+        $partYear = date('Y');
+        // dd($resultb);
+        //dd($partYear);
+
+        $currentResultsArray1 = explode(',',$currentResultsArray);
+        $resultyear = $currentResultsArray1[0];
+        $resultsem = $currentResultsArray1[1];
+
+
+        // if ($arraycc[0]->YEAR != $resultyear) {
+        //     $yearcc = $resultyear;
+        // }
+
+
+        $kojoSense = 0;
+        $array = $sys->getSemYear();
+        //$sem = $request->input("sem");
+
+
+
+        return Excel::create($partYear.' '.$faculty.' fee paypents', function ($excel) use ($kojoSense, $sys, $yearcc, $faculty){
+
+            $excel->getProperties()
+                ->setCreator("TTU")
+                ->setTitle("TTU STUDENTS REPORTS")
+                ->setLastModifiedBy("TPCONNECT")
+                ->setDescription('Multiple sheets showing all fees payments')
+                ->setSubject("TPCONNECT")
+                ->setKeywords('TP, fees');
+
+            $programSelect= Models\ProgrammeModel::join('tpoly_department', 'tpoly_programme.DEPTCODE', '=', 'tpoly_department.DEPTCODE')->join('tpoly_faculty', 'tpoly_department.FACCODE', '=', 'tpoly_faculty.FACCODE')->where("tpoly_faculty.FACCODE", $faculty)->orderBy("tpoly_department.DEPTCODE")->orderBy("PROGRAMME")->get();
+
+            foreach($programSelect as $row){
+
+                $programName = $row->PROGRAMME;
+
+                $departmentName = $sys->getDepartmentProgramme($row->PROGRAMMECODE);
+
+                $facultyName = $sys->getSchoolName($faculty);
+
+                $levelPay = Models\StudentModel::where("tpoly_students.PROGRAMMECODE", $row->PROGRAMMECODE)->where("tpoly_students.STATUS", 'In school')
+                    ->groupBy('tpoly_students.LEVEL')
+                    ->select('tpoly_students.LEVEL')
+                    ->get();
+
+                foreach($levelPay as $level_row){
+
+                    //     $studentPayUpdate = Models\StudentModel::join('tpoly_programme', 'tpoly_students.PROGRAMMECODE', '=', 'tpoly_programme.PROGRAMMECODE')->where("tpoly_students.STATUS", 'In school')->where("tpoly_students.PROGRAMMECODE", $row->PROGRAMMECODE)->where("tpoly_students.LEVEL", $level_row->LEVEL)
+                    // ->orderBy('tpoly_students.INDEXNO')
+                    // ->get();
+                    // foreach($studentPayUpdate as $pay_update){
+                    //     $indexUpdate = $pay_update->INDEXNO;
+                    //     $indexBalance = $pay_update->BALANCE;
+                    //     $indexBillUpdate = $sys->getStudentFee($indexUpdate, $level_row->LEVEL);
+                    //     $indexPayUpdate = $sys->getTotalPayment($indexUpdate, $yearcc);
+                    //     $billUpdate = $indexBalance + $indexBillUpdate;
+                    //     $owingUpdate = $billUpdate - $indexPayUpdate;
+
+
+                    //     Models\StudentModel::where("INDEXNO", $indexUpdate)->update(array("BILLS" => $billUpdate, "PAID" => $indexPayUpdate,'BILL_OWING' => $owingUpdate));
+                    //     \DB::commit();
+
+                    // }
+
+                    $studentPay = Models\StudentModel::join('tpoly_programme', 'tpoly_students.PROGRAMMECODE', '=', 'tpoly_programme.PROGRAMMECODE')->where("tpoly_students.STATUS", 'In school')->where("tpoly_students.PROGRAMMECODE", $row->PROGRAMMECODE)->where("tpoly_students.LEVEL", $level_row->LEVEL)
+                        ->groupBy('tpoly_students.INDEXNO')
+                        ->orderBy('tpoly_students.INDEXNO')
+                        ->select('tpoly_students.INDEXNO', 'tpoly_students.NAME', 'tpoly_students.BALANCE as BAL_B/F', 'tpoly_students.BILLS AS BILL', 'tpoly_students.PAID','tpoly_students.BILL_OWING AS OWING')
+                        ->get();
+
+                    $excel->sheet($row->PROGRAMMECODE, function ($sheet) use ($kojoSense, $yearcc, $studentPay, $facultyName, $departmentName, $programName) {
+
+                        $sheet->setWidth(array(
+                            'A'     =>  4,
+                            'B'     =>  15,
+                            'C'     =>  35,
+                            'D'     =>  10,
+                            'E'     =>  10,
+                            'F'     =>  10,
+                            'G'     =>  10,
+                        ));
+                        @$kojoSense = count(@$studentPay)+1;
+
+                        @$sheet->fromArray(@$studentPay, Null, 'B1', true);
+                        @$sheet->setBorder('A1:G'.@$kojoSense.'', 'thin');
+
+                        for($k=1;$k<$kojoSense;$k++){
+                            $kID = $k;
+                            $kIdCount = $kID + 1;
+                            $sheet->setCellValue('A'.$kIdCount.'',$k);
+
+
+
+                        }
+
+                        $countKojoSense = $kojoSense + 1;
+                        $sheet->setCellValue('D'.$countKojoSense.'','=SUM(D2:D'.$kojoSense.')');
+                        $sheet->setCellValue('E'.$countKojoSense.'','=SUM(E2:E'.$kojoSense.')');
+                        $sheet->setCellValue('F'.$countKojoSense.'','=SUM(F2:F'.$kojoSense.')');
+                        $sheet->setCellValue('G'.$countKojoSense.'','=SUM(G2:G'.$kojoSense.')');
+
+                        $sheet->getStyle('D'.$countKojoSense.':G'.$countKojoSense.'')->getNumberFormat()->setFormatCode('#,###.00');
+
+                        $sheet->cells('D'.$countKojoSense.':G'.$countKojoSense.'', function($cells) {
+
+                            // manipulate the cell
+                            ////$cell->setAlignment('center');
+                            $cells->setFont(array(
+                                'size'       => '10',
+                                'bold'       =>  true
+                            ));
+
+                        });
+
+                        $sheet->prependRow(1, array(' '.' '.' '.''
+                        ));
+                        $urrent_time = \Carbon\Carbon::now()->toDateTimeString();
+                        $current_time = date('l d F, Y @ H:i:s', strtotime($urrent_time));
+                        //$sheet->setCellValue('A3',$current_time);
+                        $sheet->prependRow(1, array(' '.' Downloaded on '. $current_time
+                        ));
+                        $sheet->prependRow(1, array(' '.$programName));
+                        $sheet->prependRow(1, array(' '.' DEPARTMENT OF '.$departmentName));
+                        $sheet->prependRow(1, array(' '.$facultyName ));
+                        $sheet->prependRow(1, array(' '.' ACCRA BUSINESS SCHOOL'
+                        ));
+
+                        $sheet->mergeCells('A1:G1');
+                        $sheet->mergeCells('A2:G2');
+                        $sheet->mergeCells('A3:G3');
+                        $sheet->mergeCells('A4:G4');
+                        $sheet->mergeCells('A5:G5');
+
+                        $sheet->cells('A1:G5', function($cells) {
+
+                            $cells->setAlignment('center');
+                        });
+
+                    });
+
+                }
+
+            }
+
+        })->download('xlsx');
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+    public function showoverpaid_excel(SystemController $sys){
+
+        $faculty=$sys->getSchoolList();
+
+        return view('students.overpaid_excel')->with('faculty', $faculty)
+            ->with('level', $sys->getLevelList())->with('year',$sys->years());
+
+
+    }
+
+    public function overpaid_excel(Request $request, SystemController $sys )
+
+    {
+
+
+        set_time_limit(200000000);
+        ini_set('memory_limit', '512M');
+        $this->validate($request, [
+
+
+            'faculty' => 'required',
+            // 'sem' => 'required',
+            // 'year' => 'required',
+            // 'year' => 'required',
+        ]);
+
+        $faculty = $request->input("faculty");
+
+        $arraycc = $sys->getSemYear();
+        $yearcc = $arraycc[0]->YEAR;
+        $grad = $arraycc[0]->GRAD;
+        //$yearcc = '2017/2018';
+
+        $currentResultsArray=$arraycc[0]->RESULT_DATE;
+
+        $partYear = date('Y');
+        // dd($resultb);
+        //dd($partYear);
+
+        $currentResultsArray1 = explode(',',$currentResultsArray);
+        $resultyear = $currentResultsArray1[0];
+        $resultsem = $currentResultsArray1[1];
+
+
+        // if ($arraycc[0]->YEAR != $resultyear) {
+        //     $yearcc = $resultyear;
+        // }
+
+
+        $kojoSense = 0;
+        $array = $sys->getSemYear();
+        //$sem = $request->input("sem");
+
+
+
+        return Excel::create($partYear.' '.$faculty.' overpaid', function ($excel) use ($kojoSense, $sys, $yearcc, $faculty){
+
+            $excel->getProperties()
+                ->setCreator("TTU")
+                ->setTitle("TTU STUDENTS REPORTS")
+                ->setLastModifiedBy("TPCONNECT")
+                ->setDescription('Multiple sheets showing all fees [ayments')
+                ->setSubject("TPCONNECT")
+                ->setKeywords('TP, fees');
+
+            $programSelect= Models\ProgrammeModel::join('tpoly_department', 'tpoly_programme.DEPTCODE', '=', 'tpoly_department.DEPTCODE')->join('tpoly_faculty', 'tpoly_department.FACCODE', '=', 'tpoly_faculty.FACCODE')->where("tpoly_faculty.FACCODE", $faculty)->orderBy("tpoly_department.DEPTCODE")->orderBy("PROGRAMME")->get();
+
+            foreach($programSelect as $row){
+
+                $programName = $row->PROGRAMME;
+
+                $departmentName = $sys->getDepartmentProgramme($row->PROGRAMMECODE);
+
+                $facultyName = $sys->getSchoolName($faculty);
+
+                $levelPay = Models\StudentModel::where("tpoly_students.PROGRAMMECODE", $row->PROGRAMMECODE)->where("tpoly_students.STATUS", 'In school')->where("tpoly_students.BILL_OWING", "<", 0)
+                    ->groupBy('tpoly_students.LEVEL')
+                    ->select('tpoly_students.LEVEL')
+                    ->get();
+
+                foreach($levelPay as $level_row){
+
+                    $studentPay = Models\StudentModel::join('tpoly_programme', 'tpoly_students.PROGRAMMECODE', '=', 'tpoly_programme.PROGRAMMECODE')->where("tpoly_students.STATUS", 'In school')->where("tpoly_students.PROGRAMMECODE", $row->PROGRAMMECODE)->where("tpoly_students.LEVEL", $level_row->LEVEL)->where("tpoly_students.BILL_OWING","<",0.00)
+                        ->groupBy('tpoly_students.INDEXNO')
+                        ->orderBy('tpoly_students.INDEXNO')
+                        ->select('tpoly_students.INDEXNO', 'tpoly_students.NAME', 'tpoly_students.BALANCE as BAL_B/F', 'tpoly_students.BILLS AS BILL', 'tpoly_students.PAID','tpoly_students.BILL_OWING AS OWING')
+                        ->get();
+
+                    $excel->sheet($row->PROGRAMMECODE, function ($sheet) use ($kojoSense, $yearcc, $studentPay, $facultyName, $departmentName, $programName) {
+
+                        $sheet->setWidth(array(
+                            'A'     =>  4,
+                            'B'     =>  15,
+                            'C'     =>  35,
+                            'D'     =>  10,
+                            'E'     =>  10,
+                            'F'     =>  10,
+                            'G'     =>  10,
+                        ));
+                        @$kojoSense = count(@$studentPay)+1;
+
+                        @$sheet->fromArray(@$studentPay, Null, 'B1', true);
+                        @$sheet->setBorder('A1:G'.@$kojoSense.'', 'thin');
+
+                        for($k=1;$k<$kojoSense;$k++){
+                            $kID = $k;
+                            $kIdCount = $kID + 1;
+                            $sheet->setCellValue('A'.$kIdCount.'',$k);
+
+
+
+                        }
+
+                        $countKojoSense = $kojoSense + 1;
+                        $sheet->setCellValue('D'.$countKojoSense.'','=SUM(D2:D'.$kojoSense.')');
+                        $sheet->setCellValue('E'.$countKojoSense.'','=SUM(E2:E'.$kojoSense.')');
+                        $sheet->setCellValue('F'.$countKojoSense.'','=SUM(F2:F'.$kojoSense.')');
+                        $sheet->setCellValue('G'.$countKojoSense.'','=SUM(G2:G'.$kojoSense.')');
+
+                        $sheet->getStyle('D'.$countKojoSense.':G'.$countKojoSense.'')->getNumberFormat()->setFormatCode('#,###.00');
+
+                        $sheet->cells('D'.$countKojoSense.':G'.$countKojoSense.'', function($cells) {
+
+                            // manipulate the cell
+                            ////$cell->setAlignment('center');
+                            $cells->setFont(array(
+                                'size'       => '10',
+                                'bold'       =>  true
+                            ));
+
+                        });
+
+                        $sheet->prependRow(1, array(' '.' '.' '.''
+                        ));
+                        $urrent_time = \Carbon\Carbon::now()->toDateTimeString();
+                        $current_time = date('l d F, Y @ H:i:s', strtotime($urrent_time));
+                        //$sheet->setCellValue('A3',$current_time);
+                        $sheet->prependRow(1, array(' '.' Downloaded on '. $current_time
+                        ));
+                        $sheet->prependRow(1, array(' '.$programName));
+                        $sheet->prependRow(1, array(' '.' DEPARTMENT OF '.$departmentName));
+                        $sheet->prependRow(1, array(' '.$facultyName ));
+                        $sheet->prependRow(1, array(' '.' ACCRA BUSINESS SCHOOL'
+                        ));
+
+                        $sheet->mergeCells('A1:G1');
+                        $sheet->mergeCells('A2:G2');
+                        $sheet->mergeCells('A3:G3');
+                        $sheet->mergeCells('A4:G4');
+                        $sheet->mergeCells('A5:G5');
+
+                        $sheet->cells('A1:G5', function($cells) {
+
+                            $cells->setAlignment('center');
+                        });
+
+                    });
+
+                }
+
+            }
+
+        })->download('xlsx');
+
+
+    }
+
+
+
+
+    public function showfully_paid_excel(SystemController $sys){
+
+        $faculty=$sys->getSchoolList();
+
+        return view('students.fully_paid_excel')->with('faculty', $faculty)
+            ->with('level', $sys->getLevelList())->with('year',$sys->years());
+
+
+    }
+
+    public function fully_paid_excel(Request $request, SystemController $sys )
+
+    {
+
+
+        set_time_limit(200000000);
+        ini_set('memory_limit', '512M');
+        $this->validate($request, [
+
+
+            'faculty' => 'required',
+            // 'sem' => 'required',
+            // 'year' => 'required',
+            // 'year' => 'required',
+        ]);
+
+        $faculty = $request->input("faculty");
+
+        $arraycc = $sys->getSemYear();
+        $yearcc = $arraycc[0]->YEAR;
+        $grad = $arraycc[0]->GRAD;
+        //$yearcc = '2017/2018';
+
+        $currentResultsArray=$arraycc[0]->RESULT_DATE;
+
+        $partYear = date('Y');
+        // dd($resultb);
+        //dd($partYear);
+
+        $currentResultsArray1 = explode(',',$currentResultsArray);
+        $resultyear = $currentResultsArray1[0];
+        $resultsem = $currentResultsArray1[1];
+
+        //$year = $array[0]->YEAR;
+        if ($arraycc[0]->YEAR != $resultyear) {
+            $yearcc = $resultyear;
+        }
+
+
+        $kojoSense = 0;
+        $array = $sys->getSemYear();
+        //$sem = $request->input("sem");
+
+
+
+        return Excel::create($partYear.' '.$faculty.' fully paid', function ($excel) use ($kojoSense, $sys, $yearcc, $faculty){
+
+            $excel->getProperties()
+                ->setCreator("TTU")
+                ->setTitle("TTU STUDENTS REPORTS")
+                ->setLastModifiedBy("TPCONNECT")
+                ->setDescription('Multiple sheets showing all fees [ayments')
+                ->setSubject("TPCONNECT")
+                ->setKeywords('TP, fees');
+
+            $programSelect= Models\ProgrammeModel::join('tpoly_department', 'tpoly_programme.DEPTCODE', '=', 'tpoly_department.DEPTCODE')->join('tpoly_faculty', 'tpoly_department.FACCODE', '=', 'tpoly_faculty.FACCODE')->where("tpoly_faculty.FACCODE", $faculty)->orderBy("tpoly_department.DEPTCODE")->orderBy("PROGRAMME")->get();
+
+            foreach($programSelect as $row){
+
+                $programName = $row->PROGRAMME;
+
+                $departmentName = $sys->getDepartmentProgramme($row->PROGRAMMECODE);
+
+                $facultyName = $sys->getSchoolName($faculty);
+
+                $levelPay = Models\StudentModel::where("tpoly_students.PROGRAMMECODE", $row->PROGRAMMECODE)->where("tpoly_students.STATUS", 'In school')
+                    ->groupBy('tpoly_students.LEVEL')
+                    ->select('tpoly_students.LEVEL')
+                    ->get();
+
+                foreach($levelPay as $level_row){
+
+                    $studentPay = Models\StudentModel::join('tpoly_programme', 'tpoly_students.PROGRAMMECODE', '=', 'tpoly_programme.PROGRAMMECODE')->where("tpoly_students.STATUS", 'In school')->where("tpoly_students.PROGRAMMECODE", $row->PROGRAMMECODE)->where("tpoly_students.LEVEL", $level_row->LEVEL)->where("tpoly_students.BILL_OWING","<=",0.00)
+                        ->groupBy('tpoly_students.INDEXNO')
+                        ->orderBy('tpoly_students.INDEXNO')
+                        ->select('tpoly_students.INDEXNO', 'tpoly_students.NAME', 'tpoly_students.BALANCE as BAL_B/F', 'tpoly_students.BILLS AS BILL', 'tpoly_students.PAID','tpoly_students.BILL_OWING AS OWING')
+                        ->get();
+
+                    $excel->sheet($row->PROGRAMMECODE, function ($sheet) use ($kojoSense, $yearcc, $studentPay, $facultyName, $departmentName, $programName) {
+
+                        $sheet->setWidth(array(
+                            'A'     =>  4,
+                            'B'     =>  15,
+                            'C'     =>  35,
+                            'D'     =>  10,
+                            'E'     =>  10,
+                            'F'     =>  10,
+                            'G'     =>  10,
+                        ));
+                        @$kojoSense = count(@$studentPay)+1;
+
+                        @$sheet->fromArray(@$studentPay, Null, 'B1', true);
+                        @$sheet->setBorder('A1:G'.@$kojoSense.'', 'thin');
+
+                        for($k=1;$k<$kojoSense;$k++){
+                            $kID = $k;
+                            $kIdCount = $kID + 1;
+                            $sheet->setCellValue('A'.$kIdCount.'',$k);
+
+
+
+                        }
+
+                        $countKojoSense = $kojoSense + 1;
+                        $sheet->setCellValue('D'.$countKojoSense.'','=SUM(D2:D'.$kojoSense.')');
+                        $sheet->setCellValue('E'.$countKojoSense.'','=SUM(E2:E'.$kojoSense.')');
+                        $sheet->setCellValue('F'.$countKojoSense.'','=SUM(F2:F'.$kojoSense.')');
+                        $sheet->setCellValue('G'.$countKojoSense.'','=SUM(G2:G'.$kojoSense.')');
+
+                        $sheet->getStyle('D'.$countKojoSense.':G'.$countKojoSense.'')->getNumberFormat()->setFormatCode('#,###.00');
+
+                        $sheet->cells('D'.$countKojoSense.':G'.$countKojoSense.'', function($cells) {
+
+                            // manipulate the cell
+                            ////$cell->setAlignment('center');
+                            $cells->setFont(array(
+                                'size'       => '10',
+                                'bold'       =>  true
+                            ));
+
+                        });
+
+                        $sheet->prependRow(1, array(' '.' '.' '.''
+                        ));
+                        $urrent_time = \Carbon\Carbon::now()->toDateTimeString();
+                        $current_time = date('l d F, Y @ H:i:s', strtotime($urrent_time));
+                        //$sheet->setCellValue('A3',$current_time);
+                        $sheet->prependRow(1, array(' '.' Downloaded on '. $current_time
+                        ));
+                        $sheet->prependRow(1, array(' '.$programName));
+                        $sheet->prependRow(1, array(' '.' DEPARTMENT OF '.$departmentName));
+                        $sheet->prependRow(1, array(' '.$facultyName ));
+                        $sheet->prependRow(1, array(' '.' ACCRA BUSINESS SCHOOL'
+                        ));
+
+                        $sheet->mergeCells('A1:G1');
+                        $sheet->mergeCells('A2:G2');
+                        $sheet->mergeCells('A3:G3');
+                        $sheet->mergeCells('A4:G4');
+                        $sheet->mergeCells('A5:G5');
+
+                        $sheet->cells('A1:G5', function($cells) {
+
+                            $cells->setAlignment('center');
+                        });
+
+                    });
+
+                }
+
+            }
+
+        })->download('xlsx');
+
+
+    }
+
+
+
 
     public function feeSummary(Request $request)
     {
@@ -1566,7 +2099,7 @@ foreach($programSelect as $row){
     }
 }
 
-    public function storeUpload(Request $request)
+    public function storeUpload(Request $request,SystemController $sys)
     {
         if ($sys->getUserLevel((@\Auth::user()->department),"enter_fees") == '1' || $sys->getUserLevel((@\Auth::user()->role),"enter_fees") == '1') {
         //get the current user in session

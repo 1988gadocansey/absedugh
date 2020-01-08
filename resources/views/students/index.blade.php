@@ -192,9 +192,9 @@
                         @endif
                         <div class="uk-width-medium-1-5">
                             <div class="uk-margin-small-top">
-                                {!! Form::select('group',
-                                (['' => 'by graduating group'] +$year  ),
-                                old("group",""),
+                                {!! Form::select('cohort',
+                                (['' => 'by cohort'] +$year  ),
+                                old("cohort",""),
                                 ['class' => 'md-input parent','id'=>"parent"] )  !!}
                             </div>
                         </div>
@@ -271,6 +271,7 @@
                             <th>PROGRAM</th>
 
                             <th>LEVEL</th>
+                            <th>COHORT</th>
 
                             <th>GENDER</th>
 
@@ -288,7 +289,6 @@
                                 <th>OWINGS</th>
                                 <th>PASSWORD</th>
                             @endif
-                            <th>YEAR GROUP</th>
 
 
 
@@ -335,6 +335,7 @@
 
                 <td>{!! strtoupper(@$row->program->PROGRAMME) !!}</td>
                 <td> {{ strtoupper(@$row->levels->slug) }}</td>
+                <td> {{ strtoupper(@$row->cohort) }}</td>
 
                 <td> {{ strtoupper(@$row->SEX) }}</td>
                 <td> {{ @$row->AGE }}yrs</td>
@@ -353,7 +354,6 @@
 
                     <td> {{ @$sys->getStudentPassword(@$row->INDEXNO) }}</td>
                 @endif
-                <td> {{ @$row->GRADUATING_GROUP }}</td>
 
 
 

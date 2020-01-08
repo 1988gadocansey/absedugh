@@ -193,7 +193,7 @@ class PaymentController extends Controller
 
 
 
-         $items=Models\PaymentProduct::all();
+         $items= \DB::table('payment_product')->lists("payment_name","id");
 
 
 
@@ -253,7 +253,11 @@ class PaymentController extends Controller
             $fee->where("PROGRAMME", "=", $request->input('program'));
 
         }
+             if ($request->has('item') && trim($request->input('item'))) {
 
+                 $fee->where("PAYMENTTYPE", "=", $request->input('item'));
+
+             }
         if ($request->has('from_date') && $request->has('to_date')) {
 
             //$fee->whereBetween('TRANSDATE', [$request->input('from_date'), $request->input('to_date')]);

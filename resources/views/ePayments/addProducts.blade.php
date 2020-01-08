@@ -30,6 +30,7 @@
                                 <div class="uk-form-row">
                                     <label for="form-h-it" class="uk-form-label">Purpose</label>
                                     <div class="uk-form-controls">
+                                        <input name="purpose" class="" placeholder="Purpose of Payment" id="payment_name" value="{{ old("purpose",@$paymentproduct->purpose) }}">
 
                                     </div>
                                 </div>
@@ -37,6 +38,7 @@
                                     <label for="form-h-ip" class="uk-form-label">Payment Name</label>
                                     <div class="uk-form-controls">
                                         <input name="payment_name" class="" placeholder="Brand Name for Payment" id="payment_name" value="{{ old("payment_name",@$paymentproduct->payment_name) }}">
+
                                     </div>
                                 </div>
                                     <div class="uk-form-row">

@@ -172,7 +172,12 @@
                         </div> -->
                         <div class="uk-width-medium-1-5">
                             <div class="uk-margin-small-top">
-                                  {!!  Form::select('mode', array('PAY IN SLIP'=>'PAY IN SLIP','Cheque'=>'Cheque','Receipts'=>'Receipts','Cash'=>'Cash','Bursary'=>'Bursary','Scholarship'=>'Scholarship'), null, ['placeholder' => 'select payment mode','id'=>'parent','class'=>'md-input parent'], old("type","")); !!}
+                                {!! Form::select('item',
+                             (['' => 'Select Payment Item'] +$items ),
+                               old("item",""),
+                                 ['class' => 'md-input parent','id'=>"parent"] )  !!}
+
+
                          </div>
                         </div>
                          <div class="uk-width-medium-1-10" style=" ">

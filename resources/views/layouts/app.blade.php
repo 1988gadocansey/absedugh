@@ -317,8 +317,8 @@
                                 <li><a href='{!! url("/attendanceSheet") !!}'>Exam Attendance Sheet</a></li>
 
                                 <li><a href='{!! url("/finance/protocol") !!}'>Protocols/Policies</a></li>
-                                <li><a href='{!! url("owing_paid") !!}'>Owing reports</a></li>
-                                <li><a href='{!! url("owing_excel") !!}'>Owing Excel</a></li>
+                                <li><a href='{!! url("owing_paid") !!}'>Fees Owing Reports</a></li>
+                                {{--<li><a href='{!! url("owing_excel") !!}'>Excel List Owing</a></li>--}}
 
                             </ul>
                         </div>
