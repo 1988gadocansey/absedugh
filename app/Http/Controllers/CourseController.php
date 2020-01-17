@@ -2537,12 +2537,14 @@ class CourseControllers extends Controller
             $programme=$sys->getProgramList();
 
             $course=$sys->getCourseList();
+            $cohort=$sys->getCohort();
             //$lecturer=$sys->getLectureList();
             $allLectureres=$sys->getLectureList_All();
             // $totalLecturers = array_merge( $lecturer, $allLectureres);
             return view('courses.mount')->with('program', $programme)
                 ->with('course', $course)
                 ->with('level', $sys->getLevelList())
+                ->with('cohort', $cohort)
                 ->with('lecturer',$allLectureres);
         }
         else{
@@ -2624,7 +2626,7 @@ class CourseControllers extends Controller
                     'level' => 'required',
                     'credit' => 'required',
                     'semester' => 'required',
-
+                    'cohort' => 'required',
                     'year' => 'required'
                 ]);
 
@@ -2632,6 +2634,7 @@ class CourseControllers extends Controller
                 $course = $request->input('course');
                 $kojo2 = explode(',', $course);
                 $program = $request->input('program');
+                 $cohort = $request->input('cohort');
                 $level = $request->input('level');
                 $semester = $request->input('semester');
                 $credit = $request->input('credit');
@@ -2684,6 +2687,7 @@ class CourseControllers extends Controller
                 $mountedCourse->PROGRAMME = $program;
                 $mountedCourse->LECTURER = $lecturer;
                 $mountedCourse->COURSE_YEAR = $year;
+                 $mountedCourse->COHORT = $cohort;
                 $mountedCourse->YEAR_GROUP = $grad2;
                 $mountedCourse->MOUNTED_BY = $hod;
                 $mountedCourse->save();

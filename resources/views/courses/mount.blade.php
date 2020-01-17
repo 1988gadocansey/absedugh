@@ -138,6 +138,23 @@
 
                                </div>
 
+
+                                <div class="uk-form-row">
+
+                                <label>Cohort</label>
+
+                                <p></p>
+
+                               {!!   Form::select('cohort',$level ,array("required"=>"required","class"=>"md-input","id"=>"level","v-model"=>"level","v-form-ctrl"=>"","v-select"=>"cohort")   )  !!}
+
+                                         
+
+                                  <p class="uk-text-danger uk-text-small"  v-if="applicationForm.level.$error.required" >Cohort is required</p>
+
+
+
+                               </div>
+
                                  <div class="uk-form-row">
 
                                 <label for="wizard_email">Course Credit<span class="req uk-text-danger">*</span></label>

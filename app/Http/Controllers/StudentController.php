@@ -197,6 +197,8 @@ class StudentController extends Controller
         if ($request->has('hall') && trim($request->input('hall')) != "") {
             $student->where("HALL", $request->input("hall", ""));
         }
+
+         
         if ($request->has('register') && trim($request->input('register')) != "") {
             $student->where("REGISTERED", $request->input("register", ""));
         }
@@ -239,10 +241,11 @@ class StudentController extends Controller
 
         \Session::put('students', $data);
         return view('students.index')->with("data", $data)
-            ->with('year', $this->cohortGroup())
+            ->with('year', $sys->getCohort())
             ->with('nationality', $sys->getCountry())
             ->with('halls', $sys->getHalls())
             ->with('level', $sys->getLevelList())
+              
             ->with('religion', $sys->getReligion())
             ->with('region', $sys->getRegions())
             ->with('department', $sys->getDepartmentList())
@@ -473,12 +476,14 @@ class StudentController extends Controller
         $region=$sys->getRegions();
         $programme=$sys->getProgramList();
         $hall=$sys->getHalls();
+         $cohort=$sys->getCohort();
         $religion=$sys->getReligion();
         return view('students.create')
             ->with('programme', $programme)
             ->with('country', $sys->getCountry())
             ->with('region', $region)
             ->with('hall',$hall)
+            ->with('cohort',$cohort)
             ->with('level', $sys->getLevelList())
             ->with('religion',$religion);
     }
@@ -530,6 +535,7 @@ class StudentController extends Controller
             $address = $request->input('address');
             $hometown = $request->input('hometown');
             $nhis = $request->input('nhis');
+            $cohort = $request->input('cohort');
             $type = $request->input('type');
             $disability = $request->input('disabilty');
             $title = $request->input('title');
@@ -547,43 +553,44 @@ class StudentController extends Controller
                 $name = $lname . ' ' . $othername . ' ' . $fname;
                 $query = new StudentModel();
                 $query->YEAR = $year;
-                //$query->LEVEL = $level;
+                $query->LEVEL = $level;
                 $query->FIRSTNAME = $fname;
                 $query->SURNAME = $lname;
                 $query->OTHERNAMES = $othername;
                 $query->TITLE = $title;
                 $query->SEX = $gender;
-                //$query->DATEOFBIRTH = $dob;
+                $query->DATEOFBIRTH = $dob;
                 $query->NAME = $name;
-                //$query->AGE = $age;
+                $query->AGE = $age;
+                $query->COHORT = $cohort;
                 //$query->GRADUATING_GROUP = $group;
-                //$query->MARITAL_STATUS = $marital_status;
-                //$query->HALL = $hall;
-                //$query->ADDRESS = $address;
-                //$query->RESIDENTIAL_ADDRESS = $residentAddress;
-                //$query->EMAIL = $email;
-                //$query->PROGRAMMECODE = $program;
-                //$query->TELEPHONENO = $phone;
-                //$query->COUNTRY = $country;
-                //$query->REGION = $region;
-                //$query->RELIGION = $religion;
-                //$query->HOMETOWN = $hometown;
-                //$query->GUARDIAN_NAME = $gname;
-                //$query->GUARDIAN_ADDRESS = $gaddress;
-                //$query->GUARDIAN_PHONE = $gphone;
-                //$query->GUARDIAN_OCCUPATION = $goccupation;
-                //$query->DISABILITY = $disability;
-                //$query->STATUS = "In school";
-                //$query->SYSUPDATE = "1";
-                //$query->NHIS = $nhis;
-                //$query->STUDENT_TYPE = $type;
-                //$query->TYPE = $category;
+                $query->MARITAL_STATUS = $marital_status;
+                $query->HALL = $hall;
+                $query->ADDRESS = $address;
+                $query->RESIDENTIAL_ADDRESS = $residentAddress;
+                $query->EMAIL = $email;
+                $query->PROGRAMMECODE = $program;
+                $query->TELEPHONENO = $phone;
+                $query->COUNTRY = $country;
+                $query->REGION = $region;
+                $query->RELIGION = $religion;
+                $query->HOMETOWN = $hometown;
+                $query->GUARDIAN_NAME = $gname;
+                $query->GUARDIAN_ADDRESS = $gaddress;
+                $query->GUARDIAN_PHONE = $gphone;
+                $query->GUARDIAN_OCCUPATION = $goccupation;
+                $query->DISABILITY = $disability;
+                $query->STATUS = "In school";
+                $query->SYSUPDATE = "1";
+                $query->NHIS = $nhis;
+                $query->STUDENT_TYPE = $type;
+               $query->TYPE = $category;
 
-                //$query->HOSTEL = $hostel;
-                //$query->BILLS=$sys->getYearBill( $fiscalYear, $level, $program);
-                // $query->BILL_OWING=$sys->getYearBill( $fiscalYear, $level, $program);
-                //$query->STNO =$indexno;
-                //$query->INDEXNO =$indexno;
+              $query->HOSTEL = $hostel;
+               $query->BILLS=$bill;
+                 $query->BILL_OWING=$bill;
+               $query->STNO =$indexno;
+                 $query->INDEXNO =$indexno;
 
                 if($query->save()){
                     \DB::commit();
@@ -711,11 +718,10 @@ class StudentController extends Controller
     public function edit($id,  SystemController $sys,Request $request)
     {
         //
-        if ($sys->getUserLevel((@\Auth::user()->department),"create_student") == '1' || $sys->getUserLevel((@\Auth::user()->role),"create_student") == '1') {
 
             $query = StudentModel::where('ID', $id)->where('STATUS','In school')->first();
             //dd( $query );
-        }
+
         
 
         //dd($query);
@@ -730,6 +736,7 @@ class StudentController extends Controller
             ->with('programme', $programme)
             ->with('country', $sys->getCountry())
             ->with('region', $region)
+            ->with('cohort', $sys->getCohort())
             ->with('level', $sys->getLevelList())
             ->with('hall',$hall)
             ->with('religion',$religion);
@@ -779,8 +786,7 @@ class StudentController extends Controller
      */
     public function update(Request $request, $id, SystemController $sys)
     {
-        if ($sys->getUserLevel((@\Auth::user()->department),"create_student") == '1' || $sys->getUserLevel((@\Auth::user()->role),"create_student") == '1') {
-            {
+
                 set_time_limit(36000);
                 /*transaction is used here so that any errror rolls
                  *  back the whole process and prevents any inserts or updates
@@ -790,10 +796,10 @@ class StudentController extends Controller
                 $year=$request->input('year');
                 $id=$request->input('id');
 
-                //$level=$request->input('year');
+                $level=$request->input('year');
                 $indexno=$request->input('indexno');
 
-                /*$program=$request->input('programme');
+                $program=$request->input('programme');
                 $gender=$request->input('gender');
                 $category=$request->input('category');
                 $hostel=$request->input('hostel');
@@ -815,39 +821,18 @@ class StudentController extends Controller
                 $hometown=$request->input('hometown');
                 $nhis=$request->input('nhis');
                 $type=$request->input('type');
+                $cohort=$request->input('cohort');
                 $disability=$request->input('disabilty');
-                */
+
                 $title=$request->input('title');
                 $age=@$sys->age($dob,'eu');
                 //$group=0;
                 $firstname=$request->input('fname');
                 $surname=$request->input('surname');
                 $othername=$request->input('othernames');
-                if( @\Auth::user()->role=="Support"){
-                    $query= StudentModel::where("ID",$id)->update(array(
-                        "FIRSTNAME"=>$firstname,
-                        "SURNAME"=>$surname,
-                        "NAME"=>$surname." ".$othername." ".$firstname,
-                        "OTHERNAMES"=>$othername));
 
-                }
-                else{
-                    $array=$sys->getSemYear();
 
-                    $fiscalYear=$array[0]->YEAR;
-                    $sem=$array[0]->SEMESTER;
-//            // $bill=$sys->getYearBill($fiscalYear, $level, $program);
-//        // $bill_owing=$sys->getYearBill($fiscalYear, $level, $program);
-//         $test=@StudentModel::where("ID",$id)->select("BILLS","BILL_OWING","PROGRAMMECODE")->first();
-//         if(empty($test) || $test->PROGRAMMECODE!=$program)
-//         {
-//             $owe=$test->BILL_OWING+ ($bill-$test->BILLS);
-//              StudentModel::where("ID",$id)->update(array(
-//                 "BILLS"=>$bill,
-//                  "BILL_OWING"=>$owe
-//                  ));
-//         }
-                    $query= StudentModel::where("ID",$id)->update(array(
+                  $query= StudentModel::where("ID",$id)->update(array(
                         "FIRSTNAME"=>strtoupper($firstname),
                         "SURNAME"=>strtoupper($surname),
                         "NAME"=>strtoupper($surname." ".$othername." ".$firstname),
@@ -876,6 +861,7 @@ class StudentController extends Controller
                         "PROGRAMMECODE"=>strtoupper($program),
                         "STATUS"=>"In school",
                         "NHIS"=>$nhis,
+                         "COHORT"=>$cohort,
                         "STUDENT_TYPE"=>strtoupper($type),
                         "TYPE"=>strtoupper($category),
                         "HOSTEL"=>$hostel,
@@ -889,7 +875,7 @@ class StudentController extends Controller
                     Models\FeePaymentModel::where("INDEXNO",$indexno)->update(array("LEVEL"=>$level,"PROGRAMME"=>$program));
 
                     \DB::commit();
-                }
+
 
                 if(!$query){
                     return redirect("/students")->withErrors("  N<u>o</u> :<span style='font-weight:bold;font-size:13px;'> data</span>could not be updated!");
@@ -899,10 +885,8 @@ class StudentController extends Controller
 //         \DB::commit();
                     return redirect("/students")->with("success"," <span style='font-weight:bold;font-size:13px;'>data successfully updated!</span> ");
 
-                }}}
-        else{
-            throw new HttpException(Response::HTTP_UNAUTHORIZED, 'This action is unauthorized.');
-        }
+                }
+
     }
     public function showUploadForm() {
         return view("students.upload");

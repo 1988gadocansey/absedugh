@@ -315,6 +315,16 @@ class SystemController extends Controller
         return $religion;
     }
 
+    public function getCohort()
+    {
+        $religion = \DB::table('cohort')
+            ->lists('name', 'name');
+        return $religion;
+    }
+
+
+
+
     public function getCountry()
     {
         $country = \DB::table('tbl_country')->orderBy("Name")->orderBy('Name')

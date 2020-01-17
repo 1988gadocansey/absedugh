@@ -381,11 +381,7 @@
 
                                                      {!! Form::close() !!}
 
-                                                     @if(@$row->CLOSED==1)<span class="uk-badge uk-badge-success">Opened</span>
-                                    <span> <a href='{{url("fireCourse/$row->ID/id/closeReg/action")}}' ><i title='Click to close this course' onclick="return confirm('Are you sure you want to close this course?' );" class="md-icon material-icons uk-text-danger">power_settings_new</i></span>
-                                    @else <span class="uk-badge uk-badge-danger">Closed</span><span> <a href='{{url("fireCourse/$row->ID/id/openReg/action")}}' ><i title='Click to open this course' onclick="return confirm('Are you sure you want to open this course?' );" class="md-icon material-icons uk-text-success">power_settings_new</i></span> @endif
-
-                                                 @endif
+                                                     
 
                                             </td>
 

@@ -335,7 +335,7 @@
 
                 <td>{!! strtoupper(@$row->program->PROGRAMME) !!}</td>
                 <td> {{ strtoupper(@$row->levels->slug) }}</td>
-                <td> {{ strtoupper(@$row->cohort) }}</td>
+                <td> {{ strtoupper(@$row->COHORT) }}</td>
 
                 <td> {{ strtoupper(@$row->SEX) }}</td>
                 <td> {{ @$row->AGE }}yrs</td>

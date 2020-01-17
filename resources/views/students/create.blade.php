@@ -242,6 +242,20 @@
                                     </div>
                                 </div>
 
+                                <div class="parsley-row"  >
+                                    <div class="uk-input-group">
+
+                                        <label for="">Cohort :</label>     
+                                        <div class="md-input-wrapper md-input-filled">
+                                          {!!   Form::select('cohort',$cohort,old('cohort',''),array("required"=>"required","class"=>"md-input","id"=>"cohort","v-model"=>"cohort","v-form-ctrl"=>"","style"=>"","v-select"=>"cohort")   )  !!}
+                                    <span class="md-input-bar"></span>
+                                        </div> 
+
+                                      <p class="uk-text-danger uk-text-small"  v-if="updateForm.cohort.$error.required">Cohort is required</p>                                        
+                                  </div>
+                              </div>
+
+
 
                             </div>
                               <div data-uk-grid-margin="" class="uk-grid uk-grid-width-medium-1-4 uk-grid-width-large-1-4">
@@ -361,7 +375,7 @@
          <div class="parsley-row">
                                     <div class="uk-input-group">
                                         
-                                        <div class="md-input-wrapper md-input-filled"><label for="wizard_email">BILLS:</label><input type="text" id="" name="bill" class="md-input"   disabled=""v-model="bill"v-form-ctrl  ><span class="md-input-bar"></span></div>                                            
+                                        <div class="md-input-wrapper md-input-filled"><label for="wizard_email">BILLS:</label><input type="text" id="" name="bill" class="md-input"    v-model="bill"v-form-ctrl  ><span class="md-input-bar"></span></div>                                            
                                         
                                     </div>
                                 </div>
