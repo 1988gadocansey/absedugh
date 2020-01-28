@@ -144,16 +144,20 @@
                                 <label>Cohort</label>
 
                                 <p></p>
+                                    {!! Form::select('cohort',
 
-                               {!!   Form::select('cohort',$level ,array("required"=>"required","class"=>"md-input","id"=>"level","v-model"=>"level","v-form-ctrl"=>"","v-select"=>"cohort")   )  !!}
+                                                                 (['' => 'Select Cohort'] + $cohort),
 
-                                         
+                                                                     null,
 
-                                  <p class="uk-text-danger uk-text-small"  v-if="applicationForm.level.$error.required" >Cohort is required</p>
+                                                                     ["required"=>"required",'class' => 'md-input','v-model'=>'cohort','v-form-ctrl'=>'','v-select'=>'cohort'] )  !!}
+
+                                    <p class="uk-text-danger uk-text-small"  v-if="applicationForm.cohort.$error.required" >Cohort is required</p>
 
 
 
-                               </div>
+
+                                </div>
 
                                  <div class="uk-form-row">
 

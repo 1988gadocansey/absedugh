@@ -1720,14 +1720,16 @@ class CourseController extends Controller
         if (@\Auth::user()->role == 'Admin' || @\Auth::user()->role == 'Support' || @\Auth::user()->role == 'Registrar') {
             $programme = $sys->getProgramList();
 
-            $course = $sys->getCourseList();
+            $course=$sys->getCourseList();
+            $cohort=$sys->getCohort();
             //$lecturer=$sys->getLectureList();
-            $allLectureres = $sys->getLectureList_All();
+            $allLectureres=$sys->getLectureList_All();
             // $totalLecturers = array_merge( $lecturer, $allLectureres);
             return view('courses.mount')->with('program', $programme)
                 ->with('course', $course)
                 ->with('level', $sys->getLevelList())
-                ->with('lecturer', $allLectureres);
+                ->with('cohort', $cohort)
+                ->with('lecturer',$allLectureres);
         } else {
             throw new HttpException(Response::HTTP_UNAUTHORIZED, 'This action is unauthorized.');
         }
@@ -8349,6 +8351,213 @@ getCalculatedValue
             throw new HttpException(Response::HTTP_UNAUTHORIZED, 'This action is unauthorized.');
         }
     }
+    public function showFileUploadRegList(SystemController $sys){
+
+        $programme=$sys->getProgramList5();
+        $course=$sys->getMountedCourseList3();
+        $cohort=$sys->getCohort();
+
+        return view('courses.downloadRegList')->with('programme', $programme)->with('courses',$course)
+            ->with('level', $sys->getLevelList())->with('year',$sys->years())->with('cohort',$cohort);
+
+
+    }
+    public function downloadRegList(Request $request, SystemController $sys )
+
+    {
+
+        $this->validate($request, [
+
+
+            'program' => 'required',
+            'sem' => 'required',
+            'cohort' => 'required',
+            'level' => 'required',
+        ]);
+
+        $kojoSense = 0;
+        $array = $sys->getSemYear();
+        $year2 = $array[0]->YEAR;
+        $sem = $request->input("sem");
+        $year = $request->input("year");
+        $cohort = $request->input("cohort");
+        $level = $request->input("level");
+        $program = $request->input("program");
+        //$course = $request->input("course");
+        $lecturer = @\Auth::user()->fund;
+        $lectname = @\Auth::user()->name;
+        $programme2 = \DB::table('tpoly_programme')->where('PROGRAMMECODE',$program)->first();
+        $programme = $programme2->PROGRAMME;
+        $dpt1 = $programme2->DEPTCODE;
+        $dpt2 = \DB::table('tpoly_department')->where('DEPTCODE',$dpt1)->first();
+        $dpt3 = $dpt2->DEPARTMENT;
+        $fac1 = $dpt2->FACCODE;
+        $fac2 = \DB::table('tpoly_faculty')->where('FACCODE',$fac1)->first();
+        $fac3 = $fac2->FACULTY;
+        //$courcec = \DB::table('tpoly_courses')->where('COURSE_CODE',$course)->first();
+        //$courced = $courcec->COURSE_NAME;
+
+
+        /* $data = Models\AcademicRecordsModel::
+         join('tpoly_students', 'tpoly_academic_record.student', '=', 'tpoly_students.ID')
+             ->where('tpoly_academic_record.code', $course)
+             ->where('tpoly_academic_record.lecturer', $lecturer)
+             ->where('tpoly_academic_record.year', $year)
+             ->where('tpoly_academic_record.sem', $sem)
+             ->select('tpoly_students.INDEXNO', 'tpoly_students.NAME', 'tpoly_academic_record.quiz1', 'tpoly_academic_record.quiz2', 'tpoly_academic_record.midsem1', 'tpoly_academic_record.exam', 'tpoly_academic_record.total')
+             ->orderBy("tpoly_students.INDEXNO")
+             ->get();*/
+        //$rownr=0;
+
+        $data = Models\StudentModel::where("PROGRAMMECODE",$program)
+            ->where("LEVEL",$level)
+            ->where("STATUS","In school")
+            ->where("COHORT",$cohort)
+            ->where("REGISTERED",1)
+            ->orderBy("INDEXNO")
+            //->set('SET @rownr=0'))//->orderBy("REGISTERED", "DESC")
+            ->select('INDEXNO', 'NAME')
+            ->get();
+
+        $kojoSense = count($data)+1;
+
+        return Excel::create($level.'_'.$programme, function ($excel) use ($data,$program,$level,$programme,$kojoSense,$dpt3,$fac3,$lectname,$year2,$cohort){
+
+            $excel->sheet($program, function ($sheet) use ($data,$kojoSense,$program,$level,$programme,$dpt3,$fac3,$lectname,$year2,$cohort) {
+                $sheet->setWidth(array(
+                    'A'     =>  5,
+                    'B'     =>  15,
+                    'C'     =>  40,
+
+                ));
+
+                $sheet->prependRow(1, array('prepended', 'prepended'));
+                //$sheet->prependRow(1, array('assignment', 'quiz', 'midsem', 'exam', 'total'));
+
+                $sheet->fromArray($data, Null, 'B1');
+                $sheet->setBorder('A1:C'.$kojoSense.'', 'thin');
+                //$sheet->setCellsValue('C2:F'.$kojoSense.'','0');
+                //$sheet->cells('C2:C5', function($cells) {
+
+                $sheet->setCellValue('A1','ID');
+                for($k=1;$k<$kojoSense;$k++){
+                    $kID = $k;
+                    $kIdCount = $kID + 1;
+                    $sheet->setCellValue('A'.$kIdCount.'',$k);
+
+
+
+                }
+
+                $current_time = \Carbon\Carbon::now()->toDateTimeString();
+                // $sheet->setCellValue('A2',$current_time);
+
+                $cheat = 25+$k;
+                $cheat2 = $cheat + 3;
+                $cheat3 = $cheat2 + 1;
+
+                $sheet->prependRow(1, array(' '.' '.' '.''
+                ));
+                $sheet->prependRow(1, array(' '.' '.' '.' '.' REGISTERED STUDENTS - '.$level.' ('.$year2 .' '.strtoupper($cohort). 'COHORT '.')'
+                ));
+                $sheet->prependRow(1, array(' '.' '.' '.' '.' '.$programme
+                ));
+                $sheet->prependRow(1, array(' '.' '.' '.' '.' '.$dpt3.' DEPARTMENT'
+                ));
+                $sheet->prependRow(1, array(' '.' '.' '.' '.' '.$fac3
+                ));
+                $sheet->prependRow(1, array(' '.' '.' '.' '.' ACCRA BUSINESS COLLEGE - '
+                ));
+
+
+                //$sheet->setCellValue('D5','Course Code :');
+
+
+                //$sheet->setCellValue('F5',$course);
+                //$sheet->setCellValue('J3','STATISTICS');
+                //$sheet->setCellValue('J4','Max :');
+                //$sheet->setCellValue('J5','Min :');
+                //$sheet->setCellValue('J6','Avg :');
+
+                //$sheet->setCellValue('J8','A+ :');
+                //$sheet->setCellValue('J9','A :');
+                //$sheet->setCellValue('J10','B+ :');
+                //$sheet->setCellValue('J11','B :');
+                //$sheet->setCellValue('J12','C+ :');
+                //$sheet->setCellValue('J13','C :');
+                //$sheet->setCellValue('J14','D+ :');
+                //$sheet->setCellValue('J15','D :');
+                //$sheet->setCellValue('J16','F :');
+                //$sheet->setCellValue('J17','Sum :');
+
+
+                //$sheet->setCellValue('B'.$cheat2,$lectname);
+                //$sheet->setCellValue('C'.$cheat2,'___________');
+                //$sheet->setCellValue('E'.$cheat2,'___________');
+                //$sheet->setCellValue('B'.$cheat3,'(Lecturer)');
+                //$sheet->setCellValue('C'.$cheat3,'(Signature)');
+                //$sheet->setCellValue('E'.$cheat3,'(Date)');
+
+
+                //=COUNTIF(H8:H11, "A+")
+                // $sheet->setCellValue('G'.$k.'','=SUM(C'.$k.':F'.$k.')');
+
+                for($lisa=1;$lisa<6;$lisa++){
+                    $sheet->mergeCells('A'.$lisa.':C'.$lisa);
+
+
+                    //$sheet->cell('A'.$lisa, function($cell) {
+                    $sheet->cells('A1:A5', function($cells) {
+
+                        // manipulate the cell
+                        ////$cell->setAlignment('center');
+                        $cells->setFont(array(
+                            'size'       => '12',
+                            'bold'       =>  true
+                        ));
+
+                    });
+                    $kojoSenseSel = $kojoSense + 6;
+                    $sheet->cells('A8:B'.$kojoSenseSel, function($cells) {
+
+                        // manipulate the cell
+                        $cells->setAlignment('center');
+                        //$cells->setFont(array(
+                        //'size'       => '12',
+                        //'bold'       =>  true
+                        //));
+
+                    });
+                    //$sheet->mergeCells('J2':'K2');
+                    $sheet->cells('A1:D6', function($cells) {
+
+                        $cells->setBackground('#ffffff');
+                    });
+
+
+                }
+
+
+
+                $sheet->setHeight(array(
+                    '1'     =>  22,
+                    '2'     =>  22,
+                    '3'     =>  22,
+                    '4'     =>  22,
+                    '5'     =>  22
+
+                ));
+
+
+                $sheet->setFreeze('A8');
+//});
+            });
+
+        })->download('xlsx');
+
+
+    }
+
     /*
      * Uploading old academic records here
      * file format Excel

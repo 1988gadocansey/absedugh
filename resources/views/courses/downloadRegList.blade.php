@@ -50,20 +50,10 @@
 
                                         </div>
 
-                                        <div class="uk-width-medium-1-5">
-                                            
 
-
-                                        </div>
 
                                         <div class="uk-width-medium-1-5">
-                                          <!--  <label>Acadamic year</label>
-                                            <p></p>
-                                            {!! Form::select('year',
-                                                       ($year ),
-                                                         old("year",""),
-                                                           ['class' => 'md-input parent','required'=>"required",'placeholder'=>'select year'] )  !!}-->
-                                        <p></p>
+
                                     <p></p>
                                         <label>Level</label>
                                         <br/>
@@ -71,6 +61,18 @@
                                         ($level ),
                                         old("level",""),
                                          ['class' => 'md-input parent','required'=>"required",'placeholder'=>'select level'] )  !!}
+
+                                        </div>
+
+                                        <div class="uk-width-medium-1-5">
+                                            <p></p>
+                                            <label>Cohort</label>
+                                            <br/>
+                                            {!! Form::select('cohort',
+                                       ($cohort ),
+                                       old("cohort",""),
+                                        ['class' => 'md-input parent','required'=>"required",'placeholder'=>'select cohort'] )  !!}
+
 
                                         </div>
                                     

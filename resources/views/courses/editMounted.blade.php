@@ -246,103 +246,19 @@ border-radius: 0;
 
                                                               <td>
 
-                                                  <select placeholder='select year' class="form-control" style="" name="level[]" required="required" class= 'md-input'v-model='course' v-form-ctrl='' v-select=''>
 
-                                                      <option  <?php
+                                                                          {!! Form::select('level',
 
-                                                                            if ($row->COURSE_LEVEL =="100H") {
+                                                                      (['' => 'All levels'] +$level ),
 
-                                                                                echo "selected='selected'";
+                                                                        old("level",""),
 
-                                                                            }
-
-                                                                            ?>   value="100H">100H</option>
-
-                                                    <option  <?php
-
-                                                                            if ($row->COURSE_LEVEL =="200H") {
-
-                                                                                echo "selected='selected'";
-
-                                                                            }
-
-                                                                            ?>   value="200H">200H</option>
+                                                                          ['class' => 'md-input parent','id'=>"parent",'placeholder'=>'select level'] )  !!}
 
 
 
-                                                   <option  <?php
 
-                                                                            if ($row->COURSE_LEVEL =="300H") {
-
-                                                                                echo "selected='selected'";
-
-                                                                            }
-
-                                                                            ?>   value="300H">300H</option>
-
-                                                  <option <?php
-
-                                                                            if ($row->COURSE_LEVEL =="100NT") {
-
-                                                                                echo "selected='selected'";
-
-                                                                            }
-
-                                                                            ?> value="100NT">100NT</option>
-
-                                                   <option<?php
-
-                                                                            if ($row->COURSE_LEVEL =="200NT") {
-
-                                                                                echo "selected='selected'";
-
-                                                                            }
-
-                                                                            ?>  value="200NT">200NT</option>
-
-                                                    <option value="100BTT" <?php
-
-                                                                            if ($row->COURSE_LEVEL =="100BTT") {
-
-                                                                                echo "selected='selected'";
-
-                                                                            }
-
-                                                                            ?> >100BTT</option>
-
-                                                      <option value="200BTT" <?php
-
-                                                                            if ($row->COURSE_LEVEL =="200BTT") {
-
-                                                                                echo "selected='selected'";
-
-                                                                            }
-
-                                                                            ?> >200BTT</option>
-
-                                                    <option value="500MT" <?php
-
-                                                                            if ($row->COURSE_LEVEL =="500MT") {
-
-                                                                                echo "selected='selected'";
-
-                                                                            }
-
-                                                                            ?> >500MT</option>
-
-                                                    <option value="600MT" <?php
-
-                                                                            if ($row->COURSE_LEVEL =="600MT") {
-
-                                                                                echo "selected='selected'";
-
-                                                                            }
-
-                                                                            ?> >600MT</option>
-
-                                                    </select>
-
-                                             </td>
+                                                              </td>
 
                                             
 

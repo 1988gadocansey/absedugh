@@ -363,13 +363,11 @@
 
                                            <td> {{ @$row->lecturer->fullName }}</td>
 
-                                           @if(@\Auth::user()->role=='FSupport' || @\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop2' || @\Auth::user()->department=='Tptop3' || @\Auth::user()->department=='Tptop4' || @\Auth::user()->department=='Tptop5')
 
                                             <td>
 
                                                  <a href='{{url("/mounted/$row->ID/edit")}}'><i  title="click to edit mounted course" class="md-icon material-icons">&#xE254;</i></a>
 
-                                            @if(@\Auth::user()->department=='Tptop' || @\Auth::user()->department=='Tptop2')
 
                                               {!!Form::open(['action' =>['CourseController@destroy_mounted', 'id'=>$row->ID], 'method' => 'DELETE','name'=>'myform' ,'style' => 'display: inline;'])  !!}
 
@@ -385,7 +383,6 @@
 
                                             </td>
 
-                                            @endif
 
                                               
 
