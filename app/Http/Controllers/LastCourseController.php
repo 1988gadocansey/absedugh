@@ -1809,6 +1809,7 @@ class CourseController extends Controller
                 $this->validate($request, [
                     'course' => 'required',
                     'program' => 'required',
+                    'cohort' => 'required',
 
                     'level' => 'required',
                     'credit' => 'required',
@@ -1824,6 +1825,7 @@ class CourseController extends Controller
                 $level = $request->input('level');
                 $semester = $request->input('semester');
                 $credit = $request->input('credit');
+                $cohort = $request->input('cohort');
                 $year = $request->input('year');
                 $lecturer = $request->input('lecturer');
                 $type = $request->input('type');
@@ -1843,6 +1845,7 @@ class CourseController extends Controller
                 $mountedCourse->COURSE_CREDIT = $credit;
                 $mountedCourse->COURSE_SEMESTER = $semester;
                 $mountedCourse->COURSE_LEVEL = $level;
+                $mountedCourse->COHORT = $cohort;
                 $mountedCourse->COURSE_TYPE = $type;
                 $mountedCourse->PROGRAMME = $program;
                 $mountedCourse->LECTURER = $lecturer;

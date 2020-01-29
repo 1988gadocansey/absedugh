@@ -283,6 +283,19 @@
 
                 @if( @Auth::user()->department=='Finance' || @Auth::user()->department=='top')
 
+
+
+
+
+
+
+
+
+
+
+
+
+
                     <li data-uk-dropdown class="uk-hidden-small">
                         <a href="#"> <i
                                     class="sidebar-menu-icon material-icons">people</i><span>Student Management</span></a>
@@ -718,6 +731,34 @@
 
 
                     @if( @Auth::user()->department=='Tptop' ||  @Auth::user()->department=='Tptop4' || @Auth::user()->department=='Tptop2' || @Auth::user()->department=='Tptop3' )
+
+                            <li data-uk-dropdown class="uk-hidden-small">
+
+
+                                <a href="#"><i
+                                            class="sidebar-menu-icon material-icons md-18">perm_identity</i><span>Admissions</span></a>
+                                <div class="uk-dropdown uk-dropdown-scrollable">
+                                    <ul class="uk-nav uk-nav-dropdown">
+
+                                        <li><a href='http://23.92.25.212/admissions_portal' target="_">Add Applicants</a></li>
+
+
+                                        <li><a href='{!! url("applicants/view") !!}'>View Applicants</a></li>
+
+
+                                        <li><a href='{!! url("/finance/reports/fees/") !!}'>View Fees</a></li>
+                                        <li><a href='{!! url("/systems/sms") !!}'>View sms sent</a></li>
+
+                                        <li><a href='{!! url("admissions/applicant/settings") !!}'>Open or Block Applicant</a>
+                                        </li>
+
+
+                                    </ul>
+                                </div>
+                            </li>
+
+
+
 
 
                         <li data-uk-dropdown class="uk-hidden-small">

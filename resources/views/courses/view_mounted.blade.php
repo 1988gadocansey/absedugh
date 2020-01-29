@@ -302,6 +302,7 @@
                      <th  style="text-align:center">CODE</th>
 
                      <th>PROGRAMME</th> 
+                     <th>COHORT</th>
 
                      <th style="text-align:center">CREDIT</th>
 
@@ -349,7 +350,9 @@
 
                                             <td> {{ @$row->course->COURSE_CODE	 }}</td>
 
-                                            <td> {{ @$sys->getProgramName($row->PROGRAMME)	 }}</td>
+                                            {{--<td> {{ @$sys->getProgramName($row->PROGRAMME)	 }}</td>--}}
+                                            <td> {{  $row->PROGRAMME	 }}</td>
+                                            <td> {{ @$row->COHORT	 }}</td>
 
                                             <td> {{ @$row->COURSE_CREDIT	 }}</td>
 

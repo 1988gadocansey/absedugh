@@ -26,11 +26,11 @@ class ApplicantController extends Controller {
         // $message = $request->input("message", "");
         $query = \Session::get('students');
         //dd($query);
-        $regular = "Congrats![firstname]. You have been admitted to TTU to  pursue [programme].Note, This letter supercedes the previous one sent you, Use this link; application.ttuportal.com to print your admission letter.";
-        $conditional = "Congrats![firstname]. You have been offered a conditional admission to TTU to pursue [programme].Note, This letter supercedes the previous one sent you, Use this link; Use this link application.ttuportal.com to print your admission letter.";
+        $regular = "Congrats![firstname]. You have been admitted to ABS to  pursue [programme].Note, This letter supercedes the previous one sent you, Use this link; application.ABSportal.com to print your admission letter.";
+        $conditional = "Congrats![firstname]. You have been offered a conditional admission to ABS to pursue [programme].Note, This letter supercedes the previous one sent you, Use this link; Use this link application.ABSportal.com to print your admission letter.";
         $technical=$regular ;
-        $provisional = "Congrats![firstname]. You have been offered a provisional admission to TTU to  pursue [programme].You will be required to send your results when published to complete the admission process.Use this link application.ttuportal.com to print your admission letter.";
-        $mature = "Congrats![firstname]. Your application for admission to TTU as mature student to  pursue [programme].Note, This letter supercedes the previous one sent you, Use this link; Use this link application.ttuportal.com to print your admission letter.";
+        $provisional = "Congrats![firstname]. You have been offered a provisional admission to ABS to  pursue [programme].You will be required to send your results when published to complete the admission process.Use this link application.ABSportal.com to print your admission letter.";
+        $mature = "Congrats![firstname]. Your application for admission to ABS as mature student to  pursue [programme].Note, This letter supercedes the previous one sent you, Use this link; Use this link application.ABSportal.com to print your admission letter.";
         foreach ($query as $rtmt => $member) {
             $name = $member->NAME;
             $firstname = $member->FIRSTNAME;
@@ -78,11 +78,11 @@ class ApplicantController extends Controller {
         // $message = $request->input("message", "");
         $query = \Session::get('students');
         //dd($query);
-        $regular = "Congrats! [name]. You have been admitted to TTU to pursue a programme of study leading to the award of [programme]. Your admission letter will be sent to you in due course.Your admission number is [code], print your letter using the link http://outreach.ttuportal.com";
-        $conditional = "Congrats! [name]. You have been offered a conditional admission to TTU to pursue a programme of study leading to the award of [programme]. Your admission letter will be sent to you in due course.Your admission number is [code], print your letter using the link http://outreach.ttuportal.com";
+        $regular = "Congrats! [name]. You have been admitted to ABS to pursue a programme of study leading to the award of [programme]. Your admission letter will be sent to you in due course.Your admission number is [code], print your letter using the link http://outreach.ABSportal.com";
+        $conditional = "Congrats! [name]. You have been offered a conditional admission to ABS to pursue a programme of study leading to the award of [programme]. Your admission letter will be sent to you in due course.Your admission number is [code], print your letter using the link http://outreach.ABSportal.com";
 
-        $provisional = "Congrats! [name]. You have been offered a provisional admission to TTU to pursue a programme of study leading to the award of [programme]. You will be required to send your results when published to complete the admission process. Your admission number is [code], print your letter using the link http://outreach.ttuportal.com";
-        //$mature = "Congrats! [name]. Your application for admission to TTU as mature student to pursue a program of study leading to the award of [programme] has been received. We will contact you in due course. Thanks";
+        $provisional = "Congrats! [name]. You have been offered a provisional admission to ABS to pursue a programme of study leading to the award of [programme]. You will be required to send your results when published to complete the admission process. Your admission number is [code], print your letter using the link http://outreach.ABSportal.com";
+        //$mature = "Congrats! [name]. Your application for admission to ABS as mature student to pursue a program of study leading to the award of [programme] has been received. We will contact you in due course. Thanks";
         foreach ($query as $rtmt => $member) {
             $name = $member->name;
             $code = $member->applicationNumber;
@@ -780,9 +780,10 @@ class ApplicantController extends Controller {
     }
 
     public function index(Request $request, SystemController $sys) {
-        if(\Auth::user()->department=="Admissions"){
+        if(\Auth::user()->department=="Admissions" ||\Auth::user()->department=="Top" || \Auth::user()->department=='Tptop' ||  \Auth::user()->department=='Tptop4' || \Auth::user()->department=='Tptop2' || \Auth::user()->department=='Tptop3'){
             ini_set('max_execution_time', 9000); //300 seconds = 5 minutes
             //$this->updateApplicantStatus();
+            dd("Coming soon");
             $student = Models\ApplicantModel::query();
 
 
